@@ -34,6 +34,7 @@ import DeliveryLayout from "../Pages/delivery/DeliveryLayout";
 import ForgotPassword from "../Pages/customer/ForgotPassword";
 import ResetPassword from "../Pages/customer/ResetPassword";
 import PlaceOrder from "../Pages/customer/PlaceOrder";
+import OrderTracking from "../Pages/customer/OrderTracking";
 
 function AppRoutes() {
     const hasSeenLanding = sessionStorage.getItem("hasSeenLanding");
@@ -105,6 +106,7 @@ function AppRoutes() {
 
             <Route path="/success" element={<Success />} />
             <Route path="/product/:id" element={<ProductDetails />} />
+            <Route path="/track-order/:orderId" element={<OrderTracking />} />
 
             {/* Delivery Routes */}
             <Route path="/delivery" element={<DeliveryAgentLogin onLoginSuccess={() => console.log("Delivery Login Successful")} />} />

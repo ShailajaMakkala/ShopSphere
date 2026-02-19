@@ -99,7 +99,7 @@ function Success() {
             className="mt-12 flex flex-col sm:flex-row gap-4 justify-center"
           >
             <button
-              onClick={() => navigate("/orders")}
+              onClick={() => navigate(`/track-order/${order.order_id || order.transactionId}`)}
               className="px-10 py-5 bg-blue-600 text-white font-black rounded-2xl shadow-xl shadow-blue-500/30 hover:shadow-blue-500/40 hover:-translate-y-1 transition-all flex items-center justify-center gap-3 group"
             >
               Track Your Order

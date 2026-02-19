@@ -449,11 +449,14 @@ function Orders() {
                         </button>
 
                         <button
-
-                          className="flex-1 md:flex-none px-8 py-3 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-gray-800 transition-all shadow-xl shadow-gray-200"
-
+                          onClick={() => navigate(`/track-order/${order.id}`)}
+                          className="flex-1 md:flex-none px-8 py-3 bg-violet-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-violet-700 transition-all shadow-xl shadow-violet-200"
                         >
-
+                          Track Order
+                        </button>
+                        <button
+                          className="flex-1 md:flex-none px-8 py-3 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-gray-800 transition-all shadow-xl shadow-gray-200"
+                        >
                           Invoice
 
                         </button>
