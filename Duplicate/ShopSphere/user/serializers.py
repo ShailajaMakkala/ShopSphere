@@ -163,9 +163,15 @@ class CouponUsageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ReviewSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username', read_only=True)
+    username = serializers.SerializerMethodField()
+    product_id = serializers.IntegerField(source='Product.id', read_only=True)
 
     class Meta:
         model = Review
-        fields = ['id', 'user', 'username', 'reviewer_name', 'rating', 'comment', 'pictures', 'created_at']
-        read_only_fields = ['user']
+        fields = ['id', 'user', 'username', 'Product', 'product_id', 'reviewer_name', 'rating', 'comment', 'pictures', 'created_at']
+        read_only_fields = ['user', 'Product']
+
+    def get_username(self, obj):
+        if obj.user:
+            return obj.user.username
+        return obj.reviewer_name or "Anonymous"

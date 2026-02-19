@@ -321,7 +321,6 @@ export const submitReview = async (productId, reviewData) => {
   const response = await axios.post(`${API_BASE_URL}/submit_review/${productId}`, reviewData, {
     headers: {
       Authorization: `Bearer ${token}`,
-      "Content-Type": "multipart/form-data",
     },
   });
   return response.data;

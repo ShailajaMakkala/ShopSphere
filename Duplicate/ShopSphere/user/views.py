@@ -487,36 +487,6 @@ def product_detail(request, product_id):
                 can_edit_review = True
                 days_left = 5 - time_diff.days
 
-    if request.method == 'POST':
-        # API handles POST separately for better clarity, but keeping this for template support
-        reviewer_name = request.data.get('reviewer_name')
-        rating = request.data.get('rating')
-        comment = request.data.get('comment')
-        pictures = request.FILES.get('pictures')
-        
-        if rating:
-            if user_review:
-                if can_edit_review:
-                    user_review.reviewer_name = reviewer_name
-                    user_review.rating = int(rating)
-                    user_review.comment = comment
-                    if pictures:
-                        user_review.pictures = pictures
-                    user_review.save()
-            else:
-                Review.objects.create(
-                    user=request.user if request.user.is_authenticated else None,
-                    Product=product,
-                    reviewer_name=reviewer_name,
-                    rating=int(rating),
-                    comment=comment,
-                    pictures=pictures
-                )
-            
-            if request.accepted_renderer.format == 'json':
-                return Response({"message": "Review submitted successfully"})
-            return redirect('user_product_detail', product_id=product.id)
-
     reviews = Review.objects.filter(Product=product).order_by('-created_at')
     
     if request.accepted_renderer.format == 'json':
@@ -544,14 +514,13 @@ def submit_review_api(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     user_review = Review.objects.filter(user=request.user, Product=product).first()
     
-    data = request.data.copy()
     if user_review:
         time_diff = timezone.now() - user_review.created_at
         if time_diff.days >= 5:
             return Response({"error": "Review editing window (5 days) has passed"}, status=403)
-        serializer = ReviewSerializer(user_review, data=data, partial=True)
+        serializer = ReviewSerializer(user_review, data=request.data, partial=True)
     else:
-        serializer = ReviewSerializer(data=data)
+        serializer = ReviewSerializer(data=request.data)
     
     if serializer.is_valid():
         serializer.save(user=request.user, Product=product)

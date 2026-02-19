@@ -33,7 +33,7 @@ const BANNERS = [
     title: "The Ultimate Future Collection",
     subtitle: "Season 2024",
     description: "Experience the next generation of premium tech and lifestyle products. Designed for those who dare to lead.",
-    image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=2070",
+    image: "/banner1.png",
     cta: "Explore Future",
     color: "from-blue-600 to-indigo-600"
   },
@@ -42,7 +42,7 @@ const BANNERS = [
     title: "Elegance in Every Detail",
     subtitle: "Luxury Minimalist",
     description: "Discover a curated collection of minimalist essentials that redefine modern sophistication and timeless style.",
-    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=2070",
+    image: "/banner2.png",
     cta: "View Collection",
     color: "from-purple-600 to-fuchsia-600"
   },
@@ -51,7 +51,7 @@ const BANNERS = [
     title: "Active Life Redefined",
     subtitle: "High Performance",
     description: "Gear up with our high-performance athletic collection. Engineered for maximum comfort and peak athletic ability.",
-    image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&q=80&w=2070",
+    image: "/banner3.png",
     cta: "Get Started",
     color: "from-orange-500 to-red-600"
   }
@@ -165,17 +165,20 @@ const Home = () => {
   const banner = BANNERS[currentBanner];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* CATEGORIES SECTION (Now between Navbar and Banner) */}
-      <section id="categories-section" className="bg-white border-b border-gray-100 shadow-sm pt-24 pb-4">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-center">
-            <div className="flex gap-2 overflow-x-auto pb-4 md:pb-0 w-full scrollbar-hide justify-center">
+    <div className="min-h-screen bg-white">
+      {/* CATEGORIES SECTION (Placed between Navbar and Banner) */}
+      <section id="categories-section" className="bg-white border-b border-gray-100 pt-[10px] pb-3 w-full sticky top-[10px] z-40">
+        <div className="w-full px-6 md:px-12">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <h2 className="text-sm font-black text-gray-900 tracking-[0.2em] whitespace-nowrap">
+              BROWSE <span className="text-violet-600">CATEGORIES</span>
+            </h2>
+            <div className="flex gap-0 overflow-x-auto pb-2 md:pb-0 w-full scrollbar-hide justify-start md:justify-end items-center">
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat.id}
                   onClick={() => { setActiveCategory(cat.id); setCurrentPage(1); }}
-                  className={`px-6 py-2 rounded-full font-bold text-sm whitespace-nowrap transition-all ${activeCategory === cat.id ? "bg-violet-600 text-white shadow-lg" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+                  className={`px-6 py-2 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all duration-300 ${activeCategory === cat.id ? "bg-violet-600 text-white shadow-lg scale-105" : "bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-900"}`}
                 >
                   {cat.label}
                 </button>
@@ -185,66 +188,79 @@ const Home = () => {
         </div>
       </section>
 
-      {/* HERO CAROUSEL (Reduced Height) */}
-      <section className="relative w-full h-[450px] overflow-hidden">
+      {/* HERO CAROUSEL (Without Arrows) */}
+      <section className="relative w-full h-[400px] md:h-[550px] overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentBanner}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
             className="absolute inset-0"
           >
-            <div className="absolute inset-0 bg-black/40 z-10" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent z-10" />
             <img src={banner.image} alt={banner.title} className="w-full h-full object-cover" />
-            <div className="absolute inset-0 z-20 flex flex-col justify-center px-12 md:px-32">
-              <motion.p
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                className="text-white/80 font-bold tracking-widest uppercase text-sm mb-4"
+            <div className="absolute inset-0 z-20 flex flex-col justify-center px-6 md:px-24 lg:px-32">
+              <motion.div
+                initial={{ x: -50, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.2, duration: 0.8 }}
+                className="max-w-3xl"
               >
-                {banner.subtitle}
-              </motion.p>
-              <motion.h1
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                className="text-4xl md:text-6xl font-black text-white mb-4 max-w-2xl leading-tight"
-              >
-                {banner.title}
-              </motion.h1>
-              <motion.p
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                className="text-gray-200 text-base md:text-lg mb-8 max-w-xl"
-              >
-                {banner.description}
-              </motion.p>
-              <motion.button
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                onClick={() => document.getElementById("products-section")?.scrollIntoView({ behavior: "smooth" })}
-                className={`w-fit px-8 py-3 bg-gradient-to-r ${banner.color} text-white font-bold rounded-2xl flex items-center gap-3 hover:scale-105 transition-transform shadow-xl`}
-              >
-                {banner.cta} <ArrowRight size={20} />
-              </motion.button>
+                <motion.p
+                  className="text-violet-400 font-black tracking-[0.3em] uppercase text-xs mb-4"
+                >
+                  {banner.subtitle}
+                </motion.p>
+                <motion.h1
+                  className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight"
+                >
+                  {banner.title}
+                </motion.h1>
+                <motion.p
+                  className="text-gray-300 text-base md:text-lg mb-8 max-w-xl leading-relaxed"
+                >
+                  {banner.description}
+                </motion.p>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => document.getElementById("products-section")?.scrollIntoView({ behavior: "smooth" })}
+                  className={`group w-fit px-10 py-4 bg-gradient-to-r ${banner.color} text-white font-black rounded-2xl flex items-center gap-3 shadow-xl transition-all duration-300`}
+                >
+                  {banner.cta} <ArrowRight size={20} />
+                </motion.button>
+              </motion.div>
             </div>
           </motion.div>
         </AnimatePresence>
 
-        <div className="absolute bottom-6 right-12 z-30 flex gap-3">
-          <button onClick={() => setCurrentBanner((prev) => (prev - 1 + BANNERS.length) % BANNERS.length)} className="p-3 bg-white/10 backdrop-blur-md rounded-full text-white hover:bg-white/20 transition-all">
-            <ChevronLeft size={20} />
-          </button>
-          <button onClick={() => setCurrentBanner((prev) => (prev + 1) % BANNERS.length)} className="p-3 bg-white/10 backdrop-blur-md rounded-full text-white hover:bg-white/20 transition-all">
-            <ChevronRight size={20} />
-          </button>
+        {/* Progress Indicators (Only indicators, no arrows) */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex gap-3 p-3 bg-black/20 backdrop-blur-xl rounded-full border border-white/10">
+          {BANNERS.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentBanner(idx)}
+              className={`h-1.5 rounded-full transition-all duration-700 ${currentBanner === idx ? "w-10 bg-violet-500 shadow-[0_0_15px_rgba(139,92,246,0.5)]" : "w-1.5 bg-white/40 hover:bg-white/60"}`}
+            />
+          ))}
         </div>
       </section>
 
-      {/* PRODUCT GRID */}
-      <section id="products-section" className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      {/* PRODUCT GRID SECTION */}
+      <section id="products-section" className="max-w-[1600px] mx-auto px-6 md:px-12 py-16">
+        <div className="flex items-end justify-between mb-12">
+          <div className="space-y-2">
+            <p className="text-violet-600 font-black tracking-widest text-xs uppercase">Curated Just for You</p>
+            <h3 className="text-3xl font-black text-gray-900 tracking-tight">FEATURED PRODUCTS</h3>
+          </div>
+          <p className="text-gray-400 text-xs font-bold hidden md:block uppercase tracking-widest">
+            {filteredProducts.length} Items Available
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {currentProducts.map((item) => (
             <ProductCard
               key={item.id}
@@ -258,19 +274,23 @@ const Home = () => {
         </div>
 
         {filteredProducts.length === 0 && (
-          <div className="text-center py-20">
-            <h3 className="text-2xl font-bold text-gray-400">No products found in this category</h3>
+          <div className="text-center py-24 bg-gray-50 rounded-[32px] border-2 border-dashed border-gray-200">
+            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Search className="text-gray-300" size={32} />
+            </div>
+            <h3 className="text-xl font-black text-gray-900 mb-2">No products found</h3>
+            <p className="text-gray-500 text-sm">Try adjusting your filters or search terms</p>
           </div>
         )}
 
         {/* PAGINATION */}
         {totalPages > 1 && (
-          <div className="flex justify-center mt-16 gap-3">
+          <div className="flex justify-center mt-20 gap-3">
             {Array.from({ length: totalPages }).map((_, i) => (
               <button
                 key={i}
                 onClick={() => paginate(i + 1)}
-                className={`w-12 h-12 rounded-xl font-bold transition-all ${currentPage === i + 1 ? "bg-violet-600 text-white shadow-lg" : "bg-white text-gray-600 hover:bg-gray-100"}`}
+                className={`w-12 h-12 rounded-xl font-black text-sm transition-all duration-500 ${currentPage === i + 1 ? "bg-black text-white shadow-xl scale-110" : "bg-white text-gray-400 border border-gray-100 hover:border-violet-200 hover:text-violet-600"}`}
               >
                 {i + 1}
               </button>
