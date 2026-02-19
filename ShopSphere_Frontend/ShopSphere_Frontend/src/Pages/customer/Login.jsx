@@ -44,7 +44,7 @@ function Login() {
         }
     };
     //Google
-    const googleLogin = useGoogleLogin({
+    const handleGoogleLogin = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
             try {
                 // Get user info from Google
@@ -62,6 +62,7 @@ function Login() {
                 console.log("Google user info from Google API:", user);
 
                 // Send user info to our backend to get JWT tokens
+                // Now calling the CORRECT imported googleLogin function from axios.js
                 const backendData = await googleLogin({
                     email: user.email,
                     name: user.name,
@@ -70,7 +71,7 @@ function Login() {
 
                 console.log("Backend Google login success:", backendData);
 
-                // Save tokens and user info
+                // Save tokens and user info (axios.js already saves tokens, but we save user profile)
                 localStorage.setItem("user", JSON.stringify(backendData));
 
                 toast.success("Logged in with Google!");
@@ -229,7 +230,7 @@ function Login() {
 
                     {/* Social Login Buttons */}
                     <div className="grid">
-                        <button onClick={() => googleLogin()} className="flex items-center justify-center gap-2 py-3 px-4 bg-white border border-gray-200 rounded-xl text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 shadow-sm hover:shadow">
+                        <button type="button" onClick={() => handleGoogleLogin()} className="flex items-center justify-center gap-2 py-3 px-4 bg-white border border-gray-200 rounded-xl text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 shadow-sm hover:shadow">
                             <svg className="w-5 h-5" viewBox="0 0 24 24">
                                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
