@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
     FaStar, FaStarHalfAlt, FaRegStar, FaPlus, FaMinus, FaShoppingCart, FaBolt, FaHeart, FaTruck, FaUndo, FaMapMarkerAlt, FaChevronLeft, FaUser, FaArrowRight
 } from "react-icons/fa";
-import { AddToCart, AddToWishlist, RemoveFromWishlist } from "../../Store";
+import { AddToCart, AddToWishlist, RemoveFromWishlist, fetchProducts } from "../../Store";
 import { getProductDetail } from "../../api/axios";
 import toast from "react-hot-toast";
 import ProductCard from "../../Components/ProductCard";

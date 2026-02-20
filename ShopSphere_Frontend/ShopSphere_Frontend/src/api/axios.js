@@ -326,6 +326,18 @@ export const submitReview = async (productId, reviewData) => {
   return response.data;
 };
 
+export const deleteReview = async (productId) => {
+  const token = localStorage.getItem("accessToken");
+  if (!token) throw new Error("Please login to delete your review");
+
+  const response = await axios.delete(`${API_BASE_URL}/delete_review/${productId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
 // TRENDING PRODUCTS (Public)
 export const getTrendingProducts = async () => {
   const response = await axios.get(`${API_BASE_URL}/trending/`);

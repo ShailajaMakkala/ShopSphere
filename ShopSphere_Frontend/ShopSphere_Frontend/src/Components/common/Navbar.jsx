@@ -230,12 +230,12 @@ function Navbar() {
                         ============================================ */}
                     <Link
                         to="/home"
-                        className="flex items-center gap-3 group flex-shrink-0"
+                        className="flex items-center gap-0 group flex-shrink-0"
                         aria-label="ShopSphere Home"
                     >
-                        <img src="/s_logo.png" alt="ShopSphere Logo" className="w-15 h-15 object-contain transition-transform duration-300 group-hover:scale-110" />
-                        <span className="text-xl sm:text-2xl font-bold text-white tracking-wide group-hover:text-orange-200 transition-colors duration-300 hidden sm:block drop-shadow-md">
-                            ShopSphere
+                        <img src="/s_logo.png" alt="ShopSphere Logo" className="w-20 h-20 object-contain transition-transform duration-300 group-hover:scale-110 translate-y-0.5" />
+                        <span className="-ml-6 text-xl sm:text-2xl font-bold text-white tracking-wide group-hover:text-orange-200 transition-colors duration-300 hidden sm:block drop-shadow-md">
+                        hopSphere
                         </span>
                     </Link>
 

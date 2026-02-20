@@ -560,6 +560,22 @@ def submit_review_api(request, product_id):
         return Response(serializer.data, status=201 if not user_review else 200)
     return Response(serializer.errors, status=400)
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_review_api(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    user_review = Review.objects.filter(user=request.user, Product=product).first()
+    
+    if not user_review:
+        return Response({"error": "Review not found"}, status=404)
+        
+    time_diff = timezone.now() - user_review.created_at
+    if time_diff.days >= 5:
+        return Response({"error": "Review deletion window (5 days) has passed"}, status=403)
+        
+    user_review.delete()
+    return Response({"message": "Review deleted successfully"})
+
 # @login_required
 # def user_reviews(request):
 #     reviews = Review.objects.filter(user=request.user)

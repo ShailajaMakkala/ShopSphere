@@ -710,7 +710,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { useNavigate } from "react-router-dom";
 import { FaStar, FaCamera, FaTimes } from "react-icons/fa";
-import { getProductDetail, submitReview } from "../../api/axios";
+import { getProductDetail, submitReview, deleteReview } from "../../api/axios";
 import toast from "react-hot-toast";
 
 import {
@@ -731,7 +731,8 @@ import {
 
   Truck,
 
-  ArrowRight
+  ArrowRight,
+  Trash2
 
 } from "lucide-react";
 
@@ -808,13 +809,45 @@ function Orders() {
       });
       toast.success("Review submitted successfully!");
       dispatch(fetchOrders());
-      navigate(`/product/${encodeURIComponent(selectedProductName)}`);
+      dispatch(fetchProducts());
+      navigate(`/product/${selectedProductId}`);
     } catch (err) {
       console.error("Submission error:", err);
       const errorMsg = err.response?.data?.error ||
         (err.response?.data && typeof err.response.data === 'object' ? Object.values(err.response.data)[0] : null) ||
         "Error submitting review";
       toast.error(typeof errorMsg === 'string' ? errorMsg : "Error submitting review");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteReview = async () => {
+    if (!selectedProductId) {
+      toast.error("Invalid product ID. Cannot delete review.");
+      return;
+    }
+
+    if (!window.confirm("Are you sure you want to delete this review?")) return;
+
+    setIsSubmitting(true);
+    try {
+      await deleteReview(selectedProductId);
+      setIsReviewModalOpen(false);
+      setNewReview({
+        name: "",
+        rating: 5,
+        comment: "",
+        image: null,
+        imagePreview: null,
+        isAltering: false
+      });
+      toast.success("Review deleted successfully!");
+      dispatch(fetchOrders());
+      dispatch(fetchProducts());
+    } catch (err) {
+      console.error("Deletion error:", err);
+      toast.error(err.response?.data?.error || "Error deleting review");
     } finally {
       setIsSubmitting(false);
     }
@@ -1358,9 +1391,21 @@ function Orders() {
               >
                 <FaTimes size={24} />
               </button>
-              <h2 className="text-3xl font-black text-gray-900 mb-1">
-                {newReview.isAltering ? "Alter the Review" : "Write a Review"}
-              </h2>
+              <div className="flex items-center justify-between pr-10">
+                <h2 className="text-3xl font-black text-gray-900 mb-1">
+                  {newReview.isAltering ? "Alter the Review" : "Write a Review"}
+                </h2>
+                {newReview.isAltering && (
+                  <button
+                    type="button"
+                    onClick={handleDeleteReview}
+                    className="p-3 bg-red-50 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all shadow-sm border border-red-100 group"
+                    title="Delete Review"
+                  >
+                    <Trash2 size={20} className="group-hover:scale-110 transition-transform" />
+                  </button>
+                )}
+              </div>
               <p className="text-[10px] font-black text-orange-400 uppercase tracking-[2px] mb-6">{selectedProductName}</p>
 
               <form onSubmit={handleReviewSubmit} className="space-y-6">
