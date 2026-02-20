@@ -16,6 +16,9 @@ from vendor.models import Product
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models import Count, F, FloatField, ExpressionWrapper, Q
 
 
 @api_view(['GET', 'POST'])
@@ -116,7 +119,8 @@ def login_api(request):
                 "access": str(refresh.access_token),
                 "refresh": str(refresh),
                 "username": user.username,
-                "role": user.role
+                "role": user.role,
+                "email": user.email
             })
         else:
             return redirect('user_products')
@@ -404,7 +408,7 @@ def my_orders(request):
     orders = Order.objects.filter(user=request.user).order_by('-created_at')
     
     if request.accepted_renderer.format == 'json':
-        serializer = OrderSerializer(orders, many=True)
+        serializer = OrderSerializer(orders, many=True, context={'request': request})
         return Response(serializer.data)
         
     return render(request, "my_orders.html", {"orders": orders})
@@ -621,3 +625,52 @@ def auth_page(request):
             return Response({"message": "Passwords do not match ❌"}, status=400)
 
     return render(request, "auth.html", {"page": page})
+
+# ======================================
+# 🔥 Trending Products Logic
+# ======================================
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def trending_products(request):
+    from user.models import Review
+    seven_days_ago = timezone.now() - timedelta(days=7)
+
+    try:
+        products = Product.objects.annotate(
+            recent_review_count=Count(
+                'reviews',
+                filter=Q(reviews__created_at__gte=seven_days_ago)
+            )
+        ).annotate(
+            trending_score=ExpressionWrapper(
+                (F('recent_review_count') * 2.0) + (F('average_rating') * 3.0),
+                output_field=FloatField()
+            )
+        ).filter(
+            trending_score__gt=0
+        ).order_by(
+            '-trending_score',
+            '-total_reviews'
+        )[:10]
+    except Exception:
+        products = Product.objects.none()
+
+    # ✅ Fallback: if no trending products found, return top-rated or newest products
+    if not products.exists():
+        # Try products that have reviews
+        products = Product.objects.filter(
+            status='active', is_blocked=False
+        ).annotate(
+            review_count=Count('reviews')
+        ).filter(
+            review_count__gt=0
+        ).order_by('-review_count')[:10]
+
+    # Final fallback: just return newest active products
+    if not products.exists():
+        products = Product.objects.filter(
+            status='active', is_blocked=False
+        ).order_by('-created_at')[:10]
+
+    serializer = ProductSerializer(products, many=True)
+    return Response(serializer.data)

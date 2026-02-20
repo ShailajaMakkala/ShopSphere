@@ -28,7 +28,7 @@ export const ProfileInfoTab = () => {
         <div className="animate-in fade-in slide-in-from-right duration-500 bg-white rounded-[32px] p-8 lg:p-12 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-10">
                 <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Personal Information</h2>
-                <button className="flex items-center gap-2 text-violet-600 hover:text-violet-700 font-bold transition-colors">
+                <button className="flex items-center gap-2 text-orange-400 hover:text-orange-400 font-bold transition-colors">
                     <FaEdit size={16} /> Edit Profile
                 </button>
             </div>
@@ -55,13 +55,13 @@ export const ProfileInfoTab = () => {
 
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-violet-50 p-6 rounded-3xl flex items-center gap-5 transition-all duration-300">
-                    <div className="min-w-[56px] min-h-[56px] bg-white rounded-2xl flex items-center justify-center text-violet-600 shadow-sm border border-violet-50/50">
+                <div className="bg-orange-50 p-6 rounded-3xl flex items-center gap-5 transition-all duration-300">
+                    <div className="min-w-[56px] min-h-[56px] bg-white rounded-2xl flex items-center justify-center text-orange-400 shadow-sm border border-orange-50/50">
                         <FaCalendarAlt size={20} />
                     </div>
                     <div>
-                        <p className="text-[10px] text-violet-500 font-black uppercase tracking-[2px] mb-0.5">Since</p>
-                        <p className="text-base font-bold text-violet-900">January 2023</p>
+                        <p className="text-[10px] text-orange-400 font-black uppercase tracking-[2px] mb-0.5">Since</p>
+                        <p className="text-base font-bold text-orange-900">January 2023</p>
                     </div>
                 </div>
                 <div className="bg-[#f2fcf5] p-6 rounded-3xl flex items-center gap-5 transition-all duration-300">
@@ -179,7 +179,7 @@ function Profile() {
                                         {user?.username?.charAt(0).toUpperCase()}
                                     </div>
                                 </div>
-                                <button className="absolute bottom-1 right-1 w-8 h-8 bg-violet-600 text-white rounded-full flex items-center justify-center border-2 border-white shadow-lg hover:scale-110 transition-transform duration-200">
+                                <button className="absolute bottom-1 right-1 w-8 h-8 bg-gradient-to-r from-orange-400 to-purple-500 text-white rounded-full flex items-center justify-center border-2 border-white shadow-lg hover:scale-110 transition-transform duration-200">
                                     <FaEdit size={12} />
                                 </button>
                             </div>
@@ -187,7 +187,7 @@ function Profile() {
                                 {user?.username}
                             </h3>
                             <p className="text-sm text-gray-400 font-bold mb-6 tracking-tight">{user?.email}</p>
-                            <div className="inline-flex items-center gap-2 px-6 py-2 bg-violet-50 text-violet-600 text-[10px] font-black uppercase tracking-[3px] rounded-full border border-violet-100 shadow-sm shadow-violet-500/5">
+                            <div className="inline-flex items-center gap-2 px-6 py-2 bg-orange-50 text-orange-400 text-[10px] font-black uppercase tracking-[3px] rounded-full border border-orange-100 shadow-sm shadow-orange-400/5">
                                 Silver Member
                             </div>
                         </div>
@@ -200,7 +200,7 @@ function Profile() {
                                     to={item.path}
                                     end={item.end}
                                     className={({ isActive }) => `flex items-center gap-4 w-full px-6 py-4.5 rounded-2xl text-[13px] font-black tracking-tight transition-all duration-300 ${isActive
-                                        ? "bg-violet-600 text-white shadow-2xl shadow-violet-500/25"
+                                        ? "bg-gradient-to-r from-orange-400 to-purple-500 text-white shadow-2xl shadow-orange-400/25"
                                         : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
                                         }`}
                                 >

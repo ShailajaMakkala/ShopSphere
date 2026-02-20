@@ -25,12 +25,27 @@ class ProductImageSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
     vendor_name = serializers.CharField(source='vendor.shop_name', read_only=True)
+    average_rating = serializers.SerializerMethodField()
+    review_count = serializers.SerializerMethodField()
+
     class Meta:
         model = Product
         fields = [
             'id', 'name', 'description', 'category', 'price', 
-            'quantity', 'images', 'status', 'is_blocked', 'created_at', 'vendor_name'
+            'quantity', 'images', 'status', 'is_blocked', 'created_at', 
+            'vendor_name', 'average_rating', 'review_count'
         ]
+
+    def get_average_rating(self, obj):
+        from django.db.models import Avg
+        from .models import Review
+        avg = Review.objects.filter(Product=obj).aggregate(Avg('rating'))['rating__avg']
+        return round(avg, 1) if avg else 0
+
+    def get_review_count(self, obj):
+        from .models import Review
+        return Review.objects.filter(Product=obj).count()
+
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -203,13 +218,49 @@ class CouponUsageSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField()
     product_id = serializers.IntegerField(source='Product.id', read_only=True)
+    can_edit_review = serializers.SerializerMethodField()
+    days_left = serializers.SerializerMethodField()
 
     class Meta:
         model = Review
-        fields = ['id', 'user', 'username', 'Product', 'product_id', 'reviewer_name', 'rating', 'comment', 'pictures', 'created_at']
+        fields = ['id', 'user', 'username', 'Product', 'product_id', 'reviewer_name', 'rating', 'comment', 'pictures', 'created_at', 'can_edit_review', 'days_left']
         read_only_fields = ['user', 'Product']
 
     def get_username(self, obj):
         if obj.user:
             return obj.user.username
         return obj.reviewer_name or "Anonymous"
+
+    def get_can_edit_review(self, obj):
+        from django.utils import timezone
+        from django.conf import settings
+        now = timezone.now()
+        
+        # If USE_TZ is False, timezone.now() might still be aware if not configured otherwise.
+        # Ensure comparison is safe.
+        if not settings.USE_TZ and timezone.is_aware(now):
+            now = timezone.make_naive(now)
+            
+        created_at = obj.created_at
+        if timezone.is_aware(created_at):
+            created_at = timezone.make_naive(created_at)
+            
+        time_diff = now - created_at
+        return time_diff.days < 5
+
+    def get_days_left(self, obj):
+        from django.utils import timezone
+        from django.conf import settings
+        now = timezone.now()
+        
+        if not settings.USE_TZ and timezone.is_aware(now):
+            now = timezone.make_naive(now)
+            
+        created_at = obj.created_at
+        if timezone.is_aware(created_at):
+            created_at = timezone.make_naive(created_at)
+            
+        time_diff = now - created_at
+        left = 5 - time_diff.days
+        return max(0, left)
+

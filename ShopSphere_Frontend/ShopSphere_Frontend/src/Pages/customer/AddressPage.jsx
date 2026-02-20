@@ -157,7 +157,7 @@ export default function AddressPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-[#fff5f5] via-[#fef3f2] to-[#f3e8ff] p-6">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-gray-800">
@@ -166,7 +166,7 @@ export default function AddressPage() {
           {returnTo && (
             <button
               onClick={() => navigate(returnTo, { state: { refresh: Date.now() } })}
-              className="bg-white text-violet-600 px-4 py-2 rounded-lg font-semibold hover:bg-violet-50 transition-all border border-violet-200"
+              className="bg-white text-orange-400 px-4 py-2 rounded-lg font-semibold hover:bg-orange-50 transition-all border border-orange-200"
             >
               ← Back to Cart
             </button>
@@ -182,7 +182,7 @@ export default function AddressPage() {
         {/* Use Current Location */}
         <button
           onClick={getCurrentLocation}
-          className="w-full bg-white border-2 border-dashed border-violet-400 text-violet-600 py-3 rounded-xl mb-6 hover:bg-violet-50 transition flex items-center justify-center gap-2"
+          className="w-full bg-white border-2 border-dashed border-orange-400 text-orange-400 py-3 rounded-xl mb-6 hover:bg-orange-50 transition flex items-center justify-center gap-2"
         >
           <span>📍</span> Use Current Location
         </button>
@@ -194,8 +194,8 @@ export default function AddressPage() {
               <div
                 key={addr.id}
                 className={`p-4 rounded-xl border-2 cursor-pointer transition ${selectedAddress === addr.id
-                  ? "border-violet-500 bg-violet-50"
-                  : "border-gray-200 bg-white hover:border-violet-300"
+                  ? "border-orange-400 bg-orange-50"
+                  : "border-gray-200 bg-white hover:border-orange-300"
                   }`}
                 onClick={() => setSelectedAddress(addr.id)}
               >
@@ -215,7 +215,7 @@ export default function AddressPage() {
                         e.stopPropagation();
                         handleEdit(addr);
                       }}
-                      className="text-blue-600 hover:text-blue-800 text-sm"
+                      className="text-orange-400 hover:text-orange-400 text-sm font-bold"
                     >
                       Edit
                     </button>
@@ -243,7 +243,7 @@ export default function AddressPage() {
               setEditId(null);
               setFormData(emptyForm);
             }}
-            className="w-full bg-violet-600 text-white py-3 rounded-xl hover:bg-violet-700 transition"
+            className="w-full bg-orange-400 text-white py-3 rounded-xl hover:bg-orange-400 transition"
           >
             + Add New Address
           </button>
@@ -266,7 +266,7 @@ export default function AddressPage() {
                 value={formData[field]}
                 onChange={handleChange}
                 placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-violet-500 outline-none ${formError && !formData[field] ? "border-red-500" : ""
+                className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none ${formError && !formData[field] ? "border-red-500" : ""
                   }`}
               />
             ))}
@@ -277,7 +277,7 @@ export default function AddressPage() {
               onChange={handleChange}
               placeholder="Full Address"
               rows="3"
-              className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-violet-500 outline-none ${formError && !formData.address ? "border-red-500" : ""
+              className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none ${formError && !formData.address ? "border-red-500" : ""
                 }`}
             />
 
@@ -285,7 +285,7 @@ export default function AddressPage() {
 
             <button
               type="submit"
-              className="w-full bg-violet-600 text-white py-3 rounded-xl hover:bg-violet-700 transition"
+              className="w-full bg-orange-400 text-white py-3 rounded-xl hover:bg-orange-400 transition"
             >
               Save Address
             </button>

@@ -47,9 +47,9 @@ export default function VerifyAccount() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-100">
+    <div className="min-h-screen bg-gradient-to-br from-[#fff5f5] via-[#fef3f2] to-[#f3e8ff]">
       {/* HEADER */}
-      <header className="px-8 py-5 bg-purple-700 shadow-sm">
+      <header className="px-8 py-5 bg-gradient-to-r from-orange-400 to-purple-500 shadow-sm">
         <h1 className="text-sm font-bold text-white">
           ShopSphere Seller Central
         </h1>
@@ -78,7 +78,7 @@ export default function VerifyAccount() {
             className={`w-full px-3 py-2 mt-1 border rounded-md focus:ring-2
               ${error
                 ? "border-red-500 focus:ring-red-300"
-                : "border-gray-300 focus:ring-purple-400"
+                : "border-gray-300 focus:ring-orange-400"
               }`}
           />
 
@@ -87,7 +87,7 @@ export default function VerifyAccount() {
           <button
             onClick={sendOtp}
             disabled={loading}
-            className="w-full mt-5 py-2 rounded-md bg-purple-600 text-white font-medium hover:bg-purple-700 transition"
+            className="w-full mt-5 py-2 rounded-md bg-gradient-to-r from-orange-400 to-purple-500 text-white font-medium hover:from-orange-600 hover:to-purple-700 transition"
           >
             {loading ? "Sending OTP..." : "Send OTP"}
           </button>

@@ -27,8 +27,8 @@ import {
 import { MdOutlinePayments, MdOutlineTimer } from "react-icons/md";
 
 import { processPayment } from "../../api/axios";
-
 import { clearCart } from "../../Store";
+import { sendOrderConfirmationEmail } from "../../utils/emailService";
 
 
 function Checkout() {
@@ -65,7 +65,7 @@ function Checkout() {
 
       description: "Pay when your order is delivered",
 
-      icon: <FaMoneyBillWave className="text-emerald-500" />,
+      icon: <FaMoneyBillWave className="text-orange-400" />,
 
     },
 
@@ -77,7 +77,7 @@ function Checkout() {
 
       description: "UPI, Cards, Netbanking (Razorpay)",
 
-      icon: <FaCreditCard className="text-violet-500" />,
+      icon: <FaCreditCard className="text-orange-400" />,
 
       tag: "Secure",
 
@@ -161,8 +161,7 @@ function Checkout() {
         try {
 
           // Sync with Backend
-
-          await processPayment({
+          const backendResponse = await processPayment({
 
             payment_mode: "ONLINE",
 
@@ -208,6 +207,32 @@ function Checkout() {
 
           dispatch(clearCart());
 
+          // Send Confirmation Email
+          try {
+            const storedUser = localStorage.getItem("user");
+            const storedAddress = localStorage.getItem("selectedAddress");
+            const userData = storedUser ? JSON.parse(storedUser) : {};
+            const address = storedAddress ? JSON.parse(storedAddress) : {};
+            const userEmail = userData.email || address?.email;
+
+            if (userEmail) {
+              await sendOrderConfirmationEmail({
+                email: userEmail,
+                orderNumber: backendResponse.order_number || "N/A",
+                items: cartObjects,
+                subtotal: subtotal,
+                tax: tax,
+                shipping: deliveryCharges,
+                total: totalAmount,
+                address: address,
+                paymentMode: "Online Payment"
+              });
+            } else {
+              console.warn("No email found for order confirmation. Please re-login.");
+            }
+          } catch (emailErr) {
+            console.error("Email notification failed:", emailErr);
+          }
 
           navigate("/success");
 
@@ -239,7 +264,7 @@ function Checkout() {
 
       theme: {
 
-        color: "#7c3aed",
+        color: "#a78bfa",
 
       },
 
@@ -314,15 +339,15 @@ function Checkout() {
 
                   className={`group cursor-pointer bg-white rounded-[32px] p-6 border-2 transition-all duration-300 flex items-center gap-6 ${selectedMethod === method.id
 
-                    ? "border-violet-600 shadow-xl shadow-violet-500/10 translate-x-2"
+                    ? "border-orange-400 shadow-xl shadow-orange-400/10 translate-x-2"
 
-                    : "border-gray-100 hover:border-violet-200"
+                    : "border-gray-100 hover:border-orange-200"
 
                     }`}
 
                 >
 
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl transition-all ${selectedMethod === method.id ? "bg-violet-600 text-white shadow-lg" : "bg-gray-50 group-hover:bg-violet-50"
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl transition-all ${selectedMethod === method.id ? "bg-gradient-to-r from-orange-400 to-purple-500 text-white shadow-lg" : "bg-gray-50 group-hover:bg-orange-50"
 
                     }`}>
 
@@ -339,7 +364,7 @@ function Checkout() {
 
                       {method.tag && (
 
-                        <span className="bg-violet-50 text-violet-600 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-violet-100">
+                        <span className="bg-orange-50 text-orange-400 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-orange-100">
 
                           {method.tag}
 
@@ -354,7 +379,7 @@ function Checkout() {
                   </div>
 
 
-                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${selectedMethod === method.id ? "border-violet-600 bg-violet-600 text-white" : "border-gray-200"
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${selectedMethod === method.id ? "border-orange-400 bg-orange-400 text-white" : "border-gray-200"
 
                     }`}>
 
@@ -432,7 +457,7 @@ function Checkout() {
 
                   </div>
 
-                  <div className="flex justify-between items-center text-sm font-bold text-emerald-500 uppercase tracking-widest">
+                  <div className="flex justify-between items-center text-sm font-bold text-orange-400 uppercase tracking-widest">
 
                     <span>Shipping</span>
 
@@ -452,7 +477,7 @@ function Checkout() {
 
                     <span className="text-xl font-black text-gray-900">Amount to Pay</span>
 
-                    <span className="text-3xl font-black text-violet-600 font-mono tracking-tighter">₹{totalAmount.toFixed(2)}</span>
+                    <span className="text-3xl font-black text-orange-400 font-mono tracking-tighter">₹{totalAmount.toFixed(2)}</span>
 
                   </div>
 
@@ -467,7 +492,7 @@ function Checkout() {
 
                     disabled={isProcessing}
 
-                    className={`w-full py-5 bg-gradient-to-br from-violet-600 to-purple-700 text-white rounded-[24px] font-black text-lg shadow-xl shadow-violet-500/20 hover:shadow-violet-500/30 hover:-translate-y-1 transition-all active:scale-[0.98] flex items-center justify-center gap-3 mb-6 ${isProcessing ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    className={`w-full py-5 bg-gradient-to-br from-orange-400 to-purple-500 text-white rounded-[24px] font-black text-lg shadow-xl shadow-orange-400/20 hover:shadow-orange-400/30 hover:-translate-y-1 transition-all active:scale-[0.98] flex items-center justify-center gap-3 mb-6 ${isProcessing ? 'opacity-70 cursor-not-allowed' : ''}`}
 
                   >
 
@@ -496,9 +521,9 @@ function Checkout() {
 
               {/* Secure Checkout Badge */}
 
-              <div className="bg-emerald-50 rounded-[32px] p-6 border border-emerald-100 flex items-center gap-5">
+              <div className="bg-orange-50 rounded-[32px] p-6 border border-orange-100 flex items-center gap-5">
 
-                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-emerald-500 shadow-sm shadow-emerald-500/10">
+                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-orange-400 shadow-sm shadow-emerald-500/10">
 
                   <MdOutlinePayments size={28} />
 
@@ -506,9 +531,9 @@ function Checkout() {
 
                 <div>
 
-                  <h4 className="font-black text-emerald-900 text-base mb-0.5">Zero Processing Fee</h4>
+                  <h4 className="font-black text-orange-900 text-base mb-0.5">Zero Processing Fee</h4>
 
-                  <p className="text-emerald-700/60 text-[10px] font-bold uppercase tracking-[1px]">No hidden charges on payment</p>
+                  <p className="text-orange-700/60 text-[10px] font-bold uppercase tracking-[1px]">No hidden charges on payment</p>
 
                 </div>
 

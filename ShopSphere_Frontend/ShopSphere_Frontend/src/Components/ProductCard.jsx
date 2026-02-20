@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaHeart, FaShoppingBag } from "react-icons/fa";
+import { FaHeart, FaShoppingBag, FaStar } from "react-icons/fa";
 
 export default function ProductCard({
     item,
@@ -66,8 +66,28 @@ export default function ProductCard({
 
             <div className="p-5 flex flex-col flex-1">
                 <div className="flex-1">
-                    <h3 className="font-bold text-lg text-gray-900 group-hover:text-violet-600 transition-colors line-clamp-1">{item.name}</h3>
-                    <p className="text-gray-500 text-sm line-clamp-2 mt-1">{item.description}</p>
+                    <h3 className="font-bold text-lg text-gray-900 group-hover:text-orange-400 transition-colors line-clamp-1">{item.name}</h3>
+
+                    {/* Rating Section */}
+                    <div className="flex items-center gap-2 mt-2">
+                        <div className="flex items-center gap-1 bg-orange-50 px-2 py-0.5 rounded-lg border border-orange-100">
+                            <span className="text-[11px] font-black text-orange-400">
+                                {Number(item.average_rating || 0).toFixed(1)}
+                            </span>
+                            <FaStar className="text-[10px] text-yellow-400 mb-0.5" />
+                        </div>
+
+                        <div className="flex gap-0.5 ml-1">
+                            {[...Array(5)].map((_, i) => (
+                                <FaStar
+                                    key={i}
+                                    className={`text-[10px] ${i < Math.floor(item.average_rating || 0) ? "text-yellow-400" : "text-gray-200"}`}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    <p className="text-gray-500 text-sm line-clamp-2 mt-3">{item.description}</p>
                 </div>
 
                 <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
@@ -80,7 +100,7 @@ export default function ProductCard({
                             e.stopPropagation();
                             handleAddToCartClick(item);
                         }}
-                        className="bg-black text-white p-4 rounded-2xl hover:bg-violet-600 transition-all shadow-lg active:scale-95"
+                        className="bg-gradient-to-r from-orange-400 to-purple-500 text-white p-4 rounded-2xl hover:from-orange-600 hover:to-purple-700 transition-all shadow-lg active:scale-95"
                     >
                         <FaShoppingBag />
                     </button>

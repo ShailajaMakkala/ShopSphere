@@ -10,7 +10,10 @@ import {
 } from "lucide-react";
 import { fetchProducts, AddToCart, AddToWishlist, RemoveFromWishlist } from "../../Store";
 import toast from "react-hot-toast";
-import ProductCard from "../../components/ProductCard";
+import ProductCard from "../../Components/ProductCard";
+import TrendingProducts from "../../Components/TrendingProducts";
+import DiscoverySection from "../../Components/DiscoverySection";
+import Newsletter from "../../Components/Newsletter";
 
 const CATEGORIES = [
   { id: "All", label: "All Products" },
@@ -35,7 +38,7 @@ const BANNERS = [
     description: "Experience the next generation of premium tech and lifestyle products. Designed for those who dare to lead.",
     image: "/banner1.png",
     cta: "Explore Future",
-    color: "from-blue-600 to-indigo-600"
+    color: "from-orange-400 to-purple-500"
   },
   {
     id: 2,
@@ -44,7 +47,7 @@ const BANNERS = [
     description: "Discover a curated collection of minimalist essentials that redefine modern sophistication and timeless style.",
     image: "/banner2.png",
     cta: "View Collection",
-    color: "from-purple-600 to-fuchsia-600"
+    color: "from-purple-600 to-orange-500"
   },
   {
     id: 3,
@@ -53,7 +56,7 @@ const BANNERS = [
     description: "Gear up with our high-performance athletic collection. Engineered for maximum comfort and peak athletic ability.",
     image: "/banner3.png",
     cta: "Get Started",
-    color: "from-orange-500 to-red-600"
+    color: "from-orange-400 to-purple-500"
   }
 ];
 
@@ -155,8 +158,8 @@ const Home = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 border-4 border-violet-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-violet-600 font-bold animate-pulse">Loading amazing products...</p>
+          <div className="w-16 h-16 border-4 border-orange-400 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-orange-400 font-bold animate-pulse">Loading amazing products...</p>
         </div>
       </div>
     );
@@ -165,20 +168,20 @@ const Home = () => {
   const banner = BANNERS[currentBanner];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-[#fff5f5] via-[#fef3f2] to-[#f3e8ff]">
       {/* CATEGORIES SECTION (Placed between Navbar and Banner) */}
-      <section id="categories-section" className="bg-white border-b border-gray-100 pt-[10px] pb-3 w-full sticky top-[10px] z-40">
+      <section id="categories-section" className="bg-white/80 backdrop-blur-sm border-b border-orange-100/50 pt-[10px] pb-3 w-full sticky top-[10px] z-40">
         <div className="w-full px-6 md:px-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <h2 className="text-sm font-black text-gray-900 tracking-[0.2em] whitespace-nowrap">
-              BROWSE <span className="text-violet-600">CATEGORIES</span>
+              BROWSE <span className="text-orange-400">CATEGORIES</span>
             </h2>
             <div className="flex gap-0 overflow-x-auto pb-2 md:pb-0 w-full scrollbar-hide justify-start md:justify-end items-center">
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat.id}
                   onClick={() => { setActiveCategory(cat.id); setCurrentPage(1); }}
-                  className={`px-6 py-2 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all duration-300 ${activeCategory === cat.id ? "bg-violet-600 text-white shadow-lg scale-105" : "bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-900"}`}
+                  className={`px-6 py-2 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all duration-300 ${activeCategory === cat.id ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg scale-105" : "bg-gray-50 text-gray-500 hover:bg-orange-50 hover:text-orange-400"}`}
                 >
                   {cat.label}
                 </button>
@@ -209,7 +212,7 @@ const Home = () => {
                 className="max-w-3xl"
               >
                 <motion.p
-                  className="text-violet-400 font-black tracking-[0.3em] uppercase text-xs mb-4"
+                  className="text-orange-400 font-black tracking-[0.3em] uppercase text-xs mb-4"
                 >
                   {banner.subtitle}
                 </motion.p>
@@ -242,17 +245,25 @@ const Home = () => {
             <button
               key={idx}
               onClick={() => setCurrentBanner(idx)}
-              className={`h-1.5 rounded-full transition-all duration-700 ${currentBanner === idx ? "w-10 bg-violet-500 shadow-[0_0_15px_rgba(139,92,246,0.5)]" : "w-1.5 bg-white/40 hover:bg-white/60"}`}
+              className={`h-1.5 rounded-full transition-all duration-700 ${currentBanner === idx ? "w-10 bg-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.5)]" : "w-1.5 bg-white/40 hover:bg-white/60"}`}
             />
           ))}
         </div>
       </section>
 
+      {/* TRENDING PRODUCTS SECTION */}
+      <TrendingProducts
+        navigate={navigate}
+        handleWishlistClick={handleWishlistClick}
+        handleAddToCartClick={handleAddToCartClick}
+        isInWishlist={isInWishlist}
+      />
+
       {/* PRODUCT GRID SECTION */}
       <section id="products-section" className="max-w-[1600px] mx-auto px-6 md:px-12 py-16">
         <div className="flex items-end justify-between mb-12">
           <div className="space-y-2">
-            <p className="text-violet-600 font-black tracking-widest text-xs uppercase">Curated Just for You</p>
+            <p className="text-orange-400 font-black tracking-widest text-xs uppercase">Curated Just for You</p>
             <h3 className="text-3xl font-black text-gray-900 tracking-tight">FEATURED PRODUCTS</h3>
           </div>
           <p className="text-gray-400 text-xs font-bold hidden md:block uppercase tracking-widest">
@@ -290,7 +301,7 @@ const Home = () => {
               <button
                 key={i}
                 onClick={() => paginate(i + 1)}
-                className={`w-12 h-12 rounded-xl font-black text-sm transition-all duration-500 ${currentPage === i + 1 ? "bg-black text-white shadow-xl scale-110" : "bg-white text-gray-400 border border-gray-100 hover:border-violet-200 hover:text-violet-600"}`}
+                className={`w-12 h-12 rounded-xl font-black text-sm transition-all duration-500 ${currentPage === i + 1 ? "bg-gradient-to-r from-orange-400 to-purple-500 text-white shadow-xl scale-110" : "bg-white text-gray-400 border border-gray-100 hover:border-orange-200 hover:text-orange-400"}`}
               >
                 {i + 1}
               </button>
@@ -298,6 +309,12 @@ const Home = () => {
           </div>
         )}
       </section>
+
+      {/* DISCOVERY SECTION */}
+      <DiscoverySection />
+
+      {/* NEWSLETTER SECTION */}
+      <Newsletter />
     </div>
   );
 };

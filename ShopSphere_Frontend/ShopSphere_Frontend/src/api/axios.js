@@ -325,3 +325,9 @@ export const submitReview = async (productId, reviewData) => {
   });
   return response.data;
 };
+
+// TRENDING PRODUCTS (Public)
+export const getTrendingProducts = async () => {
+  const response = await axios.get(`${API_BASE_URL}/trending/`);
+  return response.data;
+};

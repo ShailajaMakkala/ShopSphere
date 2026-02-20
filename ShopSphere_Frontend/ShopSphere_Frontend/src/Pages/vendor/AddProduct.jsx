@@ -222,11 +222,6 @@
 //     </div>
 //   );
 // }
-
-
-
-
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { add_Product } from "../../api/vendor_axios"; // ✅ import backend function
@@ -251,7 +246,7 @@ export default function AddProduct() {
     const { name, value } = e.target;
     setProduct({ ...product, [name]: value });
 
-    if (name === "category" && value !== "Other") {
+    if (name === "category" && value !== "other") {
       setCustomCategory("");
     }
   };
@@ -291,18 +286,18 @@ export default function AddProduct() {
 
   // ✅ Submit product to backend
   const submitProduct = async () => {
-    if (!product.name || !product.price) {
-      alert("Please fill required fields");
+    if (!product.name || !product.price || !product.description || !product.stock || !product.category) {
+      alert("Please fill all required fields");
       return;
     }
 
-    if (product.category === "Other" && !customCategory.trim()) {
+    if (product.category === "other" && !customCategory.trim()) {
       alert("Please specify a category");
       return;
     }
 
     if (product.images.length < 4) {
-      alert("Please upload at least 4 images of the product.");
+      alert("Minimum 4 product images are required.");
       return;
     }
 
@@ -310,14 +305,15 @@ export default function AddProduct() {
       await add_Product({
         ...product,
         category:
-          product.category === "Other" ? customCategory.trim() : product.category,
+          product.category === "other" ? customCategory.trim() : product.category,
       });
 
-      alert("Submitted for approval!");
+      alert("Product submitted for approval!");
       navigate("/vendorallproducts");
     } catch (error) {
       console.error("Error submitting product:", error);
-      alert("Failed to submit product. Please try again.");
+      const errorMessage = error.response?.data?.error || error.response?.data?.detail || "Failed to submit product. Please try again.";
+      alert(errorMessage);
     }
   };
 
@@ -383,14 +379,18 @@ export default function AddProduct() {
           <option value="">Select a category</option>
           <option value="electronics">Electronics</option>
           <option value="fashion">Fashion</option>
-          <option value="grocery">Groceries</option>
           <option value="home_kitchen">Home & Kitchen</option>
+          <option value="grocery">Groceries</option>
           <option value="beauty_personal_care">Beauty & Personal Care</option>
           <option value="sports_fitness">Sports & Fitness</option>
+          <option value="toys_games">Toys & Games</option>
+          <option value="automotive">Automotive</option>
+          <option value="books">Books</option>
+          <option value="services">Services</option>
           <option value="other">Other</option>
         </select>
 
-        {product.category === "Other" && (
+        {product.category === "other" && (
           <div className="mb-4">
             <label className="text-sm font-semibold">Specify Category *</label>
             <input
@@ -448,4 +448,3 @@ export default function AddProduct() {
     </div>
   );
 }
-

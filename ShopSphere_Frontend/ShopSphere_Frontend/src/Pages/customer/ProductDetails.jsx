@@ -3,11 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-    FaStar, FaStarHalfAlt, FaRegStar, FaPlus, FaMinus, FaShoppingCart, FaBolt, FaHeart, FaTruck, FaUndo, FaMapMarkerAlt, FaChevronLeft, FaUser
+    FaStar, FaStarHalfAlt, FaRegStar, FaPlus, FaMinus, FaShoppingCart, FaBolt, FaHeart, FaTruck, FaUndo, FaMapMarkerAlt, FaChevronLeft, FaUser, FaArrowRight
 } from "react-icons/fa";
 import { AddToCart, AddToWishlist, RemoveFromWishlist } from "../../Store";
 import { getProductDetail } from "../../api/axios";
 import toast from "react-hot-toast";
+import ProductCard from "../../Components/ProductCard";
 
 // Mock Rating Component
 const Rating = ({ rating }) => {
@@ -41,6 +42,7 @@ const ProductDetails = () => {
     const [quantity, setQuantity] = useState(1);
     const [selectedImgIndex, setSelectedImgIndex] = useState(0);
     const [reviews, setReviews] = useState([]);
+    const [relatedProducts, setRelatedProducts] = useState([]);
 
     const normalizeImagePath = (path) => {
         if (!path) return "/public/placeholder.jpg";
@@ -97,6 +99,16 @@ const ProductDetails = () => {
                 } else {
                     setReviews([]);
                 }
+
+                // Related Products Logic
+                if (data.product?.category && allProducts?.length > 0) {
+                    const currentCategory = data.product.category.toLowerCase();
+                    const related = allProducts.filter(p =>
+                        p.category?.toLowerCase() === currentCategory &&
+                        p.id !== data.product.id
+                    ).slice(0, 4); // Show top 4 related
+                    setRelatedProducts(related);
+                }
             } catch (err) {
                 console.error("Error fetching product details:", err);
             }
@@ -105,9 +117,11 @@ const ProductDetails = () => {
         fetchDetails();
     }, [id, allProducts]);
 
-
-
-
+    useEffect(() => {
+        if (!allProducts || allProducts.length === 0) {
+            dispatch(fetchProducts());
+        }
+    }, [dispatch, allProducts]);
 
     const isInWishlist = (itemName) => {
         return wishlist.some((item) => item.name === itemName);
@@ -141,6 +155,33 @@ const ProductDetails = () => {
         toast.success("Added to cart");
     };
 
+    const handleRelatedWishlist = (item) => {
+        const user = localStorage.getItem("accessToken");
+        if (!user) {
+            toast.error("Please login to manage your wishlist");
+            navigate("/login");
+            return;
+        }
+        if (isInWishlist(item.name)) {
+            dispatch(RemoveFromWishlist(item));
+            toast.success("Removed from wishlist");
+        } else {
+            dispatch(AddToWishlist(item));
+            toast.success("Added to wishlist");
+        }
+    };
+
+    const handleRelatedAddToCart = (item) => {
+        const user = localStorage.getItem("accessToken");
+        if (!user) {
+            toast.error("Please login to add items to your cart");
+            navigate("/login");
+            return;
+        }
+        dispatch(AddToCart(item));
+        toast.success("Added to cart");
+    };
+
     const handleBuyNow = () => {
         const user = localStorage.getItem("accessToken");
         if (!user) {
@@ -155,17 +196,17 @@ const ProductDetails = () => {
     if (!product) {
         return (
             <div className="min-h-screen flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-violet-600 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-12 h-12 border-4 border-orange-400 border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gradient-to-br from-[#fff5f5] via-[#fef3f2] to-[#f3e8ff] pt-24 pb-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
                 <button
                     onClick={() => navigate(-1)}
-                    className="mb-6 flex items-center gap-2 text-gray-600 hover:text-violet-600 font-bold transition-all group"
+                    className="mb-6 flex items-center gap-2 text-gray-600 hover:text-orange-400 font-bold transition-all group"
                 >
                     <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md border border-gray-100 transition-all">
                         <FaChevronLeft size={16} />
@@ -184,7 +225,7 @@ const ProductDetails = () => {
                                         setMainImage(img);
                                         setSelectedImgIndex(idx);
                                     }}
-                                    className={`relative flex-shrink-0 w-20 h-20 bg-gray-50 rounded-2xl overflow-hidden border-2 transition-all duration-300 ${selectedImgIndex === idx ? "border-violet-600 scale-105 shadow-lg" : "border-transparent opacity-70 hover:opacity-100"
+                                    className={`relative flex-shrink-0 w-20 h-20 bg-gray-50 rounded-2xl overflow-hidden border-2 transition-all duration-300 ${selectedImgIndex === idx ? "border-orange-400 scale-105 shadow-lg" : "border-transparent opacity-70 hover:opacity-100"
                                         }`}
                                 >
                                     <img src={img} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" />
@@ -221,14 +262,13 @@ const ProductDetails = () => {
                     {/* RIGHT SECTION: INFO */}
                     <div className="w-full lg:w-[45%] p-8 lg:p-14 lg:border-l border-gray-100 flex flex-col justify-between">
                         <div>
-                            <p className="text-violet-600 text-[12px] font-black uppercase tracking-[3px] mb-3">Premium Collection</p>
+                            <p className="text-orange-400 text-[12px] font-black uppercase tracking-[3px] mb-3">Premium Collection</p>
                             <h1 className="text-4xl lg:text-5xl font-black text-gray-900 leading-[1.1] mb-6 tracking-tight">
                                 {product.name}
                             </h1>
-                            <div className="flex items-center gap-4 mb-8">
-                                <Rating rating={product.rating} />
-                                <span className="w-1.5 h-1.5 bg-gray-300 rounded-full"></span>
-                                <span className="text-sm font-bold text-gray-400">128 Reviews</span>
+                            <div className="flex items-center gap-4">
+                                <Rating rating={product.average_rating || 0} />
+                                <span className="text-gray-400 font-bold">Based on {product.review_count || 0} reviews</span>
                             </div>
                             <div className="flex items-end gap-5 mb-8">
                                 <p className="text-5xl font-black text-gray-900 tracking-tighter">
@@ -252,14 +292,14 @@ const ProductDetails = () => {
                                 <div className="flex items-center bg-gray-50 border border-gray-200 rounded-2xl p-1.5 shadow-inner">
                                     <button
                                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                        className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:bg-white hover:text-violet-600 transition-all font-bold"
+                                        className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:bg-white hover:text-orange-400 transition-all font-bold"
                                     >
                                         <FaMinus size={12} />
                                     </button>
                                     <span className="w-12 text-center text-lg font-black text-gray-900">{quantity}</span>
                                     <button
                                         onClick={() => setQuantity(quantity + 1)}
-                                        className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:bg-white hover:text-violet-600 transition-all font-bold"
+                                        className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:bg-white hover:text-orange-400 transition-all font-bold"
                                     >
                                         <FaPlus size={12} />
                                     </button>
@@ -274,7 +314,7 @@ const ProductDetails = () => {
                                 </button>
                                 <button
                                     onClick={handleBuyNow}
-                                    className="flex-1 py-5 bg-gradient-to-br from-violet-600 to-purple-700 text-white rounded-[24px] font-black text-lg shadow-xl shadow-violet-500/20 hover:shadow-violet-500/40 hover:-translate-y-1 transition-all flex items-center justify-center gap-3 active:scale-95"
+                                    className="flex-1 py-5 bg-gradient-to-br from-orange-400 to-purple-500 text-white rounded-[24px] font-black text-lg shadow-xl shadow-orange-400/20 hover:shadow-orange-400/40 hover:-translate-y-1 transition-all flex items-center justify-center gap-3 active:scale-95"
                                 >
                                     <FaBolt size={18} /> Buy it Now
                                 </button>
@@ -284,7 +324,7 @@ const ProductDetails = () => {
                         <div className="border-t border-gray-100 pt-8 mt-auto">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div className="flex gap-4">
-                                    <div className="w-12 h-12 bg-violet-50 text-violet-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                                    <div className="w-12 h-12 bg-orange-50 text-orange-400 rounded-2xl flex items-center justify-center flex-shrink-0">
                                         <FaTruck size={20} />
                                     </div>
                                     <div>
@@ -293,7 +333,7 @@ const ProductDetails = () => {
                                     </div>
                                 </div>
                                 <div className="flex gap-4">
-                                    <div className="w-12 h-12 bg-fuchsia-50 text-fuchsia-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                                    <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center flex-shrink-0">
                                         <FaUndo size={20} />
                                     </div>
                                     <div>
@@ -312,8 +352,8 @@ const ProductDetails = () => {
                         <div>
                             <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-2">Customer Reviews</h2>
                             <div className="flex items-center gap-4">
-                                <Rating rating={product.rating || 0} />
-                                <span className="text-gray-400 font-bold">Based on {reviews.length} reviews</span>
+                                <Rating rating={product.average_rating || 0} />
+                                <span className="text-gray-400 font-bold">Based on {product.review_count || 0} reviews</span>
                             </div>
                         </div>
 
@@ -327,11 +367,11 @@ const ProductDetails = () => {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: idx * 0.1 }}
-                                className="p-8 bg-gray-50 rounded-[32px] border border-gray-100 hover:border-violet-200 transition-all group"
+                                className="p-8 bg-gray-50 rounded-[32px] border border-gray-100 hover:border-orange-200 transition-all group"
                             >
                                 <div className="flex justify-between items-start mb-6">
                                     <div className="flex gap-4">
-                                        <div className="w-12 h-12 bg-gradient-to-br from-violet-600 to-purple-700 text-white rounded-2xl flex items-center justify-center font-black shadow-lg">
+                                        <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-purple-500 text-white rounded-2xl flex items-center justify-center font-black shadow-lg">
                                             {review.avatar}
                                         </div>
                                         <div>
@@ -361,6 +401,37 @@ const ProductDetails = () => {
                         )}
                     </div>
                 </div>
+
+                {/* RELATED PRODUCTS SECTION */}
+                {relatedProducts.length > 0 && (
+                    <div className="mt-20">
+                        <div className="flex items-end justify-between mb-10 px-4 md:px-0">
+                            <div className="space-y-2">
+                                <p className="text-orange-400 font-black tracking-widest text-xs uppercase">More like this</p>
+                                <h3 className="text-3xl font-black text-gray-900 tracking-tight">RELATED PRODUCTS</h3>
+                            </div>
+                            <button
+                                onClick={() => navigate("/home")}
+                                className="text-orange-400 font-bold hover:text-purple-600 transition-colors flex items-center gap-2 group"
+                            >
+                                View all <FaArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                            {relatedProducts.map((item) => (
+                                <ProductCard
+                                    key={item.id}
+                                    item={item}
+                                    navigate={navigate}
+                                    handleWishlistClick={handleRelatedWishlist}
+                                    handleAddToCartClick={handleRelatedAddToCart}
+                                    isInWishlist={isInWishlist}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
 

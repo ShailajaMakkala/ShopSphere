@@ -48,7 +48,7 @@ function ResetPassword() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-100 px-4">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fff5f5] via-[#fef3f2] to-[#f3e8ff] px-4">
             <form
                 onSubmit={handleSubmit}
                 className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md"
@@ -65,7 +65,7 @@ function ResetPassword() {
                     value={form.password}
                     onChange={handleChange}
                     required
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 mb-4 focus:outline-none focus:border-violet-500"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 mb-4 focus:outline-none focus:border-orange-400"
                 />
 
                 {/* Confirm Password */}
@@ -76,14 +76,14 @@ function ResetPassword() {
                     value={form.confirmPassword}
                     onChange={handleChange}
                     required
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 mb-6 focus:outline-none focus:border-violet-500"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 mb-6 focus:outline-none focus:border-orange-400"
                 />
 
                 {/* Submit Button */}
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-violet-600 text-white py-3 rounded-lg hover:bg-violet-700 transition"
+                    className="w-full bg-orange-400 text-white py-3 rounded-lg hover:bg-orange-400 transition"
                 >
                     {loading ? "Resetting..." : "Reset Password"}
                 </button>

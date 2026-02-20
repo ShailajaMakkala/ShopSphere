@@ -56,46 +56,40 @@ const productsSlice = createSlice({
             : ["/public/placeholder.jpg"];
 
           return {
-            id: product.id,
-            name: product.name,
-            price: product.price,
+            ...product, // Preserve all backend fields
             image: gallery[0],
             gallery: gallery,
-            description: product.description,
-            category: product.category,
-            vendor: product.vendor_name
+            vendor: product.vendor_name,
+            price: Number(product.price)
           };
         });
 
         state.all = processedProducts;
 
-        // Reset categories
-        state.electronics = [];
-        state.sports = [];
-        state.fashion = [];
-        state.books = [];
-        state.home_kitchen = [];
-        state.grocery = [];
-        state.beauty_personal_care = [];
-        state.toys_games = [];
-        state.automotive = [];
-        state.services = [];
-        state.other = [];
+        // Reset and Redistribute categories
+        const categorized = {
+          electronics: [], sports: [], fashion: [], books: [], home_kitchen: [],
+          grocery: [], beauty_personal_care: [], toys_games: [], automotive: [],
+          services: [], other: []
+        };
 
-        // Distribute products into categories
         processedProducts.forEach(p => {
-          const category = p.category?.toLowerCase();
-          if (category === 'electronics') state.electronics.push(p);
-          else if (category === 'sports' || category === 'sports_fitness') state.sports.push(p);
-          else if (category === 'fashion') state.fashion.push(p);
-          else if (category === 'books') state.books.push(p);
-          else if (category === 'home_kitchen') state.home_kitchen.push(p);
-          else if (category === 'grocery') state.grocery.push(p);
-          else if (category === 'beauty_personal_care') state.beauty_personal_care.push(p);
-          else if (category === 'toys_games') state.toys_games.push(p);
-          else if (category === 'automotive') state.automotive.push(p);
-          else if (category === 'services') state.services.push(p);
-          else state.other.push(p);
+          const cat = p.category?.toLowerCase();
+          if (cat === 'electronics') categorized.electronics.push(p);
+          else if (cat === 'sports' || cat === 'sports_fitness') categorized.sports.push(p);
+          else if (cat === 'fashion') categorized.fashion.push(p);
+          else if (cat === 'books') categorized.books.push(p);
+          else if (cat === 'home_kitchen') categorized.home_kitchen.push(p);
+          else if (cat === 'grocery') categorized.grocery.push(p);
+          else if (cat === 'beauty_personal_care') categorized.beauty_personal_care.push(p);
+          else if (cat === 'toys_games') categorized.toys_games.push(p);
+          else if (cat === 'automotive') categorized.automotive.push(p);
+          else if (cat === 'services') categorized.services.push(p);
+          else categorized.other.push(p);
+        });
+
+        Object.keys(categorized).forEach(key => {
+          state[key] = categorized[key];
         });
       })
       .addCase(fetchProducts.rejected, (state, action) => {
@@ -112,24 +106,45 @@ const cartSlice = createSlice({
   initialState: [],
   reducers: {
     AddToCart: (state, action) => {
-      const item = state.find(i => i.name === action.payload.name);
-      const qtyToAdd = action.payload.quantity || 1;
-      if (item) item.quantity += qtyToAdd;
-      else state.push({ ...action.payload, quantity: qtyToAdd });
+      const existingItem = state.find(
+        item => item.id === action.payload.id
+      );
+
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        state.push({
+          ...action.payload,
+          quantity: 1, // ✅ FORCE quantity = 1
+        });
+      }
     },
+
     IncrCart: (state, action) => {
-      const item = state.find(i => i.name === action.payload.name);
-      if (item) item.quantity += 1;
+      const item = state.find(i => i.id === action.payload.id);
+      if (item) {
+        item.quantity += 1;
+      }
     },
+
     DecrCart: (state, action) => {
-      const item = state.find(i => i.name === action.payload.name);
-      if (item && item.quantity > 1) item.quantity -= 1;
-      else return state.filter(i => i.name !== action.payload.name);
+      const index = state.findIndex(i => i.id === action.payload.id);
+
+      if (index !== -1) {
+        if (state[index].quantity > 1) {
+          state[index].quantity -= 1;
+        } else {
+          state.splice(index, 1); // ✅ Proper removal
+        }
+      }
     },
-    RemoveFromCart: (state, action) =>
-      state.filter(i => i.name !== action.payload.name),
+
+    RemoveFromCart: (state, action) => {
+      return state.filter(i => i.id !== action.payload.id);
+    },
+
     clearCart: () => [],
-  }
+  },
 });
 
 export const {
@@ -139,6 +154,7 @@ export const {
   RemoveFromCart,
   clearCart
 } = cartSlice.actions;
+
 
 // WISHLIST SLICE
 

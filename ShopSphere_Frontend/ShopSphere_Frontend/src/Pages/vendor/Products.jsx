@@ -52,31 +52,73 @@ export default function ProductList() {
   };
 
   const startEdit = (index) => {
+    const product = products[index];
+    const knownCategories = [
+      "electronics",
+      "fashion",
+      "home_kitchen",
+      "grocery",
+      "beauty_personal_care",
+      "sports_fitness",
+      "toys_games",
+      "automotive",
+      "books",
+      "services",
+    ];
+
+    const isCustom =
+      product.category &&
+      !knownCategories.includes(product.category.toLowerCase());
+
     setEditingIndex(index);
-    setEditedProduct(products[index]);
-    setPreviews(products[index].images || []);
+    setEditedProduct({
+      ...product,
+      stock: product.quantity,
+      category: isCustom ? "other" : product.category.toLowerCase(),
+      images: [],
+    });
+
+    if (isCustom) {
+      setCustomCategory(product.category);
+    } else {
+      setCustomCategory("");
+    }
+
+    setPreviews(
+      product.images?.map((img) =>
+        img.image.startsWith("http") ? img.image : `${API_BASE_URL}${img.image}`
+      ) || []
+    );
   };
 
+  const [customCategory, setCustomCategory] = useState("");
+
   const handleEditChange = (e) => {
-    setEditedProduct({ ...editedProduct, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setEditedProduct({ ...editedProduct, [name]: value });
+
+    if (name === "category" && value !== "other") {
+      setCustomCategory("");
+    }
   };
 
   const handleImages = (e) => {
     const files = Array.from(e.target.files);
     Promise.all(
-      files.map(file =>
-        new Promise(resolve => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.readAsDataURL(file);
-        })
+      files.map(
+        (file) =>
+          new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.readAsDataURL(file);
+          })
       )
-    ).then((imgs) => {
-      setEditedProduct(prev => ({
+    ).then((newImages) => {
+      setEditedProduct((prev) => ({
         ...prev,
-        images: [...(prev.images || []), ...imgs]
+        images: [...(prev.images || []), ...files], // Store File objects
       }));
-      setPreviews(prev => [...prev, ...imgs]);
+      setPreviews((prev) => [...prev, ...newImages]);
     });
   };
 
@@ -89,14 +131,34 @@ export default function ProductList() {
   };
 
   const saveEdit = async () => {
+    if (
+      !editedProduct.name ||
+      !editedProduct.price ||
+      !editedProduct.description ||
+      !editedProduct.stock ||
+      !editedProduct.category
+    ) {
+      toast.error("Please fill all required fields");
+      return;
+    }
+
+    // If new images are provided, check minimum 4 requirement
+    // If not provided, backend preserves old ones
+    if (editedProduct.images.length > 0 && editedProduct.images.length < 4) {
+      toast.error("Minimum 4 product images are required if updating photos.");
+      return;
+    }
+
     try {
       setLoading(true);
-      const productToUpdate = { ...editedProduct };
-
-      // Map stock to quantity if it has been updated
-      if (productToUpdate.stock) {
-        productToUpdate.quantity = productToUpdate.stock;
-      }
+      const productToUpdate = {
+        ...editedProduct,
+        category:
+          editedProduct.category === "other"
+            ? customCategory.trim()
+            : editedProduct.category,
+        quantity: editedProduct.stock, // Ensure backend gets 'quantity'
+      };
 
       await updateVendorProduct(editedProduct.id, productToUpdate);
 
@@ -105,7 +167,11 @@ export default function ProductList() {
       setEditingIndex(null);
     } catch (error) {
       console.error("Error saving product:", error);
-      toast.error("Failed to update product");
+      const errorMessage =
+        error.response?.data?.error ||
+        error.response?.data?.detail ||
+        "Failed to update product";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -243,91 +309,162 @@ export default function ProductList() {
 
       {/* EDIT OVERLAY */}
       {editingIndex !== null && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-start pt-20 z-50">
-          <div className="bg-white rounded-xl p-8 w-full max-w-2xl relative shadow-xl">
-            <h2 className="text-2xl font-bold mb-4">Edit Product</h2>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-[32px] p-8 w-full max-w-2xl relative shadow-2xl animate-in fade-in zoom-in duration-300 mx-auto">
 
-            <input
-              name="name"
-              value={editedProduct.name}
-              onChange={handleEditChange}
-              className="border rounded-lg p-2 w-full mb-2"
-              placeholder="Product Name"
-            />
-            <textarea
-              name="description"
-              value={editedProduct.description}
-              onChange={handleEditChange}
-              className="border rounded-lg p-2 w-full mb-2"
-              rows={3}
-              placeholder="Description"
-            />
-            <input
-              name="price"
-              value={editedProduct.price}
-              onChange={handleEditChange}
-              className="border rounded-lg p-2 w-full mb-2"
-              placeholder="Price"
-            />
-            <input
-              name="stock"
-              value={editedProduct.stock}
-              onChange={handleEditChange}
-              className="border rounded-lg p-2 w-full mb-2"
-              placeholder="Stock"
-            />
-            <input
-              name="category"
-              value={editedProduct.category}
-              onChange={handleEditChange}
-              className="border rounded-lg p-2 w-full mb-2"
-              placeholder="Category"
-            />
-
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={handleImages}
-              className="border rounded-lg p-2 w-full mb-3"
-            />
-
-            {/* IMAGE PREVIEWS */}
-            <div className="flex gap-2 flex-wrap mb-4">
-              {previews.map((img, idx) => (
-                <div key={idx} className="relative">
-                  <img src={img} className="w-24 h-24 object-cover rounded" />
-                  <button
-                    onClick={() => removeImage(idx)}
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-2xl font-black text-gray-900 flex items-center gap-3">
+                <span className="p-2.5 bg-orange-100 rounded-2xl">
+                  <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </span>
+                Edit Product
+              </h2>
+              <button
+                onClick={() => setEditingIndex(null)}
+                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-900 transition-all"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
             </div>
 
-            <div className="flex gap-4">
+            <div className="space-y-5 max-h-[65vh] overflow-y-auto pr-2 custom-scrollbar">
+              <div>
+                <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1.5 block">Product Name</label>
+                <input
+                  name="name"
+                  value={editedProduct.name}
+                  onChange={handleEditChange}
+                  className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-3 focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500/50 outline-none transition-all font-medium text-gray-900"
+                  placeholder="Enter product name"
+                />
+              </div>
+
+              <div>
+                <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1.5 block">Description</label>
+                <textarea
+                  name="description"
+                  value={editedProduct.description}
+                  onChange={handleEditChange}
+                  className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-3 focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500/50 outline-none transition-all font-medium text-gray-900 resize-none"
+                  rows={4}
+                  placeholder="Tell us about your product..."
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-5">
+                <div>
+                  <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1.5 block">Price (₹)</label>
+                  <div className="relative">
+                    <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 font-bold">₹</span>
+                    <input
+                      name="price"
+                      type="number"
+                      value={editedProduct.price}
+                      onChange={handleEditChange}
+                      className="w-full bg-gray-50 border border-gray-100 rounded-2xl pl-10 pr-5 py-3 focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500/50 outline-none transition-all font-bold text-gray-900"
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1.5 block">Stock</label>
+                  <input
+                    name="stock"
+                    type="number"
+                    value={editedProduct.stock}
+                    onChange={handleEditChange}
+                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-3 focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500/50 outline-none transition-all font-bold text-gray-900"
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1.5 block">Category</label>
+                  <select
+                    name="category"
+                    value={editedProduct.category}
+                    onChange={handleEditChange}
+                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-3 focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500/50 outline-none transition-all font-bold text-gray-900 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M5%207.5L10%2012.5L15%207.5%22%20stroke%3D%22%2394A3B8%22%20stroke-width%3D%221.67%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E')] bg-[length:20px_20px] bg-[right_1.25rem_center] bg-no-repeat"
+                  >
+                    <option value="">Select Category</option>
+                    <option value="electronics">Electronics</option>
+                    <option value="fashion">Fashion</option>
+                    <option value="home_kitchen">Home & Kitchen</option>
+                    <option value="grocery">Groceries</option>
+                    <option value="beauty_personal_care">Beauty & Personal Care</option>
+                    <option value="sports_fitness">Sports & Fitness</option>
+                    <option value="toys_games">Toys & Games</option>
+                    <option value="automotive">Automotive</option>
+                    <option value="books">Books</option>
+                    <option value="services">Services</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                {editedProduct.category === "other" && (
+                  <div>
+                    <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1.5 block">Custom Category</label>
+                    <input
+                      name="customCategory"
+                      value={customCategory}
+                      onChange={(e) => setCustomCategory(e.target.value)}
+                      placeholder="Enter category name"
+                      className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-3 focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500/50 outline-none transition-all font-medium text-gray-900"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1.5 block">Product Photos (Min 4)</label>
+                <div className="relative group/upload">
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImages}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  />
+                  <div className="w-full bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl py-4 px-5 text-center group-hover/upload:border-orange-500/50 group-hover/upload:bg-orange-50/30 transition-all">
+                    <span className="text-sm font-bold text-gray-500 group-hover/upload:text-orange-600">Click to upload new images</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* IMAGE PREVIEWS */}
+              <div className="flex gap-3 flex-wrap p-4 bg-gray-50/50 rounded-2xl border border-gray-100 shadow-inner">
+                {previews.map((img, idx) => (
+                  <div key={idx} className="relative group/img">
+                    <img src={img} className="w-20 h-20 object-cover rounded-xl shadow-sm border border-white" />
+                    <button
+                      onClick={() => removeImage(idx)}
+                      className="absolute -top-2 -right-2 bg-white text-red-500 rounded-full w-6 h-6 flex items-center justify-center text-sm shadow-xl opacity-0 group-hover/img:opacity-100 transition-all hover:scale-110"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-4 mt-8 pt-6 border-t border-gray-100">
               <button
                 onClick={saveEdit}
-                className="flex-1 bg-emerald-500 text-white py-2 rounded-lg"
+                disabled={loading}
+                className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 transition-all hover:-translate-y-1 active:scale-95 disabled:opacity-50 disabled:translate-y-0"
               >
-                Save
+                {loading ? "Saving..." : "Save Changes"}
               </button>
               <button
                 onClick={() => setEditingIndex(null)}
-                className="flex-1 border py-2 rounded-lg"
+                className="flex-1 bg-gray-50 text-gray-500 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-gray-100 transition-all active:scale-95"
               >
                 Cancel
               </button>
             </div>
-
-            <button
-              onClick={() => setEditingIndex(null)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-black text-xl font-bold"
-            >
-              ×
-            </button>
           </div>
         </div>
       )}

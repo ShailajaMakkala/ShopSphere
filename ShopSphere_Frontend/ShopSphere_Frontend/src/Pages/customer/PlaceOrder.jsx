@@ -8,7 +8,8 @@ import { processPayment } from "../../api/axios";
 
 import { FaMapMarkerAlt, FaMoneyBillWave, FaShieldAlt, FaTruck, FaLock } from "react-icons/fa";
 
-import { clearCart } from "../../Store"; // Assuming this action exists, if not I'll just clear via UI or ignore for now, but usually we clear cart on success.
+import { clearCart } from "../../Store";
+import { sendOrderConfirmationEmail } from "../../utils/emailService";
 
 
 function PlaceOrder() {
@@ -92,24 +93,43 @@ function PlaceOrder() {
             // 2. Store success info
 
             localStorage.setItem(
-
                 "orderSuccess",
-
                 JSON.stringify({
-
-                    transactionId: `COD-${Date.now()}`,
-
+                    transactionId: response.order_number || `COD-${Date.now()}`,
                     items: cartObjects,
-
                     totalAmount: totalAmount,
-
                     date: new Date().toLocaleString(),
-
                     paymentMode: "Cash on Delivery"
-
                 })
-
             );
+
+            // 2.5 Send Confirmation Email
+            try {
+                const storedUser = localStorage.getItem("user");
+                const userData = storedUser ? JSON.parse(storedUser) : {};
+                const userEmail = userData.email || address?.email;
+                console.log("DEBUG: User object from localStorage:", userData);
+                console.log("DEBUG: Resolved email for order confirmation:", userEmail);
+
+                if (userEmail) {
+                    await sendOrderConfirmationEmail({
+                        email: userEmail,
+                        orderNumber: response.order_number || "N/A",
+                        items: cartObjects,
+                        subtotal: subtotal,
+                        tax: tax,
+                        shipping: deliveryCharges,
+                        total: totalAmount,
+                        address: address,
+                        paymentMode: "Cash on Delivery"
+                    });
+                } else {
+                    console.warn("No email found for order confirmation. Please re-login.");
+                }
+            } catch (emailErr) {
+                console.error("Email notification failed:", emailErr);
+                // We don't block the UI for email failure
+            }
 
 
             // 3. Clear Cart
@@ -162,11 +182,11 @@ function PlaceOrder() {
 
                             <h2 className="text-xl font-black text-gray-900 mb-4 flex items-center gap-3">
 
-                                <FaMapMarkerAlt className="text-violet-600" /> Delivery Address
+                                <FaMapMarkerAlt className="text-orange-400" /> Delivery Address
 
                             </h2>
 
-                            <div className="bg-violet-50 rounded-2xl p-5 border border-violet-100 text-gray-800">
+                            <div className="bg-orange-50 rounded-2xl p-5 border border-orange-100 text-gray-800">
 
                                 <p className="font-bold text-lg mb-1">{address.name}</p>
 
@@ -203,7 +223,7 @@ function PlaceOrder() {
 
                                             <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
 
-                                            <p className="font-bold text-violet-600">₹{item.price}</p>
+                                            <p className="font-bold text-orange-400">₹{item.price}</p>
 
                                         </div>
 
@@ -296,7 +316,7 @@ function PlaceOrder() {
 
                                 <span className="text-xl font-black text-gray-900">Total Amount</span>
 
-                                <span className="text-3xl font-black text-violet-600">₹{totalAmount.toFixed(2)}</span>
+                                <span className="text-3xl font-black text-orange-400">₹{totalAmount.toFixed(2)}</span>
 
                             </div>
 
@@ -307,7 +327,7 @@ function PlaceOrder() {
 
                                 disabled={isProcessing}
 
-                                className={`w-full py-4 bg-violet-600 hover:bg-violet-700 text-white rounded-2xl font-black text-lg shadow-xl shadow-violet-500/20 transition-all flex items-center justify-center gap-2 ${isProcessing ? 'opacity-70 cursor-not-allowed' : ''}`}
+                                className={`w-full py-4 bg-orange-400 hover:bg-orange-400 text-white rounded-2xl font-black text-lg shadow-xl shadow-orange-400/20 transition-all flex items-center justify-center gap-2 ${isProcessing ? 'opacity-70 cursor-not-allowed' : ''}`}
 
                             >
 

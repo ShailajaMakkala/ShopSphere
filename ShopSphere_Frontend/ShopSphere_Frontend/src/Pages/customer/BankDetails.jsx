@@ -220,9 +220,9 @@ export default function BankDetails() {
         Object.values(form).every((v) => v);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-100">
+        <div className="min-h-screen bg-gradient-to-br from-[#fff5f5] via-[#fef3f2] to-[#f3e8ff]">
 
-            <header className="px-8 py-5 bg-purple-700 shadow-sm">
+            <header className="px-8 py-5 bg-gradient-to-r from-orange-400 to-purple-500 shadow-sm">
                 <h1 className="text-sm font-bold text-white">
                     ShopSphere Seller Central
                 </h1>

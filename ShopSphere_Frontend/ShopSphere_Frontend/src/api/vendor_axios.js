@@ -125,7 +125,7 @@ export const updateVendorProduct = async (productId, productData) => {
                     }
                 });
             }
-        } else if (key === "quantity") {
+        } else if (key === "quantity" || key === "stock") {
             formData.append("quantity", productData[key]);
         } else {
             formData.append(key, productData[key]);

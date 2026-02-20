@@ -44,8 +44,8 @@ export default function VerifyOTP() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-100">
-      <header className="px-8 py-5 bg-purple-700 shadow-sm">
+    <div className="min-h-screen bg-gradient-to-br from-[#fff5f5] via-[#fef3f2] to-[#f3e8ff]">
+      <header className="px-8 py-5 bg-gradient-to-r from-orange-400 to-purple-500 shadow-sm">
         <h1 className="text-sm font-bold text-white">
           ShopSphere Seller Central
         </h1>
@@ -70,7 +70,7 @@ export default function VerifyOTP() {
               setOtp(e.target.value.replace(/\D/g, ""));
               setError("");
             }}
-            className="w-full px-3 py-2 mt-1 text-center tracking-widest border rounded-md"
+            className="w-full px-3 py-2 mt-1 text-center tracking-widest border rounded-md focus:ring-2 focus:ring-orange-400 outline-none"
           />
 
           {error && (
@@ -79,7 +79,7 @@ export default function VerifyOTP() {
 
           <button
             onClick={verifyOtp}
-            className="w-full mt-5 py-2 rounded-md bg-purple-600 text-white"
+            className="w-full mt-5 py-2 rounded-md bg-gradient-to-r from-orange-400 to-purple-500 text-white font-medium hover:from-orange-600 hover:to-purple-700 transition"
           >
             Verify OTP
           </button>

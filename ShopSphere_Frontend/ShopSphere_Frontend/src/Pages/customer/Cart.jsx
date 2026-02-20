@@ -209,7 +209,7 @@ function Cart() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#fff5f5] via-[#fef3f2] to-[#f3e8ff] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row gap-10">
           {/* ─── Left Column ─── */}
@@ -217,7 +217,7 @@ function Cart() {
             {/* Header */}
             <div className="flex items-center justify-between mb-10">
               <h1 className="text-3xl font-black text-gray-900 tracking-tight flex items-center gap-4">
-                <span className="bg-violet-600 text-white p-3 rounded-2xl shadow-lg shadow-violet-500/20">
+                <span className="bg-gradient-to-r from-orange-400 to-purple-500 text-white p-3 rounded-2xl shadow-lg shadow-orange-400/20">
                   🛒
                 </span>
                 Shopping Cart
@@ -250,7 +250,7 @@ function Cart() {
                       <p className="text-gray-400 text-sm font-medium mb-4 line-clamp-1">
                         {item.description}
                       </p>
-                      <div className="text-2xl font-black text-violet-600 flex items-center justify-center md:justify-start gap-2">
+                      <div className="text-2xl font-black text-orange-400 flex items-center justify-center gap-1">
                         <span className="text-sm text-gray-400 font-bold">
                           Price:
                         </span>{" "}
@@ -298,7 +298,7 @@ function Cart() {
                   {/* Section Header */}
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-3">
-                      <FaMapMarkerAlt className="text-violet-600" />
+                      <FaMapMarkerAlt className="text-orange-400" />
                       Delivery Address
                     </h2>
                   </div>
@@ -319,7 +319,7 @@ function Cart() {
                           setFormData(emptyForm);
                           setAddressError("");
                         }}
-                        className="flex-1 flex items-center justify-center gap-2 bg-violet-600 text-white py-3 px-5 rounded-xl font-bold hover:bg-violet-700 transition-all shadow-md shadow-violet-500/20"
+                        className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-orange-400 to-purple-500 text-white py-3 rounded-xl hover:from-orange-600 hover:to-purple-700 transition-all shadow-lg font-bold"
                       >
                         <FaPlus size={12} /> Add New Address
                       </button>
@@ -327,7 +327,7 @@ function Cart() {
                       <button
                         onClick={getCurrentLocation}
                         disabled={isLocating}
-                        className="flex-1 flex items-center justify-center gap-2 bg-white text-violet-600 py-3 px-5 rounded-xl font-bold border-2 border-dashed border-violet-400 hover:bg-violet-50 transition-all disabled:opacity-50"
+                        className="flex-1 flex items-center justify-center gap-2 bg-white text-orange-400 py-3 px-5 rounded-xl font-bold border-2 border-dashed border-orange-400 hover:bg-orange-50 transition-all disabled:opacity-50"
                       >
                         <FaCrosshairs
                           size={14}
@@ -364,7 +364,7 @@ function Cart() {
                         type="button"
                         onClick={getCurrentLocation}
                         disabled={isLocating}
-                        className="w-full flex items-center justify-center gap-2 bg-white text-violet-600 py-2.5 px-4 rounded-xl font-semibold text-sm border-2 border-dashed border-violet-300 hover:bg-violet-50 transition-all disabled:opacity-50"
+                        className="w-full flex items-center justify-center gap-2 bg-white text-orange-400 border-2 border-orange-200 py-3 rounded-xl hover:bg-orange-50 transition-all font-bold"
                       >
                         <FaCrosshairs
                           size={13}
@@ -381,7 +381,7 @@ function Cart() {
                           value={formData.name}
                           onChange={handleChange}
                           placeholder="Full Name"
-                          className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-violet-500 outline-none bg-white ${formError && !formData.name ? "border-red-400" : "border-gray-200"
+                          className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none transition ${formError && !formData.name ? "border-red-400" : "border-gray-200"
                             }`}
                         />
                         <input
@@ -390,7 +390,7 @@ function Cart() {
                           onChange={handleChange}
                           placeholder="Phone (10 digits)"
                           maxLength={10}
-                          className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-violet-500 outline-none bg-white ${formError && !formData.phone ? "border-red-400" : "border-gray-200"
+                          className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none bg-white ${formError && !formData.phone ? "border-red-400" : "border-gray-200"
                             }`}
                         />
                         <input
@@ -399,7 +399,7 @@ function Cart() {
                           onChange={handleChange}
                           placeholder="Pincode (6 digits)"
                           maxLength={6}
-                          className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-violet-500 outline-none bg-white ${formError && !formData.pincode ? "border-red-400" : "border-gray-200"
+                          className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none bg-white ${formError && !formData.pincode ? "border-red-400" : "border-gray-200"
                             }`}
                         />
                         <input
@@ -407,7 +407,7 @@ function Cart() {
                           value={formData.city}
                           onChange={handleChange}
                           placeholder="City"
-                          className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-violet-500 outline-none bg-white ${formError && !formData.city ? "border-red-400" : "border-gray-200"
+                          className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none bg-white ${formError && !formData.city ? "border-red-400" : "border-gray-200"
                             }`}
                         />
                         <input
@@ -415,7 +415,7 @@ function Cart() {
                           value={formData.state}
                           onChange={handleChange}
                           placeholder="State"
-                          className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-violet-500 outline-none bg-white ${formError && !formData.state ? "border-red-400" : "border-gray-200"
+                          className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none bg-white ${formError && !formData.state ? "border-red-400" : "border-gray-200"
                             }`}
                         />
                         <div className="sm:col-span-2">
@@ -425,7 +425,7 @@ function Cart() {
                             onChange={handleChange}
                             placeholder="Datailed Address (Street, House No, etc.)"
                             rows="2"
-                            className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-violet-500 outline-none bg-white ${formError && !formData.address_line1 ? "border-red-400" : "border-gray-200"
+                            className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none bg-white ${formError && !formData.address_line1 ? "border-red-400" : "border-gray-200"
                               }`}
                           />
                         </div>
@@ -441,7 +441,7 @@ function Cart() {
                         <button
                           type="submit"
                           disabled={isSaving}
-                          className="w-full bg-violet-600 text-white py-3 rounded-xl hover:bg-violet-700 transition font-bold shadow-lg shadow-violet-500/20 disabled:opacity-70 disabled:cursor-not-allowed"
+                          className="w-full bg-gradient-to-r from-orange-400 to-purple-500 text-white py-3 rounded-xl hover:from-orange-600 hover:to-purple-700 transition-all shadow-lg font-bold disabled:opacity-50"
                         >
                           {isSaving ? "Saving Address..." : "Save Address"}
                         </button>
@@ -463,15 +463,15 @@ function Cart() {
                             setAddressError("");
                           }}
                           className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${selectedAddress === addr.id
-                            ? "border-violet-500 bg-violet-50 ring-2 ring-violet-200"
-                            : "border-gray-100 bg-white hover:border-violet-200"
+                            ? "border-orange-400 bg-orange-50 ring-2 ring-orange-200"
+                            : "border-gray-100 bg-white hover:border-orange-200"
                             }`}
                         >
                           <div className="flex justify-between items-start">
                             <div className="flex gap-4">
                               <div
                                 className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-1 ${selectedAddress === addr.id
-                                  ? "border-violet-600 bg-violet-600"
+                                  ? "border-orange-400 bg-orange-400"
                                   : "border-gray-300"
                                   }`}
                               >
@@ -500,7 +500,7 @@ function Cart() {
                                   e.stopPropagation();
                                   handleEdit(addr);
                                 }}
-                                className="p-2 text-violet-500 hover:bg-violet-50 rounded-lg transition"
+                                className="p-2 text-orange-400 hover:bg-orange-50 rounded-lg transition"
                                 title="Edit Address"
                               >
                                 <FaEdit />
@@ -543,7 +543,7 @@ function Cart() {
                 </p>
                 <button
                   onClick={() => navigate("/")}
-                  className="bg-violet-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-violet-700 transition-all shadow-xl shadow-violet-500/30 hover:-translate-y-1"
+                  className="bg-gradient-to-r from-orange-400 to-purple-500 text-white px-8 py-4 rounded-2xl font-bold hover:from-orange-600 hover:to-purple-700 transition-all shadow-xl shadow-orange-400/30 hover:-translate-y-1"
                 >
                   Start Shopping
                 </button>
@@ -554,7 +554,7 @@ function Cart() {
           {/* ─── Right Column: Order Summary ─── */}
           {cartObjects.length > 0 && (
             <div className="lg:w-1/3 space-y-6">
-              <div className="bg-white rounded-[32px] p-8 shadow-xl shadow-indigo-100/50 border border-gray-100 sticky top-24">
+              <div className="bg-white rounded-[32px] p-8 shadow-xl shadow-orange-100/50 border border-gray-100 sticky top-24">
                 <h2 className="text-2xl font-black text-gray-900 mb-8 flex items-center gap-3">
                   <span className="bg-yellow-100 text-yellow-600 p-2 rounded-xl">
                     <FaReceipt size={20} />
@@ -592,7 +592,7 @@ function Cart() {
                     <span className="text-lg font-black text-gray-900">
                       Total
                     </span>
-                    <span className="text-3xl font-black text-violet-600">
+                    <span className="text-3xl font-black text-orange-400">
                       ₹{totalAmount.toFixed(2)}
                     </span>
                   </div>
@@ -602,7 +602,7 @@ function Cart() {
                 <button
                   onClick={handleCheckout}
                   disabled={!selectedAddress}
-                  className="w-full bg-gray-900 text-white py-4 rounded-2xl font-bold hover:bg-black transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group"
+                  className="w-full bg-gradient-to-r from-orange-400 to-purple-500 text-white py-4 rounded-2xl font-bold hover:from-orange-600 hover:to-purple-700 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group"
                 >
                   Proceed to Payment
                   <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
@@ -623,7 +623,7 @@ function Cart() {
                     </span>
                   </div>
                   <div className="flex flex-col items-center p-3 bg-gray-50 rounded-2xl">
-                    <FaCheckCircle className="text-blue-500 mb-1" size={20} />
+                    <FaCheckCircle className="text-orange-400 mb-1" size={20} />
                     <span className="text-xs font-bold text-gray-600">
                       Quality Assured
                     </span>

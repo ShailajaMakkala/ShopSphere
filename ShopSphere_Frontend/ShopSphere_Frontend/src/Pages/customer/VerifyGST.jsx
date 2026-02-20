@@ -55,10 +55,10 @@ export default function VerifyGST() {
         navigate("/store-name");
     };
     return (
-        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-100">
+        <div className="min-h-screen bg-gradient-to-br from-[#fff5f5] via-[#fef3f2] to-[#f3e8ff]">
 
             {/* Header */}
-            <header className="flex items-center justify-between px-8 py-5 bg-purple-700 shadow-sm">
+            <header className="flex items-center justify-between px-8 py-5 bg-gradient-to-r from-orange-400 to-purple-500 shadow-sm">
                 <div className="flex items-center gap-1">
                     {/* <img
                         src="/s_logo.png"
@@ -164,8 +164,8 @@ export default function VerifyGST() {
                         </p>
                         <button
                             onClick={handleContinue}
-                            className="px-6 py-3 bg-purple-700 text-white rounded-lg 
-                            hover:bg-purple-800 transition font-medium shadow-md">
+                            className="px-6 py-3 bg-gradient-to-r from-orange-400 to-purple-500 text-white rounded-lg 
+                            hover:from-orange-600 hover:to-purple-700 transition font-medium shadow-md">
                             Continue
                         </button>
                     </div>
