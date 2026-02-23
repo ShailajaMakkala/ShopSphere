@@ -1,0 +1,4 @@
+-r Duplicate/ShopSphere/requirements.txt
+gunicorn
+dj-database-url
+whitenoise
