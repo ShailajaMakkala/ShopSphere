@@ -443,7 +443,7 @@ class DeliveryAgentProfileCreateSerializer(serializers.ModelSerializer):
                 user = AuthUser.objects.filter(email=email).first()
                 if user:
                     # Update existing user role
-                    if user.role == 'customer':
+                    if user.role not in ['delivery', 'admin']:
                         user.role = 'delivery'
                         if phone_number:
                             user.phone = phone_number
@@ -453,6 +453,7 @@ class DeliveryAgentProfileCreateSerializer(serializers.ModelSerializer):
                     else:
                         # Should have been caught in validate, but safety first
                         raise serializers.ValidationError({"error": f"Cannot register user with role '{user.role}' as delivery agent."})
+
                 else:
                     # Create new user
                     user = AuthUser.objects.create_user(

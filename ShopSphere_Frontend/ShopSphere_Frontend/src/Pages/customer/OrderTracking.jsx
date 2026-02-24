@@ -98,7 +98,7 @@ const OrderTracking = () => {
                 <div className="flex items-center gap-4 mb-8">
                     <button
                         onClick={() => navigate(-1)}
-                        className="p-2 hover:bg-white rounded-full transition-colors group"
+                        className="p-2 hover:bg-white rounded-full transition-colors group relative z-10"
                     >
                         <ArrowLeft className="text-gray-400 group-hover:text-gray-900" size={20} />
                     </button>
