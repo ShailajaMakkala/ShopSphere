@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const base_url = import.meta.env.VITE_API_BASE_URL || "https://duplicate-39hf.onrender.com";
+const base_url = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
 // ── Token helper ─────────────────────────────────────────────────────────────
 const getAdminToken = () => {
