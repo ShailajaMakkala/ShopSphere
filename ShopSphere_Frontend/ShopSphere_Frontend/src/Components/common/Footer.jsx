@@ -56,20 +56,22 @@ const Footer = () => {
                             <li><a href="/returns" className="text-purple-300/70 text-sm hover:text-orange-400 transition-colors duration-300 flex items-center gap-2"><span className="w-1 h-1 rounded-full bg-purple-500/50"></span>Returns</a></li>
                         </ul>
                     </div>
-                    <div>
-                        <h4 className="text-sm font-black uppercase tracking-[0.2em] text-orange-400 mb-6">Newsletter</h4>
-                        <p className="text-purple-300/70 text-sm mb-4">Subscribe to get the latest deals and offers.</p>
-                        <div className="flex gap-2">
-                            <input
-                                type="email"
-                                placeholder="Your email"
-                                className="flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder-purple-400/50 focus:outline-none focus:border-orange-400/50 focus:ring-1 focus:ring-orange-400/20 transition-all"
-                            />
-                            <button className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-400 to-purple-500 text-white text-sm font-bold hover:from-orange-600 hover:to-purple-700 transition-all shadow-lg shadow-orange-400/20">
-                                Go
-                            </button>
+                    {location.pathname !== "/home" && (
+                        <div>
+                            <h4 className="text-sm font-black uppercase tracking-[0.2em] text-orange-400 mb-6">Newsletter</h4>
+                            <p className="text-purple-300/70 text-sm mb-4">Subscribe to get the latest deals and offers.</p>
+                            <div className="flex gap-2">
+                                <input
+                                    type="email"
+                                    placeholder="Your email"
+                                    className="flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder-purple-400/50 focus:outline-none focus:border-orange-400/50 focus:ring-1 focus:ring-orange-400/20 transition-all"
+                                />
+                                <button className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-400 to-purple-500 text-white text-sm font-bold hover:from-orange-600 hover:to-purple-700 transition-all shadow-lg shadow-orange-400/20">
+                                    Go
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
                 <div className="border-t border-white/5 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p className="text-purple-400/60 text-sm">&copy; {new Date().getFullYear()} ShopSphere. All rights reserved.</p>

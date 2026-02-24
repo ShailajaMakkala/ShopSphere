@@ -14,9 +14,12 @@ import {
   Store,
 } from "lucide-react";
 import { fetchProducts, AddToCart, AddToWishlist, RemoveFromWishlist } from "../../Store";
+import { getProducts } from "../../api/axios";
 import toast from "react-hot-toast";
 import ProductCard from "../../Components/ProductCard";
 import TrendingProducts from "../../Components/TrendingProducts";
+import BestValueDeals from "../../Components/BestValueDeals";
+import MostSearched from "../../Components/MostSearched";
 import DiscoverySection from "../../Components/DiscoverySection";
 import Newsletter from "../../Components/Newsletter";
 
@@ -134,7 +137,24 @@ const Home = () => {
   const isLoading = useSelector((state) => state.products.isLoading);
   const wishlist = useSelector((state) => state.wishlist);
 
-  useEffect(() => { dispatch(fetchProducts()); }, [dispatch]);
+  // Fetch the full product catalog once on mount
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
+
+  // Background search count tracking & local frequency history
+  useEffect(() => {
+    const term = urlSearchQuery?.trim().toLowerCase();
+    if (term && term.length > 2) {
+      // 1. Backend tracking
+      getProducts({ search: term });
+
+      // 2. Local frequency tracking for personal relevance
+      const history = JSON.parse(localStorage.getItem('recentSearchFreq') || "{}");
+      history[term] = (history[term] || 0) + 1;
+      localStorage.setItem('recentSearchFreq', JSON.stringify(history));
+    }
+  }, [urlSearchQuery]);
 
   useEffect(() => {
     setSearchQuery(urlSearchQuery);
@@ -186,7 +206,9 @@ const Home = () => {
       const matchSearch = !searchQuery
         ? true
         : item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.description?.toLowerCase().includes(searchQuery.toLowerCase());
+        item.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (item.category_display && item.category_display.toLowerCase().includes(searchQuery.toLowerCase()));
       return matchCat && matchBrand && matchPrice && matchSearch;
     });
   }, [allProducts, selectedCategory, selectedPriceRange, selectedBrand, searchQuery]);
@@ -305,6 +327,12 @@ const Home = () => {
         isInWishlist={isInWishlist}
       />
 
+      {/* ── BEST VALUE DEALS ─────────────────────────────────────────────────── */}
+      <BestValueDeals />
+
+      {/* ── MOST SEARCHED ─────────────────────────────────────────────────── */}
+      <MostSearched />
+
       {/* ── PRODUCTS SECTION ──────────────────────────────────────────────────── */}
       <section id="products-section" className="max-w-[1600px] mx-auto px-6 md:px-12 py-16">
 
@@ -327,7 +355,18 @@ const Home = () => {
                 type="text"
                 placeholder="Search products..."
                 value={searchQuery}
-                onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setSearchQuery(val);
+                  setCurrentPage(1);
+
+                  // Update URL so it's globally synced
+                  if (val.trim()) {
+                    navigate(`/home?search=${encodeURIComponent(val.trim())}`, { replace: true });
+                  } else {
+                    navigate('/home', { replace: true });
+                  }
+                }}
                 className="pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-2xl text-sm font-medium outline-none focus:border-orange-400 focus:ring-4 focus:ring-orange-400/5 transition-all w-64"
               />
             </div>

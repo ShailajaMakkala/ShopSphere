@@ -47,7 +47,7 @@ import DeliveryVehicleOps from "../Pages/delivery/VehicleOps";
 import DeliveryBankDocs from "../Pages/delivery/BankDocs";
 import CategoryProducts from "../Pages/customer/CategoryProducts";
 import BrandProducts from "../Pages/customer/BrandProducts";
-
+import OfferZone from "../Pages/customer/OfferZone";
 
 function AppRoutes() {
     const hasSeenLanding = sessionStorage.getItem("hasSeenLanding");
@@ -65,6 +65,7 @@ function AppRoutes() {
 
             {/* Customer Routes */}
             <Route path="/home" element={<Home />} />
+            <Route path="/offer-zone" element={<OfferZone />} />
             <Route path="/category/:category" element={<CategoryProducts />} />
             <Route path="/brand/:brand" element={<BrandProducts />} />
             <Route path="/cart" element={<Cart />} />

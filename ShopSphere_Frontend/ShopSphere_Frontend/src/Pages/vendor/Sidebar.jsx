@@ -53,7 +53,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="flex justify-between items-center mb-10 px-2 h-16">
         <Link to="/welcome" className="flex items-center gap-0 group">
-          <img src="/s_logo.png" alt="ShopSphere" className="w-16 h-16 object-contain transition-transform duration-300 group-hover:scale-110" />
+          <img src="/s_logo.png" alt="ShopSphere" className="w-16 h-16 object-contain transition-transform duration-300 group-hover:scale-110 mb-5 mr-1" />
           {!collapsed && (
             <div className="flex flex-col -ml-5">
               <span className={`text-xl font-bold leading-none tracking-wide transition-colors duration-300 group-hover:text-sky-400 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>

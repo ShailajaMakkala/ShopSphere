@@ -266,7 +266,7 @@ export default function AddressPage() {
               <input
                 name="name" value={formData.name} onChange={handleChange}
                 placeholder="Full Name (letters only, >3 chars)"
-                className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none ${fieldErrors.name ? "border-red-500 bg-red-50" : "border-gray-200"}`}
+                className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none text-gray-900 bg-white placeholder:text-gray-500 ${fieldErrors.name ? "border-red-500 bg-red-50" : "border-gray-200"}`}
               />
               {fieldErrors.name && <p className="text-red-500 text-xs mt-1 font-bold">⚠ {fieldErrors.name}</p>}
             </div>
@@ -276,7 +276,7 @@ export default function AddressPage() {
                 name="phone" value={formData.phone} onChange={handleChange}
                 placeholder="Phone (10 digits only)"
                 maxLength={10}
-                className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none ${fieldErrors.phone ? "border-red-500 bg-red-50" : "border-gray-200"}`}
+                className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none text-gray-900 bg-white placeholder:text-gray-500 ${fieldErrors.phone ? "border-red-500 bg-red-50" : "border-gray-200"}`}
               />
               {fieldErrors.phone && <p className="text-red-500 text-xs mt-1 font-bold">⚠ {fieldErrors.phone}</p>}
             </div>
@@ -286,7 +286,7 @@ export default function AddressPage() {
                 name="pincode" value={formData.pincode} onChange={handleChange}
                 placeholder="Pincode (6 digits)"
                 maxLength={6}
-                className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none ${fieldErrors.pincode ? "border-red-500 bg-red-50" : "border-gray-200"}`}
+                className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none text-gray-900 bg-white placeholder:text-gray-500 ${fieldErrors.pincode ? "border-red-500 bg-red-50" : "border-gray-200"}`}
               />
               {fieldErrors.pincode && <p className="text-red-500 text-xs mt-1 font-bold">⚠ {fieldErrors.pincode}</p>}
             </div>
@@ -295,7 +295,7 @@ export default function AddressPage() {
               <input
                 name="city" value={formData.city} onChange={handleChange}
                 placeholder="City"
-                className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none ${fieldErrors.city ? "border-red-500 bg-red-50" : "border-gray-200"}`}
+                className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none text-gray-900 bg-white placeholder:text-gray-500 ${fieldErrors.city ? "border-red-500 bg-red-50" : "border-gray-200"}`}
               />
               {fieldErrors.city && <p className="text-red-500 text-xs mt-1 font-bold">⚠ {fieldErrors.city}</p>}
             </div>
@@ -304,7 +304,7 @@ export default function AddressPage() {
               <input
                 name="state" value={formData.state} onChange={handleChange}
                 placeholder="State"
-                className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none ${fieldErrors.state ? "border-red-500 bg-red-50" : "border-gray-200"}`}
+                className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none text-gray-900 bg-white placeholder:text-gray-500 ${fieldErrors.state ? "border-red-500 bg-red-50" : "border-gray-200"}`}
               />
               {fieldErrors.state && <p className="text-red-500 text-xs mt-1 font-bold">⚠ {fieldErrors.state}</p>}
             </div>
@@ -314,7 +314,7 @@ export default function AddressPage() {
                 name="address" value={formData.address} onChange={handleChange}
                 placeholder="Full Address (door no, street, area)"
                 rows="3"
-                className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none ${fieldErrors.address ? "border-red-500 bg-red-50" : "border-gray-200"}`}
+                className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none text-gray-900 bg-white placeholder:text-gray-500 ${fieldErrors.address ? "border-red-500 bg-red-50" : "border-gray-200"}`}
               />
               {fieldErrors.address && <p className="text-red-500 text-xs mt-1 font-bold">⚠ {fieldErrors.address}</p>}
             </div>

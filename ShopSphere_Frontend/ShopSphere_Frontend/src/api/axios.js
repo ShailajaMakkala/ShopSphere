@@ -274,8 +274,9 @@ export const resetPassword = async (token, password1, password2) => {
 };
 
 // PRODUCTS (Public)
-export const getProducts = async () => {
-  const response = await axios.get(`${API_BASE_URL}/products`);
+export const getProducts = async (params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  const response = await axios.get(`${API_BASE_URL}/products?${query}`);
   return response.data;
 };
 

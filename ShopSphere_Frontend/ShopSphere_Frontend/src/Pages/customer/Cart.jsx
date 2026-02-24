@@ -377,7 +377,7 @@ function Cart() {
                           value={formData.name}
                           onChange={handleChange}
                           placeholder="Full Name"
-                          className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none transition ${formError && !formData.name ? "border-red-400" : "border-gray-200"
+                          className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none transition text-gray-900 bg-white placeholder:text-gray-500 ${formError && !formData.name ? "border-red-400" : "border-gray-200"
                             }`}
                         />
                         <input
@@ -386,7 +386,7 @@ function Cart() {
                           onChange={handleChange}
                           placeholder="Phone (10 digits)"
                           maxLength={10}
-                          className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none bg-white ${formError && !formData.phone ? "border-red-400" : "border-gray-200"
+                          className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none bg-white text-gray-900 placeholder:text-gray-500 ${formError && !formData.phone ? "border-red-400" : "border-gray-200"
                             }`}
                         />
                         <input
@@ -395,7 +395,7 @@ function Cart() {
                           onChange={handleChange}
                           placeholder="Pincode (6 digits)"
                           maxLength={6}
-                          className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none bg-white ${formError && !formData.pincode ? "border-red-400" : "border-gray-200"
+                          className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none bg-white text-gray-900 placeholder:text-gray-500 ${formError && !formData.pincode ? "border-red-400" : "border-gray-200"
                             }`}
                         />
                         <input
@@ -403,7 +403,7 @@ function Cart() {
                           value={formData.city}
                           onChange={handleChange}
                           placeholder="City"
-                          className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none bg-white ${formError && !formData.city ? "border-red-400" : "border-gray-200"
+                          className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none bg-white text-gray-900 placeholder:text-gray-500 ${formError && !formData.city ? "border-red-400" : "border-gray-200"
                             }`}
                         />
                         <input
@@ -411,7 +411,7 @@ function Cart() {
                           value={formData.state}
                           onChange={handleChange}
                           placeholder="State"
-                          className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none bg-white ${formError && !formData.state ? "border-red-400" : "border-gray-200"
+                          className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none bg-white text-gray-900 placeholder:text-gray-500 ${formError && !formData.state ? "border-red-400" : "border-gray-200"
                             }`}
                         />
                         <div className="sm:col-span-2">
@@ -421,7 +421,7 @@ function Cart() {
                             onChange={handleChange}
                             placeholder="Datailed Address (Street, House No, etc.)"
                             rows="2"
-                            className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none bg-white ${formError && !formData.address_line1 ? "border-red-400" : "border-gray-200"
+                            className={`w-full border rounded-xl p-3 focus:ring-2 focus:ring-orange-400 outline-none bg-white text-gray-900 placeholder:text-gray-500 ${formError && !formData.address_line1 ? "border-red-400" : "border-gray-200"
                               }`}
                           />
                         </div>

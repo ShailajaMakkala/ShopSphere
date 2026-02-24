@@ -17,6 +17,9 @@ export default function VendorLayout() {
         setVendor(data);
       } catch (error) {
         console.error("Error fetching vendor profile:", error);
+        if (error.response?.status === 404) {
+          navigate('/account-verification');
+        }
       }
     };
     fetchProfile();

@@ -87,7 +87,12 @@ function Navbar() {
     useEffect(() => {
         setIsOpen(false);
         setProfileDropdownOpen(false);
-    }, [location.pathname]);
+
+        // Sync search query from URL
+        const params = new URLSearchParams(location.search);
+        const q = params.get("search") || "";
+        setSearchQuery(q);
+    }, [location.pathname, location.search]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {

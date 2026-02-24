@@ -301,7 +301,7 @@ function Checkout() {
 
   return (
 
-    <div className="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#fff5f5] via-[#fef3f2] to-[#f3e8ff] py-12 px-4 sm:px-6 lg:px-8">
 
       <div className="max-w-6xl mx-auto">
 

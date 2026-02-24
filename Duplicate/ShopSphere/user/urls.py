@@ -7,6 +7,7 @@ urlpatterns = [
     path('user_login', views.login_api, name='user_login'),
     path('google_login', views.google_login_api, name='google_login'),
     path('register', views.register_api, name='register'),
+    path('check-email', views.check_email_exists, name='check_email_exists'),
     path('logout', views.logout_api, name='logout'),
     path('update-profile', views.update_profile, name='update_profile'),
     path('api/reverse-geocode/', views.reverse_geocode, name='reverse_geocode'),

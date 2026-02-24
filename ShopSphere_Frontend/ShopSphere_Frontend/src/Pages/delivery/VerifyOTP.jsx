@@ -91,23 +91,23 @@ export default function DeliveryVerifyOTP() {
         <div className={`min-h-screen flex items-center justify-center p-6 relative overflow-hidden transition-colors duration-500 ${isDarkMode ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'}`}>
             {/* Background Aesthetics */}
             <div className={`absolute top-0 right-0 w-[800px] h-[800px] rounded-full translate-x-1/2 -translate-y-1/2 blur-[150px] pointer-events-none transition-opacity duration-1000 ${isDarkMode ? 'bg-orange-500/10 opacity-100' : 'bg-orange-500/5 opacity-50'}`}></div>
-            <div className={`absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full -translate-x-1/2 translate-y-1/2 blur-[120px] pointer-events-none transition-opacity duration-1000 ${isDarkMode ? 'bg-indigo-500/10 opacity-100' : 'bg-indigo-500/5 opacity-50'}`}></div>
+            <div className={`absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full -translate-x-1/2 translate-y-1/2 blur-[120px] pointer-events-none transition-opacity duration-1000 ${isDarkMode ? 'bg-orange-500/10 opacity-100' : 'bg-orange-500/5 opacity-50'}`}></div>
 
             <div className="w-full max-w-lg relative z-10 animate-fadeInUp">
                 <div className="mb-12 text-center">
                     <div className={`inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl mb-8 border transition-all ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-slate-200 shadow-sm'}`}>
                         <ShieldCheck className="text-orange-500" size={18} />
-                        <span className={`text-[10px] font-black uppercase tracking-[4px] ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Security Checkpoint</span>
+                        <span className={`text-[10px] font-bold uppercase tracking-wider ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Security Checkpoint</span>
                     </div>
-                    <h1 className={`text-5xl lg:text-6xl font-black tracking-tighter italic uppercase mb-4 transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                    <h1 className={`text-5xl lg:text-6xl font-bold tracking-tight  uppercase mb-4 transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
                         Final <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-indigo-400 to-purple-500">Access.</span>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-orange-500 to-purple-500">Access.</span>
                     </h1>
-                    <p className={`font-bold text-[11px] uppercase tracking-[3px] italic transition-colors ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>Code transmitted to <span className={`text-orange-500 decoration-orange-500/30 underline underline-offset-4`}>{email}</span></p>
+                    <p className={`font-bold text-[11px] uppercase tracking-wider  transition-colors ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>Code transmitted to <span className={`text-orange-500 decoration-orange-500/30 underline underline-offset-4`}>{email}</span></p>
                 </div>
 
                 <div className={`backdrop-blur-3xl rounded-[48px] p-10 md:p-14 shadow-2xl relative overflow-hidden border transition-all duration-500 ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-slate-100 shadow-slate-200'}`}>
-                    <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-orange-400 via-indigo-500 to-purple-600"></div>
+                    <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-orange-400 via-orange-500 to-purple-600"></div>
 
                     <form onSubmit={handleVerify} className="space-y-12">
                         <div className="flex justify-between gap-2 md:gap-4">
@@ -120,7 +120,7 @@ export default function DeliveryVerifyOTP() {
                                     onChange={(e) => handleChange(e.target, index)}
                                     onKeyDown={(e) => handleKeyDown(e, index)}
                                     onFocus={(e) => e.target.select()}
-                                    className={`w-12 h-16 md:w-16 md:h-20 text-center text-4xl font-black rounded-2xl border-2 outline-none transition-all shadow-inner italic ${isDarkMode ? 'bg-[#020617] border-transparent focus:border-orange-500 text-orange-400 focus:bg-black/40' : 'bg-slate-50 border-slate-100 focus:border-orange-400 text-orange-500 focus:bg-white'}`}
+                                    className={`w-12 h-16 md:w-16 md:h-20 text-center text-4xl font-bold rounded-2xl border-2 outline-none transition-all shadow-inner  ${isDarkMode ? 'bg-[#020617] border-transparent focus:border-orange-500 text-orange-400 focus:bg-black/40' : 'bg-slate-50 border-slate-100 focus:border-orange-400 text-orange-500 focus:bg-white'}`}
                                 />
                             ))}
                         </div>
@@ -128,7 +128,7 @@ export default function DeliveryVerifyOTP() {
                         <div className="flex flex-col items-center gap-6">
                             <div className={`flex items-center gap-3 px-6 py-3 rounded-full border transition-all ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-100'}`}>
                                 <Timer className={`transition-all ${timer < 60 ? "text-rose-500 animate-pulse" : isDarkMode ? "text-slate-600" : "text-slate-400"}`} size={16} />
-                                <span className={`text-[10px] font-black uppercase tracking-[3px] transition-colors ${timer < 60 ? "text-rose-500" : isDarkMode ? "text-slate-500" : "text-slate-400"}`}>
+                                <span className={`text-[10px] font-bold uppercase tracking-wider transition-colors ${timer < 60 ? "text-rose-500" : isDarkMode ? "text-slate-500" : "text-slate-400"}`}>
                                     Pulse Expiry: <span className={isDarkMode ? "text-white" : "text-slate-900"}>{formatTime(timer)}</span>
                                 </span>
                             </div>
@@ -137,7 +137,7 @@ export default function DeliveryVerifyOTP() {
                                 <button
                                     type="button"
                                     onClick={() => navigate("/delivery/account-verification")}
-                                    className="text-[10px] font-black uppercase tracking-[4px] text-orange-400 hover:text-orange-500 transition-all border-b-2 border-orange-400/20 hover:border-orange-500 pb-1 italic"
+                                    className="text-[10px] font-bold uppercase tracking-wider text-orange-400 hover:text-orange-500 transition-all border-b-2 border-orange-400/20 hover:border-orange-500 pb-1 "
                                 >
                                     Re-generate Signal
                                 </button>
@@ -146,7 +146,7 @@ export default function DeliveryVerifyOTP() {
 
                         <button
                             type="submit"
-                            className={`w-full py-6 rounded-[32px] text-[11px] font-black uppercase tracking-[5px] shadow-2xl transition-all flex items-center justify-center gap-4 group italic border-none cursor-pointer ${isDarkMode ? 'bg-white text-[#0f172a] hover:bg-orange-400 hover:text-white shadow-white/5' : 'bg-slate-900 text-white hover:bg-orange-500 shadow-slate-900/10'}`}
+                            className={`w-full py-6 rounded-[32px] text-[11px] font-bold uppercase tracking-wider shadow-2xl transition-all flex items-center justify-center gap-4 group  border-none cursor-pointer ${isDarkMode ? 'bg-white text-[#0f172a] hover:bg-orange-400 hover:text-white shadow-white/5' : 'bg-slate-900 text-white hover:bg-orange-500 shadow-slate-900/10'}`}
                         >
                             Confirm Access <ArrowRight className="group-hover:translate-x-2 transition-transform" size={18} />
                         </button>
@@ -154,7 +154,7 @@ export default function DeliveryVerifyOTP() {
                 </div>
 
                 <div className="mt-16 text-center">
-                    <p className={`text-[9px] font-black uppercase tracking-[5px] transition-colors ${isDarkMode ? 'text-slate-700' : 'text-slate-300'}`}>
+                    <p className={`text-[9px] font-bold uppercase tracking-wider transition-colors ${isDarkMode ? 'text-slate-700' : 'text-slate-300'}`}>
                         Secured by ShopSphere Logistics Command
                     </p>
                 </div>

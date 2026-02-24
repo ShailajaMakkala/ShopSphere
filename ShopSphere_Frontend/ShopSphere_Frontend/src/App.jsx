@@ -2,6 +2,7 @@ import { BrowserRouter, useLocation } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
 import Navbar from "./Components/common/Navbar";
 import Footer from "./Components/common/Footer";
+import ScrollToTop from "./Components/common/ScrollToTop";
 import { Toaster } from "react-hot-toast";
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 
@@ -23,13 +24,15 @@ function Layout() {
     "/shipping-address",
     "/shipping-method",
     "/shipping-fee-preferences",
-    "/bank-details"
+    "/bank-details",
+    "/offer-zone"
   ];
   const hideNavbarFooter = hidePaths.some(path => location.pathname === path || location.pathname.startsWith(path + "/"));
   const { isDarkMode } = useTheme();
 
   return (
     <div className={`flex flex-col min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-[#0f172a] text-slate-100' : 'bg-white text-slate-800'}`}>
+      <ScrollToTop />
       <Toaster
         position="top-right"
         reverseOrder={false}

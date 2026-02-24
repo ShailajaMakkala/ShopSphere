@@ -90,9 +90,9 @@ const DeliveryAgentLogin = ({ onLoginSuccess }) => {
             <div className="w-full flex flex-col lg:flex-row min-h-screen">
 
                 {/* Visual Brand Section */}
-                <div className={`w-full lg:w-1/2 min-h-[40vh] lg:min-h-screen p-8 lg:p-20 flex flex-col justify-center items-center relative overflow-hidden transition-all duration-500 ${isDarkMode ? 'bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#0f172a]' : 'bg-gradient-to-br from-indigo-900 via-indigo-800 to-indigo-950'}`}>
+                <div className={`w-full lg:w-1/2 min-h-[40vh] lg:min-h-screen p-8 lg:p-20 flex flex-col justify-center items-center relative overflow-hidden transition-all duration-500 ${isDarkMode ? 'bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#0f172a]' : 'bg-gradient-to-br from-orange-400 to-purple-500'}`}>
                     <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-orange-500/10 rounded-full translate-x-1/2 -translate-y-1/2 blur-[150px] pointer-events-none animate-pulse"></div>
-                    <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-500/10 rounded-full -translate-x-1/2 translate-y-1/2 blur-[120px] pointer-events-none animate-pulse"></div>
+                    <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-orange-500/10 rounded-full -translate-x-1/2 translate-y-1/2 blur-[120px] pointer-events-none animate-pulse"></div>
 
                     <div className="relative z-10 w-full max-w-lg">
                         <div className="flex items-center gap-0 mb-20 justify-center lg:justify-start group cursor-default">
@@ -100,16 +100,16 @@ const DeliveryAgentLogin = ({ onLoginSuccess }) => {
                             <div className="flex flex-col -ml-5">
                                 <h1 className="text-2xl font-bold text-white tracking-wide leading-none flex items-center">
                                     hopSphere
-                                    <span className="ml-3 px-3 py-1 bg-orange-500 text-white text-[8px] font-black uppercase tracking-widest rounded-lg">DELIVERY</span>
+                                    <span className="ml-3 px-3 py-1 bg-orange-500 text-white text-[8px] font-bold uppercase tracking-widest rounded-lg">DELIVERY</span>
                                 </h1>
-                                <p className="text-indigo-300 text-[9px] font-black uppercase tracking-[4px] mt-1">Delivery Portal</p>
+                                <p className="text-indigo-300 text-[9px] font-bold uppercase tracking-wider mt-1">Delivery Portal</p>
                             </div>
                         </div>
 
                         <div className="text-center lg:text-left">
-                            <h2 className="text-6xl lg:text-8xl font-black text-white mb-8 tracking-tighter leading-[0.8] italic uppercase">
+                            <h2 className="text-6xl lg:text-8xl font-bold text-white mb-8 tracking-tight leading-[0.8]  uppercase">
                                 MOVE <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-indigo-400 to-purple-400">FASTER.</span>
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-orange-400 to-purple-400">FASTER.</span>
                             </h2>
                             <p className="text-indigo-200/60 text-lg leading-relaxed mb-12 max-w-sm mx-auto lg:mx-0 font-medium">
                                 Deliver faster, smarter, and get paid. Log in to your delivery dashboard.
@@ -119,15 +119,15 @@ const DeliveryAgentLogin = ({ onLoginSuccess }) => {
                         <div className="grid grid-cols-2 gap-4 md:gap-6 mt-12">
                             <div className="p-6 md:p-8 bg-white/5 border border-white/10 rounded-[32px] backdrop-blur-xl group hover:border-orange-500/50 transition-all cursor-default">
                                 <Zap className="text-orange-400 mb-4" size={24} />
-                                <p className="text-[9px] font-black text-white/50 uppercase tracking-widest mb-1">Response Time</p>
-                                <p className="text-2xl font-black text-white">4.2min</p>
+                                <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest mb-1">Response Time</p>
+                                <p className="text-2xl font-bold text-white">4.2min</p>
                                 <p className="text-[8px] text-orange-400 font-bold mt-1 uppercase">Instant Dispatch</p>
                             </div>
-                            <div className="p-6 md:p-8 bg-white/5 border border-white/10 rounded-[32px] backdrop-blur-xl group hover:border-indigo-500/50 transition-all cursor-default">
-                                <Globe className="text-indigo-400 mb-4" size={24} />
-                                <p className="text-[9px] font-black text-white/50 uppercase tracking-widest mb-1">Global Reach</p>
-                                <p className="text-2xl font-black text-white">128+</p>
-                                <p className="text-[8px] text-indigo-400 font-bold mt-1 uppercase">Active Hubs</p>
+                            <div className="p-6 md:p-8 bg-white/5 border border-white/10 rounded-[32px] backdrop-blur-xl group hover:border-orange-500/50 transition-all cursor-default">
+                                <Globe className="text-orange-400 mb-4" size={24} />
+                                <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest mb-1">Global Reach</p>
+                                <p className="text-2xl font-bold text-white">128+</p>
+                                <p className="text-[8px] text-orange-400 font-bold mt-1 uppercase">Active Hubs</p>
                             </div>
                         </div>
                     </div>
@@ -137,12 +137,12 @@ const DeliveryAgentLogin = ({ onLoginSuccess }) => {
                 <div className={`w-full lg:w-1/2 p-8 lg:p-20 flex flex-col justify-center items-center relative transition-colors duration-300 ${isDarkMode ? 'bg-[#0f172a]' : 'bg-white'}`}>
                     <div className="w-full max-w-lg scroll-mt-20">
                         <div className="mb-12 text-center lg:text-left">
-                            <h2 className={`text-4xl lg:text-5xl font-black tracking-tighter mb-3 italic uppercase transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                            <h2 className={`text-4xl lg:text-5xl font-bold tracking-tight mb-3  uppercase transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
                                 Authenticate
                             </h2>
                             <div className="flex items-center gap-3 justify-center lg:justify-start">
-                                <div className="h-1.5 w-12 bg-indigo-600 rounded-full"></div>
-                                <p className={`font-black uppercase tracking-[5px] text-[9px] ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>Delivery Agent Login</p>
+                                <div className="h-1.5 w-12 bg-orange-500 rounded-full"></div>
+                                <p className={`font-bold uppercase tracking-wider text-[9px] ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>Delivery Agent Login</p>
                             </div>
                         </div>
 
@@ -150,8 +150,8 @@ const DeliveryAgentLogin = ({ onLoginSuccess }) => {
                         <div className={`flex p-2 rounded-[32px] mb-10 border transition-all ${isDarkMode ? 'bg-white/5 border-white/5' : 'bg-slate-100 border-slate-200 shadow-inner'}`}>
                             <button
                                 onClick={() => setActiveTab('login')}
-                                className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-[26px] text-[10px] font-black uppercase tracking-[3px] transition-all duration-300 ${activeTab === 'login'
-                                    ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-900/40 scale-[1.02]'
+                                className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-[26px] text-[10px] font-bold uppercase tracking-wider transition-all duration-300 ${activeTab === 'login'
+                                    ? 'bg-orange-500 text-white shadow-xl shadow-indigo-900/40 scale-[1.02]'
                                     : isDarkMode ? 'bg-transparent text-slate-500 hover:text-white' : 'bg-transparent text-slate-500 hover:text-slate-900'
                                     }`}
                             >
@@ -159,8 +159,8 @@ const DeliveryAgentLogin = ({ onLoginSuccess }) => {
                             </button>
                             <button
                                 onClick={() => setActiveTab('signup')}
-                                className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-[26px] text-[10px] font-black uppercase tracking-[3px] transition-all duration-300 ${activeTab === 'signup'
-                                    ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-900/40 scale-[1.02]'
+                                className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-[26px] text-[10px] font-bold uppercase tracking-wider transition-all duration-300 ${activeTab === 'signup'
+                                    ? 'bg-orange-500 text-white shadow-xl shadow-indigo-900/40 scale-[1.02]'
                                     : isDarkMode ? 'bg-transparent text-slate-500 hover:text-white' : 'bg-transparent text-slate-500 hover:text-slate-900'
                                     }`}
                             >
@@ -172,13 +172,13 @@ const DeliveryAgentLogin = ({ onLoginSuccess }) => {
                             {activeTab === 'login' ? (
                                 <form className="space-y-6 animate-fadeInUp" onSubmit={handleLoginSubmit}>
                                     <div className="space-y-3">
-                                        <label className={`text-[9px] font-black uppercase tracking-[3px] ml-1 flex items-center gap-2 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                                        <label className={`text-[9px] font-bold uppercase tracking-wider ml-1 flex items-center gap-2 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
                                             <Mail size={10} /> Email Address
                                         </label>
                                         <input
                                             type="email"
                                             placeholder="your@email.com"
-                                            className={`w-full py-5 px-8 border-2 rounded-[24px] font-black outline-none transition-all placeholder:text-slate-300 italic shadow-sm hover:border-indigo-500/30 focus:border-indigo-600 ${isDarkMode ? 'bg-white/5 border-white/5 text-white focus:bg-white/10' : 'bg-slate-50 border-slate-100 text-slate-900 focus:bg-white'}`}
+                                            className={`w-full py-5 px-8 border-2 rounded-[24px] font-bold outline-none transition-all placeholder:text-slate-300  shadow-sm hover:border-orange-500/30 focus:border-orange-500 ${isDarkMode ? 'bg-white/5 border-white/5 text-white focus:bg-white/10' : 'bg-slate-50 border-slate-100 text-slate-900 focus:bg-white'}`}
                                             value={loginForm.email}
                                             onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
                                             required
@@ -186,13 +186,13 @@ const DeliveryAgentLogin = ({ onLoginSuccess }) => {
                                     </div>
                                     <div className="space-y-3">
                                         <div className="flex justify-between items-center px-1">
-                                            <label className={`text-[9px] font-black uppercase tracking-[3px] flex items-center gap-2 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                                            <label className={`text-[9px] font-bold uppercase tracking-wider flex items-center gap-2 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
                                                 <Lock size={10} /> Password
                                             </label>
                                             <button
                                                 type="button"
                                                 onClick={() => setShowForgotPassword(true)}
-                                                className="text-[9px] font-black uppercase tracking-[3px] text-orange-500 hover:text-orange-600 transition-colors bg-transparent border-none cursor-pointer"
+                                                className="text-[9px] font-bold uppercase tracking-wider text-orange-500 hover:text-orange-600 transition-colors bg-transparent border-none cursor-pointer"
                                             >
                                                 Forgot Password?
                                             </button>
@@ -201,14 +201,14 @@ const DeliveryAgentLogin = ({ onLoginSuccess }) => {
                                             <input
                                                 type={showPassword ? 'text' : 'password'}
                                                 placeholder="••••••••"
-                                                className={`w-full py-5 px-8 border-2 rounded-[24px] font-black outline-none transition-all placeholder:text-slate-300 italic shadow-sm hover:border-indigo-500/30 focus:border-indigo-600 ${isDarkMode ? 'bg-white/5 border-white/5 text-white focus:bg-white/10' : 'bg-slate-50 border-slate-100 text-slate-900 focus:bg-white'}`}
+                                                className={`w-full py-5 px-8 border-2 rounded-[24px] font-bold outline-none transition-all placeholder:text-slate-300  shadow-sm hover:border-orange-500/30 focus:border-orange-500 ${isDarkMode ? 'bg-white/5 border-white/5 text-white focus:bg-white/10' : 'bg-slate-50 border-slate-100 text-slate-900 focus:bg-white'}`}
                                                 value={loginForm.password}
                                                 onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
                                                 required
                                             />
                                             <button
                                                 type="button"
-                                                className={`absolute right-5 top-1/2 -translate-y-1/2 h-9 px-4 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all ${isDarkMode ? 'bg-white/10 text-white hover:bg-white hover:text-slate-900 shadow-lg shadow-white/5' : 'bg-slate-900 text-white hover:bg-slate-700'}`}
+                                                className={`absolute right-5 top-1/2 -translate-y-1/2 h-9 px-4 rounded-xl text-[8px] font-bold uppercase tracking-widest transition-all ${isDarkMode ? 'bg-white/10 text-white hover:bg-white hover:text-slate-900 shadow-lg shadow-white/5' : 'bg-slate-900 text-white hover:bg-slate-700'}`}
                                                 onClick={() => setShowPassword(!showPassword)}
                                             >
                                                 {showPassword ? 'Hide' : 'Show'}
@@ -218,7 +218,7 @@ const DeliveryAgentLogin = ({ onLoginSuccess }) => {
 
                                     <button
                                         type="submit"
-                                        className="w-full py-6 rounded-[28px] bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-black uppercase tracking-[5px] transition-all duration-500 shadow-2xl shadow-indigo-900/40 hover:scale-[1.02] active:scale-[0.98] mt-6 flex items-center justify-center gap-4 italic"
+                                        className="w-full py-6 rounded-[28px] bg-orange-500 hover:bg-orange-500 text-white text-[11px] font-bold uppercase tracking-wider transition-all duration-500 shadow-2xl shadow-indigo-900/40 hover:scale-[1.02] active:scale-[0.98] mt-6 flex items-center justify-center gap-4 "
                                         disabled={isLoading}
                                     >
                                         {isLoading ? (
@@ -236,33 +236,33 @@ const DeliveryAgentLogin = ({ onLoginSuccess }) => {
                             ) : (
                                 <div className="space-y-10 py-10 text-center animate-fadeInUp">
                                     <div className="relative mx-auto">
-                                        <div className="w-24 h-24 bg-indigo-600/10 rounded-[40px] flex items-center justify-center mx-auto text-4xl shadow-2xl shadow-indigo-900/10 mb-8 border border-indigo-600/20">
-                                            <Truck className="text-indigo-600" size={40} />
+                                        <div className="w-24 h-24 bg-orange-500/10 rounded-[40px] flex items-center justify-center mx-auto text-4xl shadow-2xl shadow-indigo-900/10 mb-8 border border-orange-500/20">
+                                            <Truck className="text-orange-500" size={40} />
                                         </div>
                                         <div className="absolute -top-2 -right-2 w-8 h-8 bg-emerald-500 rounded-full border-4 border-white flex items-center justify-center text-white scale-0 animate-popIn">
                                             <ShieldCheck size={14} />
                                         </div>
                                     </div>
                                     <div className="space-y-3">
-                                        <h3 className={`text-4xl font-black tracking-tighter italic transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Become an Agent</h3>
+                                        <h3 className={`text-4xl font-bold tracking-tight  transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Become an Agent</h3>
                                         <p className={`font-bold uppercase tracking-widest text-[9px] max-w-xs mx-auto leading-relaxed ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
                                             Apply to become a delivery agent. Complete the registration and get approved.
                                         </p>
                                     </div>
                                     <button
                                         onClick={() => navigate("/delivery/account-verification")}
-                                        className="w-full py-6 bg-slate-900 text-white rounded-[28px] text-[11px] font-black uppercase tracking-[5px] shadow-2xl hover:bg-indigo-600 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                        className="w-full py-6 bg-slate-900 text-white rounded-[28px] text-[11px] font-bold uppercase tracking-wider shadow-2xl hover:bg-orange-500 transition-all hover:scale-[1.02] active:scale-[0.98]"
                                     >
                                         Get Started
                                     </button>
                                     <div className="flex items-center justify-center gap-6 pt-4">
                                         <div className="flex items-center gap-2">
                                             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                                            <span className={`text-[8px] font-black uppercase tracking-widest ${isDarkMode ? 'text-slate-600' : 'text-slate-400'}`}>OTP Secure</span>
+                                            <span className={`text-[8px] font-bold uppercase tracking-widest ${isDarkMode ? 'text-slate-600' : 'text-slate-400'}`}>OTP Secure</span>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></div>
-                                            <span className={`text-[8px] font-black uppercase tracking-widest ${isDarkMode ? 'text-slate-600' : 'text-slate-400'}`}>KYC Ready</span>
+                                            <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                                            <span className={`text-[8px] font-bold uppercase tracking-widest ${isDarkMode ? 'text-slate-600' : 'text-slate-400'}`}>KYC Ready</span>
                                         </div>
                                     </div>
                                 </div>
@@ -270,7 +270,7 @@ const DeliveryAgentLogin = ({ onLoginSuccess }) => {
                         </div>
 
                         <div className="mt-20 text-center">
-                            <p className="text-[10px] font-black flex items-center justify-center gap-4 transition-colors">
+                            <p className="text-[10px] font-bold flex items-center justify-center gap-4 transition-colors">
                                 <span className={isDarkMode ? 'text-slate-700' : 'text-slate-300'}>© 2026 ShopSphere</span>
                                 <span className={isDarkMode ? 'text-slate-700' : 'text-slate-300'}>•</span>
                                 <span className={isDarkMode ? 'text-slate-700' : 'text-slate-300'}>Delivery Portal</span>
@@ -284,28 +284,28 @@ const DeliveryAgentLogin = ({ onLoginSuccess }) => {
             {showForgotPassword && (
                 <div className={`fixed inset-0 backdrop-blur-2xl flex items-center justify-center z-[100] p-6 transition-all ${isDarkMode ? 'bg-[#0f172a]/95' : 'bg-slate-900/60'}`} onClick={closeForgotModal}>
                     <div className={`rounded-[56px] p-12 md:p-16 max-w-lg w-full relative shadow-3xl animate-scaleIn text-center overflow-hidden border transition-all ${isDarkMode ? 'bg-[#0f172a] border-white/10' : 'bg-white border-slate-200'}`} onClick={(e) => e.stopPropagation()}>
-                        <div className="absolute top-0 right-0 w-40 h-40 bg-indigo-500/5 rounded-full translate-x-1/2 -translate-y-1/2 blur-2xl"></div>
-                        <button className="absolute top-10 right-10 text-[9px] font-black tracking-widest text-slate-400 hover:text-indigo-600 transition-colors bg-transparent border-none cursor-pointer uppercase italic" onClick={closeForgotModal}>Abort</button>
+                        <div className="absolute top-0 right-0 w-40 h-40 bg-orange-500/5 rounded-full translate-x-1/2 -translate-y-1/2 blur-2xl"></div>
+                        <button className="absolute top-10 right-10 text-[9px] font-bold tracking-widest text-slate-400 hover:text-orange-500 transition-colors bg-transparent border-none cursor-pointer uppercase " onClick={closeForgotModal}>Abort</button>
 
                         {!resetEmailSent ? (
                             <div className="space-y-10">
                                 <div className={`w-24 h-24 rounded-[40px] flex items-center justify-center mx-auto text-4xl shadow-inner border transition-all ${isDarkMode ? 'bg-white/5 border-white/5' : 'bg-slate-50 border-slate-100'}`}>
-                                    <Lock className="text-indigo-600" size={32} />
+                                    <Lock className="text-orange-500" size={32} />
                                 </div>
                                 <div className="space-y-2">
-                                    <h3 className={`text-4xl font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Forgot Password?</h3>
+                                    <h3 className={`text-4xl font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Forgot Password?</h3>
                                     <p className={`font-bold uppercase tracking-widest text-[9px] ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>Enter your email to reset your password</p>
                                 </div>
                                 <form className="space-y-6" onSubmit={handleForgotPassword}>
                                     <input
                                         type="email"
                                         placeholder="agent@shopsphere.hq"
-                                        className={`w-full py-6 px-10 border-2 rounded-[28px] font-black text-center outline-none transition-all text-sm italic ${isDarkMode ? 'bg-white/5 border-white/10 text-white focus:border-indigo-600' : 'bg-slate-50 border-slate-100 text-slate-900 focus:border-indigo-600'}`}
+                                        className={`w-full py-6 px-10 border-2 rounded-[28px] font-bold text-center outline-none transition-all text-sm  ${isDarkMode ? 'bg-white/5 border-white/10 text-white focus:border-orange-500' : 'bg-slate-50 border-slate-100 text-slate-900 focus:border-orange-500'}`}
                                         value={forgotEmail}
                                         onChange={(e) => setForgotEmail(e.target.value)}
                                         required
                                     />
-                                    <button type="submit" className="w-full py-6 bg-slate-900 text-white rounded-[28px] font-black uppercase tracking-[4px] shadow-2xl hover:bg-indigo-600 transition-all border-none cursor-pointer shadow-indigo-900/10">Send Reset Link</button>
+                                    <button type="submit" className="w-full py-6 bg-slate-900 text-white rounded-[28px] font-bold uppercase tracking-wider shadow-2xl hover:bg-orange-500 transition-all border-none cursor-pointer shadow-indigo-900/10">Send Reset Link</button>
                                 </form>
                             </div>
                         ) : (
@@ -314,11 +314,11 @@ const DeliveryAgentLogin = ({ onLoginSuccess }) => {
                                     <Mail className="text-emerald-500" size={48} />
                                 </div>
                                 <div className="space-y-4">
-                                    <h3 className={`text-4xl font-black tracking-tighter ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Email Sent!</h3>
-                                    <p className="text-emerald-500 font-black tracking-tight text-xl italic">{forgotEmail}</p>
+                                    <h3 className={`text-4xl font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Email Sent!</h3>
+                                    <p className="text-emerald-500 font-bold tracking-tight text-xl ">{forgotEmail}</p>
                                     <p className={`text-[9px] font-bold uppercase tracking-widest ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>Check your email for a reset link.</p>
                                 </div>
-                                <button className={`w-full py-6 rounded-[28px] font-black uppercase tracking-[4px] border-none cursor-pointer shadow-xl transition-all italic ${isDarkMode ? 'bg-white text-[#0f172a] hover:bg-indigo-600 hover:text-white' : 'bg-slate-900 text-white hover:bg-slate-800'}`} onClick={closeForgotModal}>Close Link</button>
+                                <button className={`w-full py-6 rounded-[28px] font-bold uppercase tracking-wider border-none cursor-pointer shadow-xl transition-all  ${isDarkMode ? 'bg-white text-[#0f172a] hover:bg-orange-500 hover:text-white' : 'bg-slate-900 text-white hover:bg-slate-800'}`} onClick={closeForgotModal}>Close Link</button>
                             </div>
                         )}
                     </div>

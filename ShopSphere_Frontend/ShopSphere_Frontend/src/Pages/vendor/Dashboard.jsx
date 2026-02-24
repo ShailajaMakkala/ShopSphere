@@ -36,15 +36,39 @@ export default function Dashboard() {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        const [products, orders, profile] = await Promise.all([
-          getVendorProducts(),
-          getVendorOrders(),
-          getVendorProfile()
+
+        // Fetch profile first to see if they are actually a vendor
+        let profile;
+        try {
+          profile = await getVendorProfile();
+          setVendor(profile);
+        } catch (err) {
+          if (err.response?.status === 404) {
+            toast.error("Vendor profile not found. Please complete your registration.");
+            navigate('/account-verification');
+            return;
+          }
+          throw err;
+        }
+
+        const [products, orders] = await Promise.all([
+          getVendorProducts().catch(() => []),
+          getVendorOrders().catch(() => [])
         ]);
 
-        setVendor(profile);
-
-        const earningsSummary = await getVendorEarningsSummary();
+        let earningsSummary = {
+          lifetime_earnings: 0,
+          available_balance: 0,
+          uncleared_balance: 0,
+          total_gross: 0,
+          total_commission: 0,
+          total_net: 0
+        };
+        try {
+          earningsSummary = await getVendorEarningsSummary();
+        } catch (err) {
+          console.warn("Could not fetch earnings summary", err);
+        }
 
         setStats({
           revenue: parseFloat(earningsSummary.lifetime_earnings || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 }),

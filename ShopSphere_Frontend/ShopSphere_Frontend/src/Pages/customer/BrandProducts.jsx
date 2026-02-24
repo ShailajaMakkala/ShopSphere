@@ -6,8 +6,6 @@ import { Search, ChevronDown, Tag, ArrowLeft } from "lucide-react";
 import { fetchProducts, AddToCart, AddToWishlist, RemoveFromWishlist } from "../../Store";
 import toast from "react-hot-toast";
 import ProductCard from "../../Components/ProductCard";
-import Navbar from "../../Components/common/Navbar";
-import Footer from "../../Components/common/Footer";
 
 const BRAND_ICONS = {
     TechNova: "💻",
@@ -132,7 +130,7 @@ const BrandProducts = () => {
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col">
-            <Navbar />
+
 
             <main className="flex-grow pt-28 pb-20">
                 {/* ── Hero Banner ── */}
@@ -275,7 +273,7 @@ const BrandProducts = () => {
                 </div>
             </main>
 
-            <Footer />
+
         </div>
     );
 };

@@ -43,9 +43,9 @@ const clearFromStorage = (type) => {
 
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
-  async (_, { rejectWithValue }) => {
+  async (params = {}, { rejectWithValue }) => {
     try {
-      const data = await getProducts();
+      const data = await getProducts(params);
       return data;
     } catch (error) {
       return rejectWithValue(error.message);

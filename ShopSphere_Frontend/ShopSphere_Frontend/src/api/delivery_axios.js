@@ -8,6 +8,11 @@ const getHeaders = () => {
 };
 
 // Delivery Agent Auth
+export const checkEmailStatus = async (email) => {
+    const response = await axios.post(`${API_BASE_URL}/check-email`, { email });
+    return response.data;
+};
+
 export const deliveryRegister = async (agentData, files = {}) => {
     const formData = new FormData();
 

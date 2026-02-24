@@ -41,6 +41,36 @@ def register_api(request):
         return Response(serializer.errors, status=400)
     return render(request, "user_register.html", {"error": serializer.errors})
 
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def check_email_exists(request):
+    email = request.data.get('email')
+    if not email:
+        return Response({"error": "Email is required"}, status=400)
+    
+    user = AuthUser.objects.filter(email=email).first()
+    if user:
+        role_label = {
+            'delivery': 'delivery agent',
+            'vendor': 'vendor',
+            'customer': 'customer',
+            'admin': 'administrator'
+        }.get(user.role, user.role)
+
+        # Specifically for the delivery agent onboarding request
+        if user.role == 'delivery':
+             return Response({
+                "exists": True,
+                "error": "This account is already registered as a delivery agent."
+            }, status=200)
+
+        return Response({
+            "exists": True,
+            "error": f"This email is already associated with a {role_label} account."
+        }, status=200)
+    
+    return Response({"exists": False}, status=200)
+
 @api_view(['GET', 'POST'])
 @permission_classes([AllowAny])
 def login_api(request):
@@ -242,8 +272,12 @@ def home_api(request):
             # Exact product-ID lookup
             products_qs = products_qs.filter(id=int(search))
         else:
-            # Name / description contains
-            products_qs = products_qs.filter(name__icontains=search)
+            # Name / category / description contains
+            products_qs = products_qs.filter(
+                Q(name__icontains=search) |
+                Q(category__icontains=search) |
+                Q(description__icontains=search)
+            )
         
         # Increment search_count for found items (cap to prevent mass updates)
         try:

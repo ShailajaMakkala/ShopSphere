@@ -161,20 +161,20 @@ export default function DeliveryBankDocs() {
     return (
         <div className={`min-h-screen py-24 px-6 relative overflow-hidden transition-colors duration-500 ${isDarkMode ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'}`}>
             {/* Background Aesthetics */}
-            <div className={`absolute top-0 left-0 w-full h-full pointer-events-none transition-opacity duration-1000 ${isDarkMode ? 'bg-gradient-to-br from-indigo-500/5 via-transparent to-orange-500/10' : 'bg-gradient-to-br from-indigo-500/[0.02] via-transparent to-orange-500/[0.03]'}`}></div>
+            <div className={`absolute top-0 left-0 w-full h-full pointer-events-none transition-opacity duration-1000 ${isDarkMode ? 'bg-gradient-to-br from-orange-500/50 via-transparent to-orange-500/10' : 'bg-gradient-to-br from-orange-500/[0.02] via-transparent to-orange-500/[0.03]'}`}></div>
             <div className={`absolute top-0 right-0 w-[800px] h-[800px] rounded-full translate-x-1/2 -translate-y-1/2 blur-[150px] pointer-events-none transition-opacity duration-1000 ${isDarkMode ? 'bg-orange-500/10' : 'bg-orange-500/[0.05]'}`}></div>
 
             <div className="max-w-6xl mx-auto relative z-10 animate-fadeInScale">
                 <div className="mb-16 text-center">
                     <div className={`inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl mb-10 border transition-all ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-slate-200 shadow-sm'}`}>
                         <Sparkles className="text-orange-500" size={18} />
-                        <span className={`text-[10px] font-black uppercase tracking-[4px] ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>The Final Vault</span>
+                        <span className={`text-[10px] font-bold uppercase tracking-wider ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>The Final Vault</span>
                     </div>
-                    <h1 className={`text-6xl lg:text-7xl font-black tracking-tighter italic uppercase mb-4 transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                    <h1 className={`text-6xl lg:text-7xl font-bold tracking-tight  uppercase mb-4 transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
                         Dossier <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-indigo-400 to-purple-600">Calibration.</span>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-orange-500 to-purple-600">Calibration.</span>
                     </h1>
-                    <p className={`font-bold text-[11px] uppercase tracking-[4px] italic transition-colors ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>Commit your financial & legal identifiers to the grid</p>
+                    <p className={`font-bold text-[11px] uppercase tracking-wider  transition-colors ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>Commit your financial & legal identifiers to the grid</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16">
@@ -186,7 +186,7 @@ export default function DeliveryBankDocs() {
                                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border transition-all ${isDarkMode ? 'bg-orange-500/10 border-orange-500/20 text-orange-400' : 'bg-orange-50 border-orange-100 text-orange-500'}`}>
                                     <University size={24} />
                                 </div>
-                                <h2 className={`text-2xl font-black tracking-tight italic uppercase transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Financial Node</h2>
+                                <h2 className={`text-2xl font-bold tracking-tight  uppercase transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Financial Node</h2>
                             </div>
 
                             <div className="space-y-8">
@@ -197,7 +197,7 @@ export default function DeliveryBankDocs() {
                                     { label: 'Signatory Name', name: 'bank_holder_name', icon: CreditCard, placeholder: 'As per bank records' },
                                 ].map((field) => (
                                     <div key={field.name} className="space-y-3">
-                                        <label className={`text-[9px] font-black uppercase tracking-[3px] ml-1 italic transition-colors ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>{field.label}</label>
+                                        <label className={`text-[9px] font-bold uppercase tracking-wider ml-1  transition-colors ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>{field.label}</label>
                                         <div className="relative group">
                                             <field.icon className={`absolute left-6 top-1/2 -translate-y-1/2 transition-colors duration-300 ${isDarkMode ? 'text-slate-700 group-focus-within:text-orange-400' : 'text-slate-300 group-focus-within:text-orange-500'}`} size={18} />
                                             <input
@@ -207,7 +207,7 @@ export default function DeliveryBankDocs() {
                                                 value={bankData[field.name]}
                                                 onChange={handleChange}
                                                 placeholder={field.placeholder}
-                                                className={`w-full pl-16 pr-8 py-5 rounded-[24px] border-2 font-black italic outline-none transition-all shadow-inner ${isDarkMode ? 'bg-[#020617] border-transparent focus:border-orange-500 text-white focus:bg-black/40 placeholder:text-slate-600' : 'bg-slate-50 border-slate-100 focus:border-orange-400 text-slate-900 focus:bg-white placeholder:text-slate-300'}`}
+                                                className={`w-full pl-16 pr-8 py-5 rounded-[24px] border-2 font-bold  outline-none transition-all shadow-inner ${isDarkMode ? 'bg-[#020617] border-transparent focus:border-orange-500 text-white focus:bg-black/40 placeholder:text-slate-600' : 'bg-slate-50 border-slate-100 focus:border-orange-400 text-slate-900 focus:bg-white placeholder:text-slate-300'}`}
                                             />
                                         </div>
                                     </div>
@@ -221,25 +221,25 @@ export default function DeliveryBankDocs() {
                                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border transition-all ${isDarkMode ? 'bg-purple-500/10 border-purple-500/20 text-purple-400' : 'bg-purple-50 border-purple-100 text-purple-500'}`}>
                                     <ShieldCheck size={24} />
                                 </div>
-                                <h2 className={`text-2xl font-black tracking-tight italic uppercase transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Civil Identifiers</h2>
+                                <h2 className={`text-2xl font-bold tracking-tight  uppercase transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Civil Identifiers</h2>
                             </div>
 
                             <div className="space-y-8">
-                                {[
-                                    { label: 'PAN Identity', name: 'pan_number', placeholder: 'ABCDE1234F' },
-                                    { label: 'Aadhaar Matrix', name: 'aadhar_number', placeholder: '0000 0000 0000' },
-                                    { label: 'Logistics License', name: 'license_number', placeholder: 'DL-00-1234567' },
+                                {[{ label: 'PAN Identity', name: 'pan_number', placeholder: 'ABCDE1234F', type: 'text' },
+                                { label: 'Aadhaar Matrix', name: 'aadhar_number', placeholder: '0000 0000 0000', type: 'text' },
+                                { label: 'Logistics License', name: 'license_number', placeholder: 'DL-00-1234567', type: 'text' },
+                                { label: 'License Expiry Date', name: 'license_expires', placeholder: '', type: 'date' },
                                 ].map((field) => (
                                     <div key={field.name} className="space-y-3">
-                                        <label className={`text-[9px] font-black uppercase tracking-[3px] ml-1 italic transition-colors ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>{field.label}</label>
+                                        <label className={`text-[9px] font-bold uppercase tracking-wider ml-1  transition-colors ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>{field.label}</label>
                                         <input
-                                            type="text"
+                                            type={field.type}
                                             name={field.name}
                                             required
                                             value={bankData[field.name]}
                                             onChange={handleChange}
                                             placeholder={field.placeholder}
-                                            className={`w-full px-8 py-5 rounded-[24px] border-2 font-black italic outline-none transition-all shadow-inner ${isDarkMode ? 'bg-[#020617] border-transparent focus:border-orange-500 text-white focus:bg-black/40 placeholder:text-slate-600' : 'bg-slate-50 border-slate-100 focus:border-orange-400 text-slate-900 focus:bg-white placeholder:text-slate-300'}`}
+                                            className={`w-full px-8 py-5 rounded-[24px] border-2 font-bold  outline-none transition-all shadow-inner ${isDarkMode ? 'bg-[#020617] border-transparent focus:border-orange-500 text-white focus:bg-black/40 placeholder:text-slate-600 color-scheme-dark' : 'bg-slate-50 border-slate-100 focus:border-orange-400 text-slate-900 focus:bg-white placeholder:text-slate-300'}`}
                                         />
                                     </div>
                                 ))}
@@ -249,7 +249,7 @@ export default function DeliveryBankDocs() {
 
                     {/* Document Upload Side */}
                     <div className="space-y-12 h-fit lg:sticky lg:top-10">
-                        <div className={`rounded-[56px] p-10 md:p-14 shadow-2xl relative overflow-hidden transition-all duration-500 ${isDarkMode ? 'bg-[#1e1b4b] text-white shadow-indigo-500/[0.05]' : 'bg-orange-600 text-white shadow-orange-600/20'}`}>
+                        <div className={`rounded-[56px] p-10 md:p-14 shadow-2xl relative overflow-hidden transition-all duration-500 ${isDarkMode ? 'bg-[#1e1b4b] text-white shadow-orange-500/[0.05]' : 'bg-orange-600 text-white shadow-orange-600/20'}`}>
                             <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
                             <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full -translate-x-1/4 translate-y-1/4 blur-2xl"></div>
 
@@ -258,7 +258,7 @@ export default function DeliveryBankDocs() {
                                     <div className="w-16 h-16 bg-white/10 rounded-[24px] flex items-center justify-center border border-white/20">
                                         <Upload size={28} />
                                     </div>
-                                    <h2 className="text-3xl font-black tracking-tight italic uppercase">Dossier Files</h2>
+                                    <h2 className="text-3xl font-bold tracking-tight  uppercase">Dossier Files</h2>
                                 </div>
 
                                 <div className="space-y-8">
@@ -269,7 +269,7 @@ export default function DeliveryBankDocs() {
                                         { label: 'Visual ID Verification (Selfie)', name: 'selfie_with_id', icon: Camera },
                                     ].map((field) => (
                                         <div key={field.name} className="group relative">
-                                            <label className="text-[8px] font-black uppercase tracking-[4px] text-white/50 mb-4 block ml-1 italic">{field.label}</label>
+                                            <label className="text-[8px] font-bold uppercase tracking-wider text-white/50 mb-4 block ml-1 ">{field.label}</label>
                                             <div className="relative">
                                                 <input
                                                     type="file"
@@ -278,7 +278,7 @@ export default function DeliveryBankDocs() {
                                                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                                 />
                                                 <div className="w-full p-6 bg-white/5 border-2 border-dashed border-white/20 rounded-[32px] group-hover:bg-white/10 group-hover:border-white/40 transition-all flex items-center justify-between">
-                                                    <span className="text-[10px] font-black uppercase tracking-widest truncate max-w-[220px]">
+                                                    <span className="text-[10px] font-bold uppercase tracking-widest truncate max-w-[220px]">
                                                         {files[field.name] ? (
                                                             <span className="text-white flex items-center gap-2">
                                                                 <CheckCircle size={12} className="text-green-400" /> {files[field.name].name}
@@ -297,7 +297,7 @@ export default function DeliveryBankDocs() {
                                 <button
                                     type="submit"
                                     disabled={loading || !isFormValid}
-                                    className={`w-full mt-20 py-8 rounded-[36px] text-[12px] font-black uppercase tracking-[6px] shadow-2xl transition-all flex items-center justify-center gap-5 group italic border-none ${isFormValid && !loading ? 'bg-white text-orange-600 hover:bg-slate-900 hover:text-white cursor-pointer active:scale-95' : 'bg-white/10 text-white/20 cursor-not-allowed shadow-none'}`}
+                                    className={`w-full mt-20 py-8 rounded-[36px] text-[12px] font-bold uppercase tracking-wider shadow-2xl transition-all flex items-center justify-center gap-5 group  border-none ${isFormValid && !loading ? 'bg-white text-orange-600 hover:bg-slate-900 hover:text-white cursor-pointer active:scale-95' : 'bg-white/10 text-white/20 cursor-not-allowed shadow-none'}`}
                                 >
                                     {loading ? (
                                         <span className="animate-pulse">Transmitting Data...</span>
@@ -308,7 +308,7 @@ export default function DeliveryBankDocs() {
                                     )}
                                 </button>
 
-                                <p className="text-center text-[8px] font-black uppercase tracking-[5px] mt-10 text-white/40 leading-relaxed">
+                                <p className="text-center text-[8px] font-bold uppercase tracking-wider mt-10 text-white/40 leading-relaxed">
                                     Broadcast encrypted via ShopSphere Command <br /> Multi-factor validation active
                                 </p>
                             </div>

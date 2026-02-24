@@ -15,18 +15,18 @@ export default function DeliveryLayout() {
     }, []);
 
     return (
-        <div className={`min-h-screen flex transition-colors duration-300 overflow-x-hidden ${isDarkMode ? 'bg-[#0f172a] text-white' : 'bg-[#f8fafc] text-slate-900'}`}>
+        <div className={`min-h-screen flex transition-colors duration-300 font-sans ${isDarkMode ? 'bg-[#0f172a] text-white' : 'bg-gradient-to-br from-[#fff5f5] via-[#fef3f2] to-[#f3e8ff] text-slate-900'}`}>
             <Sidebar />
 
             <div className="flex-1 flex flex-col min-w-0">
                 {/* Header for mobile or for theme toggle if not in sidebar */}
-                <header className={`md:hidden h-16 flex items-center justify-between px-4 border-b transition-colors duration-300 ${isDarkMode ? 'bg-[#0f172a]/80 border-slate-800' : 'bg-white/80 border-slate-200'}`}>
+                <header className={`md:hidden h-16 flex items-center justify-between px-4 border-b transition-colors duration-300 ${isDarkMode ? 'bg-[#0f172a]/80 border-slate-800' : 'bg-white/80 border-slate-200 backdrop-blur-md'}`}>
                     <div className="pl-12">
-                        <span className="text-sm font-black uppercase tracking-widest italic">Delivery Portal</span>
+                        <span className="text-sm font-bold uppercase tracking-wider text-orange-500">Delivery Portal</span>
                     </div>
                     <button
                         onClick={toggleTheme}
-                        className={`p-2 rounded-xl transition-all ${isDarkMode ? 'text-amber-400 bg-slate-800' : 'text-indigo-600 bg-slate-50 border border-slate-200'}`}
+                        className={`p-2 rounded-xl transition-all ${isDarkMode ? 'text-amber-400 bg-slate-800' : 'text-orange-500 bg-orange-50 border border-orange-100'}`}
                     >
                         {isDarkMode ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
                     </button>
@@ -45,10 +45,10 @@ export default function DeliveryLayout() {
                             onClick={toggleTheme}
                             className={`p-2 rounded-xl border transition-all duration-300 flex items-center gap-3 group ${isDarkMode
                                 ? 'bg-slate-800 border-slate-700 text-amber-400 hover:border-amber-400/50'
-                                : 'bg-white border-slate-200 text-indigo-600 hover:border-indigo-300 shadow-sm'}`}
+                                : 'bg-white/80 backdrop-blur-sm border-orange-100 text-orange-500 hover:border-orange-300 shadow-sm'}`}
                         >
                             {isDarkMode ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
-                            <span className="text-[10px] font-black uppercase tracking-widest">{isDarkMode ? 'Light' : 'Dark'}</span>
+                            <span className="text-[10px] font-bold uppercase tracking-wider">{isDarkMode ? 'Light' : 'Dark'}</span>
                         </button>
                     </div>
 
