@@ -196,8 +196,13 @@ class Order(models.Model):
         return self.status in ['pending', 'confirmed']
 
     def can_be_returned(self):
-        """Check if order can be returned"""
-        return self.status == 'delivered'
+        """Check if order can be returned (within 3 days of delivery)"""
+        if self.status != 'delivered' or not self.delivered_at:
+            return False
+        
+        from django.utils import timezone
+        from datetime import timedelta
+        return timezone.now() <= self.delivered_at + timedelta(days=3)
 
 
 class OrderItem(models.Model):
@@ -413,10 +418,11 @@ class OrderReturn(models.Model):
     RETURN_STATUS_CHOICES = [
         ('requested', 'Return Requested'),
         ('approved', 'Return Approved'),
+        ('pickup_assigned', 'Pickup Assigned'),
+        ('picked_up', 'Picked Up'),
+        ('received', 'Received/Verified'),
+        ('completed', 'Refund Processed'),
         ('rejected', 'Return Rejected'),
-        ('shipped_back', 'Shipped Back'),
-        ('received', 'Received'),
-        ('completed', 'Completed'),
         ('cancelled', 'Cancelled'),
     ]
 
@@ -439,6 +445,11 @@ class OrderReturn(models.Model):
     description = models.TextField()
     status = models.CharField(max_length=20, choices=RETURN_STATUS_CHOICES, default='requested')
     
+    # Pickup Verification Logic
+    pickup_agent = models.ForeignKey('deliveryAgent.DeliveryAgentProfile', on_delete=models.SET_NULL, null=True, blank=True, related_name='return_pickups')
+    condition_notes = models.TextField(blank=True, null=True)
+    verification_images = models.ImageField(upload_to='return_verification/', null=True, blank=True)
+    
     return_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     refund_status = models.CharField(max_length=20, default='pending', choices=[
         ('pending', 'Pending'),
@@ -449,6 +460,7 @@ class OrderReturn(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     approved_at = models.DateTimeField(null=True, blank=True)
+    processed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ['-created_at']

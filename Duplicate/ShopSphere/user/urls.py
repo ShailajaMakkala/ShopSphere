@@ -32,6 +32,7 @@ urlpatterns = [
     path('my_orders', views.my_orders, name='my_orders'),
     path('cancel-order/<int:order_id>', views.cancel_order, name='cancel_order'),
     path('order_tracking/<str:order_number>', views.order_tracking, name='order_tracking'),
+    path('request-return/<int:order_id>', views.request_return_api, name='request_return_api'),
     path('address', views.address_page, name="address_page"),
     path('delete-address/<int:id>', views.delete_address, name="delete_address"),
     path('update-address/<int:id>', views.update_address, name="update_address"),

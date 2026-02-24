@@ -7,16 +7,7 @@ class Command(BaseCommand):
     help = 'Process T+7 settlement for vendor ledger entries'
 
     def handle(self, *args, **options):
-        now = timezone.now()
+        from finance.services import FinanceService
         
-        with transaction.atomic():
-            # Find all unsettled entries where the settlement period has passed
-            entries = LedgerEntry.objects.filter(
-                is_settled=False,
-                settlement_date__lte=now
-            )
-            
-            count = entries.count()
-            entries.update(is_settled=True)
-            
-            self.stdout.write(self.style.SUCCESS(f'Successfully settled {count} ledger entries.'))
+        count = FinanceService.release_expired_funds()
+        self.stdout.write(self.style.SUCCESS(f'Successfully processed and released funds for {count} orders.'))

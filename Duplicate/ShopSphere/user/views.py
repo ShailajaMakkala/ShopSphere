@@ -1051,3 +1051,66 @@ def get_trending_products(request):
         if item.get('average_rating') is None:
             item['average_rating'] = 0.0
     return Response(data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def request_return_api(request, order_id):
+    """Initiate a return request for an order"""
+    from .models import Order, OrderReturn, OrderTracking
+    from django.db import transaction
+    
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    
+    # 1. Eligibility Check
+    if not order.can_be_returned():
+        return Response({
+            "error": "This order is not eligible for return. Ensure it's delivered and within the 3rd-day window."
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    # 2. Check if already requested
+    if OrderReturn.objects.filter(order=order).exclude(status='rejected').exists():
+         return Response({
+            "error": "A return request has already been initiated for this order."
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    reason = request.data.get('reason')
+    description = request.data.get('description', '')
+    
+    if not reason:
+         return Response({"error": "Reason for return is required."}, status=400)
+
+    # 3. Create Return Request for items
+    returns_created = []
+    with transaction.atomic():
+        for item in order.items.all():
+            ret = OrderReturn.objects.create(
+                order=order,
+                order_item=item,
+                user=request.user,
+                reason=reason,
+                description=description,
+                return_amount=item.subtotal,
+                status='requested'
+            )
+            returns_created.append(ret.id)
+            
+        # Add a tracking entry
+        OrderTracking.objects.create(
+            order=order,
+            status='Return Requested',
+            location='Online Request',
+            notes=f"Return initiated for all items. Reason: {reason}"
+        )
+        
+        # Trigger Auto-Assignment for the Return Pickup
+        try:
+            from deliveryAgent.services import auto_assign_return
+            auto_assign_return(order, returns_created)
+        except Exception as e:
+            print(f"DEBUG: Auto-assignment failed for return: {str(e)}")
+
+    return Response({
+        "message": "Return request submitted successfully. We have assigned a pickup agent to collect the items.",
+        "return_ids": returns_created
+    }, status=201)

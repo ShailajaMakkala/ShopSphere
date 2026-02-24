@@ -343,6 +343,48 @@ class DeliveryAssignmentViewSet(viewsets.ViewSet):
             return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=True, methods=['post'])
+    def verify_return(self, request, pk=None):
+        """Action for agent to verify condition during return pickup"""
+        try:
+            from django.db import transaction
+            agent = DeliveryAgentProfile.objects.get(user=request.user)
+            assignment = DeliveryAssignment.objects.get(id=pk, agent=agent, assignment_type='return')
+            
+            if assignment.status not in ('picked_up', 'in_transit', 'arrived'):
+                return Response({'error': 'Return must be picked up before verification'}, status=400)
+            
+            condition_notes = request.data.get('condition_notes')
+            verification_images = request.FILES.get('verification_images')
+
+            if not condition_notes:
+                return Response({'error': 'Condition notes are required'}, status=400)
+
+            # Update Return Request
+            with transaction.atomic():
+                return_request = assignment.return_request
+                if return_request:
+                    return_request.condition_notes = condition_notes
+                    if verification_images:
+                        return_request.verification_images = verification_images
+                    return_request.status = 'received'
+                    return_request.save()
+
+                assignment.status = 'delivered' 
+                assignment.completed_at = timezone.now()
+                assignment.save()
+
+                from finance.services import FinanceService
+                for item in return_request.order.items.all():
+                    FinanceService.process_refund(item, item.subtotal, reason="Product Return Verified")
+                
+                return_request.status = 'completed'
+                return_request.save()
+
+            return Response({'message': 'Return verified and refund initiated'}, status=200)
+        except Exception as e:
+            return Response({'error': str(e)}, status=500)
     
     @action(detail=False, methods=['get'])
     def active(self, request):
@@ -770,6 +812,13 @@ class UpdateOrderStatusView(APIView):
         new_status = request.data.get('status', '').strip().lower()
         notes = request.data.get('notes', '')
 
+        # Idempotency: If already in the target status, return success
+        if new_status == assignment.status:
+            return Response({
+                'message': f'Status is already {new_status}',
+                'assignment_status': assignment.status,
+            }, status=status.HTTP_200_OK)
+
         allowed = self.VALID_TRANSITIONS.get(assignment.status, [])
         if new_status not in allowed:
             return Response({
@@ -797,17 +846,24 @@ class UpdateOrderStatusView(APIView):
             assignment.save()
 
             # Sync order status
-            order_status = self.ORDER_STATUS_MAP.get(new_status)
-            if order_status and assignment.order:
-                assignment.order.status = order_status
-                assignment.order.save(update_fields=['status'])
+            if assignment.order:
+                if assignment.assignment_type == 'delivery':
+                    order_status = self.ORDER_STATUS_MAP.get(new_status)
+                    if order_status:
+                        assignment.order.status = order_status
+                        assignment.order.save(update_fields=['status'])
+                else:
+                    # For returns
+                    if new_status == 'picked_up':
+                        assignment.order.status = 'returned'
+                        assignment.order.save(update_fields=['status'])
 
             # Create tracking record for delivery agent
             status_labels = {
-                'picked_up':  'Picked Up from Vendor',
-                'in_transit': 'Out for Delivery',
-                'arrived':    'Arrived at Customer Location',
-                'failed':     'Delivery Attempt Failed',
+                'picked_up':  'Picked Up from Vendor' if assignment.assignment_type == 'delivery' else 'Picked Up from Customer',
+                'in_transit': 'Out for Delivery' if assignment.assignment_type == 'delivery' else 'Returning to Warehouse',
+                'arrived':    'Arrived at Customer Location' if assignment.assignment_type == 'delivery' else 'Arrived at Warehouse',
+                'failed':     'Delivery Attempt Failed' if assignment.assignment_type == 'delivery' else 'Return Pickup Failed',
             }
             DeliveryTracking.objects.create(
                 delivery_assignment=assignment,

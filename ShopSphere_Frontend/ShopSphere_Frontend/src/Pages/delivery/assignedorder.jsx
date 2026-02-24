@@ -25,6 +25,7 @@ import {
     markInTransit,
     markArrived,
     failDelivery,
+    verifyReturn,
 } from '../../api/delivery_axios';
 import { toast } from 'react-hot-toast';
 import { useTheme } from '../../context/ThemeContext';
@@ -70,6 +71,72 @@ function StatusStepper({ currentStatus, isDarkMode }) {
                     <FaTimesCircle className="w-4 h-4" /> Delivery Failed
                 </div>
             )}
+        </div>
+    );
+}
+
+// ─── Return Verification Panel ──────────────────────────────────────────────
+function ReturnVerificationPanel({ orderId, loading, onVerify, isDarkMode }) {
+    const [notes, setNotes] = useState('');
+    const [image, setImage] = useState(null);
+
+    return (
+        <div className={`rounded-[42px] p-8 md:p-10 mt-10 border transition-all shadow-2xl relative overflow-hidden group ${isDarkMode ? 'bg-[#0f172a] border-white/5' : 'bg-white border-slate-200'}`}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full translate-x-1/2 -translate-y-1/2 blur-2xl"></div>
+
+            <div className="relative z-10">
+                <div className="flex items-center gap-4 mb-8">
+                    <div className={`w-12 h-12 border rounded-2xl flex items-center justify-center backdrop-blur-xl transition-all ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-200'}`}>
+                        <FaBox className="text-indigo-400" size={20} />
+                    </div>
+                    <div>
+                        <p className={`font-bold text-xl tracking-tight uppercase ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Verify Return Condition</p>
+                        <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider mt-1">Item inspection required for refund</p>
+                    </div>
+                </div>
+
+                <div className="space-y-6">
+                    <textarea
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        placeholder="Describe item condition (e.g., Original packaging intact, No visible damage)"
+                        className={`w-full p-6 rounded-3xl border-2 outline-none transition-all min-h-[120px] text-sm font-medium ${isDarkMode ? 'bg-white/5 border-white/10 text-white placeholder-slate-500 focus:border-orange-500' : 'bg-slate-100 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-orange-500'}`}
+                    />
+
+                    <div className="relative">
+                        <input
+                            type="file"
+                            id={`file-${orderId}`}
+                            onChange={(e) => setImage(e.target.files[0])}
+                            className="hidden"
+                        />
+                        <label
+                            htmlFor={`file-${orderId}`}
+                            className={`flex items-center justify-center p-6 border-2 border-dashed rounded-[24px] cursor-pointer transition-all hover:border-orange-500/50 ${isDarkMode ? 'bg-white/5 border-white/10 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-500'}`}
+                        >
+                            {image ? (
+                                <span className="text-orange-400 font-bold text-xs uppercase tracking-wider flex items-center gap-2">
+                                    <FaCheck size={12} /> {image.name}
+                                </span>
+                            ) : (
+                                <span className="text-[10px] font-bold uppercase tracking-wider">Upload Verification Image (Optional)</span>
+                            )}
+                        </label>
+                    </div>
+
+                    <button
+                        disabled={!notes || loading}
+                        onClick={() => onVerify(orderId, { condition_notes: notes, verification_images: image })}
+                        className="w-full py-5 bg-orange-500 text-white font-bold uppercase tracking-wider text-[11px] rounded-3xl shadow-xl hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-20 flex items-center justify-center gap-3"
+                    >
+                        {loading ? (
+                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        ) : (
+                            <>Complete Return & Initiate Refund <FaChevronRight size={10} /></>
+                        )}
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }
@@ -166,8 +233,11 @@ export default function AssignedOrders() {
     const loadDeliveries = async () => {
         try {
             setLoading(true);
-            const data = await fetchAssignedOrders('assigned');
-            setActiveDeliveries(data);
+            const data = await fetchAssignedOrders();
+            const working = data.filter(a =>
+                ['assigned', 'accepted', 'picked_up', 'in_transit', 'arrived'].includes(a.status)
+            );
+            setActiveDeliveries(working);
         } catch (error) {
             if (error.response?.status === 403) {
                 toast.error('Account restricted.');
@@ -209,6 +279,19 @@ export default function AssignedOrders() {
         } catch (error) {
             const msg = error.response?.data?.error || 'Failed to verify OTP';
             toast.error(msg);
+        } finally {
+            setActionLoading(prev => ({ ...prev, [id]: false }));
+        }
+    };
+
+    const handleReturnVerification = async (id, data) => {
+        setActionLoading(prev => ({ ...prev, [id]: true }));
+        try {
+            await verifyReturn(id, data);
+            toast.success('🎉 Return verified and refund initiated!');
+            loadDeliveries();
+        } catch (error) {
+            toast.error(error.response?.data?.error || 'Failed to verify return');
         } finally {
             setActionLoading(prev => ({ ...prev, [id]: false }));
         }
@@ -282,8 +365,10 @@ export default function AssignedOrders() {
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-3">
-                                                <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-                                                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider ">Current Status: {order.status.replace('_', ' ')}</p>
+                                                <div className={`w-2 h-2 rounded-full animate-pulse ${order.assignment_type === 'return' ? 'bg-orange-500' : 'bg-orange-500'}`}></div>
+                                                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider ">
+                                                    {order.assignment_type === 'return' ? 'RETURN PICKUP' : 'STANDARD DELIVERY'} • {order.status.replace('_', ' ')}
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -305,18 +390,22 @@ export default function AssignedOrders() {
                                             </h3>
                                             <div className={`relative pl-10 space-y-12 border-l-2 border-dashed ml-4 transition-colors ${isDarkMode ? 'border-white/5' : 'border-slate-200'}`}>
                                                 <div className="relative text-left">
-                                                    <div className="absolute -left-[57px] bg-emerald-600 w-8 h-8 rounded-xl flex items-center justify-center shadow-lg">
-                                                        <FaStore className="text-white w-3 h-3" />
+                                                    <div className={`absolute -left-[57px] w-8 h-8 rounded-xl flex items-center justify-center shadow-lg ${order.assignment_type === 'return' ? 'bg-orange-500' : 'bg-emerald-600'}`}>
+                                                        {order.assignment_type === 'return' ? <FaMapMarkerAlt className="text-white w-3 h-3" /> : <FaStore className="text-white w-3 h-3" />}
                                                     </div>
-                                                    <p className="text-[9px] text-emerald-500 font-bold uppercase tracking-wider mb-2 ">Pickup (Store)</p>
-                                                    <p className={`font-bold text-sm md:text-base leading-snug tracking-tight uppercase  ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{order.pickup_address}</p>
+                                                    <p className={`text-[9px] font-bold uppercase tracking-wider mb-2 ${order.assignment_type === 'return' ? 'text-indigo-400' : 'text-emerald-500'}`}>
+                                                        {order.assignment_type === 'return' ? 'Pickup (Customer)' : 'Pickup (Store)'}
+                                                    </p>
+                                                    <p className={`font-bold text-sm md:text-base leading-snug tracking-tight uppercase ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{order.pickup_address}</p>
                                                 </div>
                                                 <div className="relative text-left">
-                                                    <div className="absolute -left-[57px] bg-orange-500 w-8 h-8 rounded-xl flex items-center justify-center shadow-lg animate-bounce">
-                                                        <FaMapMarkerAlt className="text-white w-3 h-3" />
+                                                    <div className={`absolute -left-[57px] w-8 h-8 rounded-xl flex items-center justify-center shadow-lg ${order.assignment_type === 'return' ? 'bg-emerald-600' : 'bg-orange-500'} animate-bounce`}>
+                                                        {order.assignment_type === 'return' ? <FaStore className="text-white w-3 h-3" /> : <FaMapMarkerAlt className="text-white w-3 h-3" />}
                                                     </div>
-                                                    <p className="text-[9px] text-indigo-400 font-bold uppercase tracking-wider mb-2 ">Delivery (Customer)</p>
-                                                    <p className={`font-bold text-lg md:text-2xl tracking-tight  leading-snug uppercase ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{order.delivery_address}</p>
+                                                    <p className={`text-[9px] font-bold uppercase tracking-wider mb-2 ${order.assignment_type === 'return' ? 'text-emerald-500' : 'text-indigo-400'}`}>
+                                                        {order.assignment_type === 'return' ? 'Return To (Warehouse)' : 'Delivery (Customer)'}
+                                                    </p>
+                                                    <p className={`font-bold text-lg md:text-2xl tracking-tight leading-snug uppercase ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{order.delivery_address}</p>
                                                     <p className="text-gray-500 font-bold text-[10px] tracking-wider mt-2 uppercase">{order.delivery_city}</p>
                                                 </div>
                                             </div>
@@ -357,7 +446,7 @@ export default function AssignedOrders() {
                                                             const nextStatusActions = {
                                                                 'accepted': { label: 'Pick Up', fn: markPickedUp },
                                                                 'picked_up': { label: 'In Transit', fn: markInTransit },
-                                                                'in_transit': { label: 'Arrived', fn: markArrived },
+                                                                'in_transit': { label: order.assignment_type === 'return' ? 'Arrived at Warehouse' : 'Arrived', fn: markArrived },
                                                             };
                                                             const action = nextStatusActions[order.status];
                                                             if (action) runAction(order.id, action.label, action.fn);
@@ -368,14 +457,16 @@ export default function AssignedOrders() {
                                                             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto"></div>
                                                         ) : (
                                                             <>Next Step: {
-                                                                order.status === 'accepted' ? 'Confirm Pick Up' :
-                                                                    order.status === 'picked_up' ? 'Start Journey' :
-                                                                        order.status === 'in_transit' ? 'Confirm Arrival' : ''
+                                                                order.status === 'accepted' ? (order.assignment_type === 'return' ? 'Confirm Item Pickup' : 'Confirm Pick Up') :
+                                                                    order.status === 'picked_up' ? (order.assignment_type === 'return' ? 'Start Return Journey' : 'Start Journey') :
+                                                                        order.status === 'in_transit' ? (order.assignment_type === 'return' ? 'Confirm Arrival at Hub' : 'Confirm Arrival') : ''
                                                             }</>
                                                         )}
                                                     </button>
                                                 ) : order.status === 'arrived' ? (
-                                                    <p className="text-indigo-400 font-bold text-sm  animate-pulse tracking-wider text-center w-full uppercase">Enter OTP Below to Finish ↓</p>
+                                                    <p className="text-indigo-400 font-bold text-sm animate-pulse tracking-wider text-center w-full uppercase">
+                                                        {order.assignment_type === 'return' ? 'Verify Return Condition Below ↓' : 'Enter OTP Below to Finish ↓'}
+                                                    </p>
                                                 ) : (
                                                     <button
                                                         disabled={actionLoading[order.id]}
@@ -404,12 +495,21 @@ export default function AssignedOrders() {
                                             {order.status !== 'assigned' && <StatusStepper currentStatus={order.status} isDarkMode={isDarkMode} />}
 
                                             {order.status === 'arrived' && (
-                                                <OtpDeliveryPanel
-                                                    orderId={order.id}
-                                                    loading={actionLoading[order.id]}
-                                                    onConfirm={handleOtpDelivery}
-                                                    isDarkMode={isDarkMode}
-                                                />
+                                                order.assignment_type === 'return' ? (
+                                                    <ReturnVerificationPanel
+                                                        orderId={order.id}
+                                                        loading={actionLoading[order.id]}
+                                                        onVerify={handleReturnVerification}
+                                                        isDarkMode={isDarkMode}
+                                                    />
+                                                ) : (
+                                                    <OtpDeliveryPanel
+                                                        orderId={order.id}
+                                                        loading={actionLoading[order.id]}
+                                                        onConfirm={handleOtpDelivery}
+                                                        isDarkMode={isDarkMode}
+                                                    />
+                                                )
                                             )}
                                         </div>
                                     </div>

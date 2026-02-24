@@ -210,6 +210,109 @@ def auto_assign_order(order):
     return assignment
 
 
+def auto_assign_return(order, return_requests=None):
+    """
+    Try to auto-assign a return request to the best available delivery agent.
+    Returns: DeliveryAssignment or None
+    """
+    # 1. Eligibility & Deduplication
+    if not order or not order.delivery_address:
+        return None
+        
+    if DeliveryAssignment.objects.filter(order=order, assignment_type='return', status__in=['assigned', 'accepted', 'picked_up']).exists():
+        return None
+
+    # 2. Get Candidates (Same logic as standard delivery)
+    candidates = DeliveryAgentProfile.objects.filter(
+        approval_status='approved',
+        is_blocked=False,
+        is_active=True,
+    )
+    
+    delivery_address = order.delivery_address
+    delivery_city = (delivery_address.city or '').strip().lower()
+    delivery_pincode = (delivery_address.pincode or '').strip()
+    
+    tier_candidates = []
+    for agent in candidates:
+        agent_city = (agent.city or '').strip().lower()
+        service_cities = [c.strip().lower() for c in (agent.service_cities or []) if c]
+        service_pincodes = [str(p).strip() for p in (agent.service_pincodes or []) if p]
+
+        pincode_match = delivery_pincode in service_pincodes or agent.postal_code == delivery_pincode
+        city_match = (agent_city == delivery_city or delivery_city in service_cities)
+
+        if pincode_match or city_match:
+            active_count = DeliveryAssignment.objects.filter(
+                agent=agent,
+                status__in=['assigned', 'accepted', 'picked_up', 'in_transit']
+            ).count()
+            
+            # Distance if coordinates available
+            distance = haversine_distance(delivery_address.latitude, delivery_address.longitude, agent.latitude, agent.longitude)
+            
+            # Status weight (available=0, on_delivery=1, etc)
+            status_map = {'available': 0, 'on_delivery': 1, 'on_break': 2, 'offline': 3}
+            status_weight = status_map.get(agent.availability_status, 4)
+            
+            tier_candidates.append((agent, status_weight, distance, active_count))
+
+    if not tier_candidates:
+        # Global fallback
+        for agent in candidates:
+             active_count = DeliveryAssignment.objects.filter(agent=agent, status__in=['assigned', 'accepted', 'picked_up']).count()
+             tier_candidates.append((agent, 0, 999999, active_count))
+
+    if not tier_candidates:
+        return None
+
+    tier_candidates.sort(key=lambda x: (x[1], x[2], x[3]))
+    best_agent = tier_candidates[0][0]
+
+    # 3. Create Assignment
+    # For a return, the 'pickup_address' is the CUSTOMER address
+    # and 'delivery_address' is the VENDOR warehouse.
+    
+    cust_addr = f"{delivery_address.address_line1}, {delivery_address.city}, {delivery_address.pincode}"
+    
+    vendor_addr = "Admin/Vendor Warehouse"
+    try:
+        first_item = order.items.first()
+        if first_item and first_item.vendor:
+            v = first_item.vendor
+            vendor_addr = f"{v.shop_name}, {v.address or ''}"
+    except: pass
+
+    # Link to the first return request if provided
+    first_ret = None
+    if return_requests and len(return_requests) > 0:
+        from user.models import OrderReturn
+        first_ret = OrderReturn.objects.filter(id=return_requests[0]).first()
+
+    assignment = DeliveryAssignment.objects.create(
+        agent=best_agent,
+        order=order,
+        assignment_type='return',
+        return_request=first_ret,
+        status='assigned',
+        pickup_address=cust_addr, # Pick up from customer
+        delivery_address=vendor_addr, # Deliver back to vendor
+        delivery_city=delivery_address.city,
+        estimated_delivery_date=timezone.now().date() + timedelta(days=2),
+        delivery_fee=Decimal('40.00'), # Lower fee for returns usually
+        customer_contact=delivery_address.phone or '',
+    )
+
+    # Tracking
+    DeliveryTracking.objects.create(
+        delivery_assignment=assignment,
+        status='Return Pickup Assigned',
+        notes=f"Auto-assigned return pickup to {best_agent.user.username}"
+    )
+
+    return assignment
+
+
 def get_unassigned_confirmed_orders():
     """
     Return queryset of confirmed/paid orders that have no DeliveryAssignment yet.

@@ -70,6 +70,13 @@ export const fetchAssignedOrders = async (status = '') => {
     return response.data;
 };
 
+export const fetchAssignmentDetail = async (id) => {
+    const response = await axios.get(`${API_BASE_URL}/api/delivery/assignments/${id}/`, {
+        headers: getHeaders()
+    });
+    return response.data;
+};
+
 export const acceptOrder = async (assignmentId) => {
     const response = await axios.post(`${API_BASE_URL}/api/delivery/assignments/${assignmentId}/accept/`, {}, {
         headers: getHeaders()
@@ -126,6 +133,26 @@ export const failDelivery = async (assignmentId, notes = '') => {
     const response = await axios.post(`${API_BASE_URL}/api/delivery/assignments/${assignmentId}/update-status/`,
         { status: 'failed', notes },
         { headers: getHeaders() }
+    );
+    return response.data;
+};
+
+export const verifyReturn = async (assignmentId, data) => {
+    const formData = new FormData();
+    formData.append('condition_notes', data.condition_notes);
+    if (data.verification_images) {
+        formData.append('verification_images', data.verification_images);
+    }
+
+    const response = await axios.post(
+        `${API_BASE_URL}/api/delivery/assignments/${assignmentId}/verify_return/`,
+        formData,
+        {
+            headers: {
+                ...getHeaders(),
+                "Content-Type": "multipart/form-data",
+            }
+        }
     );
     return response.data;
 };

@@ -141,18 +141,53 @@ class FinanceService:
     @transaction.atomic
     def settle_order_financials(order):
         """
-        Mark all REVENUE ledger entries for this order as settled.
+        Mark REVENUE ledger entries for this order with a 3-day settlement window.
         Executed when an order is successfully delivered.
+        Funds are NOT released immediately to vendor wallet.
         """
+        from datetime import timedelta
+        # Funds stay uncleared for 3 days to allow for returns
+        settlement_date = timezone.now() + timedelta(days=3)
+        
         updated_count = LedgerEntry.objects.filter(
             order=order,
-            entry_type='REVENUE',
-            is_settled=False
+            entry_type='REVENUE'
         ).update(
-            is_settled=True,
-            settlement_date=timezone.now()
+            is_settled=False,  # Force false to ensure 3-day hold
+            settlement_date=settlement_date
         )
         return updated_count
+
+    @staticmethod
+    @transaction.atomic
+    def release_expired_funds():
+        """
+        Background task: Find all ledger entries where settlement_date has passed
+        and no return request exists, then mark them as settled (releasing funds to vendor).
+        """
+        from user.models import OrderReturn
+        
+        # 1. Identify entries that reached settlement date
+        pending_entries = LedgerEntry.objects.filter(
+            is_settled=False,
+            settlement_date__lte=timezone.now(),
+            entry_type='REVENUE'
+        )
+
+        released_count = 0
+        for entry in pending_entries:
+            # Check if there's an active return request for this order
+            if entry.order:
+                has_active_return = OrderReturn.objects.filter(
+                    order=entry.order
+                ).exclude(status='rejected').exists()
+                
+                if not has_active_return:
+                    entry.is_settled = True
+                    entry.save(update_fields=['is_settled'])
+                    released_count += 1
+        
+        return released_count
 
     @staticmethod
     @transaction.atomic

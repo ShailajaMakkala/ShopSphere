@@ -13,15 +13,17 @@ import {
     FaExclamationTriangle,
     FaTimes,
     FaLock,
+    FaChevronRight,
 } from 'react-icons/fa';
 import {
-    fetchAssignedOrders,
+    fetchAssignmentDetail,
     completeDelivery,
     markPickedUp,
     markInTransit,
     markArrived,
     failDelivery,
-    acceptOrder as apiAcceptOrder
+    acceptOrder as apiAcceptOrder,
+    verifyReturn,
 } from '../../api/delivery_axios';
 import { toast } from 'react-hot-toast';
 import { useTheme } from '../../context/ThemeContext';
@@ -73,6 +75,72 @@ function StatusStepper({ currentStatus, isDarkMode }) {
     );
 }
 
+// ─── Return Verification Panel ──────────────────────────────────────────────
+function ReturnVerificationPanel({ orderId, loading, onVerify, isDarkMode }) {
+    const [notes, setNotes] = useState('');
+    const [image, setImage] = useState(null);
+
+    return (
+        <div className={`rounded-[42px] p-8 md:p-10 mt-10 border transition-all shadow-2xl relative overflow-hidden group ${isDarkMode ? 'bg-[#0f172a] border-white/5' : 'bg-white border-slate-200'}`}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full translate-x-1/2 -translate-y-1/2 blur-2xl"></div>
+
+            <div className="relative z-10">
+                <div className="flex items-center gap-4 mb-8">
+                    <div className={`w-12 h-12 border rounded-2xl flex items-center justify-center backdrop-blur-xl transition-all ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-200'}`}>
+                        <FaBox className="text-indigo-400" size={20} />
+                    </div>
+                    <div>
+                        <p className={`font-bold text-xl tracking-tight uppercase ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Verify Return Condition</p>
+                        <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider mt-1">Item inspection required for refund</p>
+                    </div>
+                </div>
+
+                <div className="space-y-6">
+                    <textarea
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        placeholder="Describe item condition (e.g., Original packaging intact, No visible damage)"
+                        className={`w-full p-6 rounded-3xl border-2 outline-none transition-all min-h-[120px] text-sm font-medium ${isDarkMode ? 'bg-white/5 border-white/10 text-white placeholder-slate-500 focus:border-orange-500' : 'bg-slate-100 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-orange-500'}`}
+                    />
+
+                    <div className="relative">
+                        <input
+                            type="file"
+                            id={`file-${orderId}`}
+                            onChange={(e) => setImage(e.target.files[0])}
+                            className="hidden"
+                        />
+                        <label
+                            htmlFor={`file-${orderId}`}
+                            className={`flex items-center justify-center p-6 border-2 border-dashed rounded-[24px] cursor-pointer transition-all hover:border-orange-500/50 ${isDarkMode ? 'bg-white/5 border-white/10 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-500'}`}
+                        >
+                            {image ? (
+                                <span className="text-orange-400 font-bold text-xs uppercase tracking-wider flex items-center gap-2">
+                                    <FaCheck size={12} /> {image.name}
+                                </span>
+                            ) : (
+                                <span className="text-[10px] font-bold uppercase tracking-wider">Upload Verification Image (Optional)</span>
+                            )}
+                        </label>
+                    </div>
+
+                    <button
+                        disabled={!notes || loading}
+                        onClick={() => onVerify('Verify Return', verifyReturn, { condition_notes: notes, verification_images: image })}
+                        className="w-full py-5 bg-orange-500 text-white font-bold uppercase tracking-wider text-[11px] rounded-3xl shadow-xl hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-20 flex items-center justify-center gap-3"
+                    >
+                        {loading ? (
+                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        ) : (
+                            <>Complete Return & Process Refund <FaChevronRight size={10} /></>
+                        )}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function DeliveryOrderDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -82,23 +150,26 @@ export default function DeliveryOrderDetail() {
     const [otpCode, setOtpCode] = useState('');
     const [showIssueModal, setShowIssueModal] = useState(false);
     const [issueText, setIssueText] = useState('');
+    const [verifiedItems, setVerifiedItems] = useState({});
     const { isDarkMode } = useTheme();
 
     const loadDetail = async () => {
         try {
-            const data = await fetchAssignedOrders();
-            const found = data.find(a => a.id === parseInt(id));
-            if (found) {
-                setAssignment(found);
-            } else {
-                toast.error("Order not found");
-                navigate('/delivery/dashboard');
-            }
+            const data = await fetchAssignmentDetail(id);
+            setAssignment(data);
         } catch (error) {
             toast.error("Failed to load order details");
+            navigate('/delivery/dashboard');
         } finally {
             setLoading(false);
         }
+    };
+
+    const toggleItemVerification = (itemId) => {
+        setVerifiedItems(prev => ({
+            ...prev,
+            [itemId]: !prev[itemId]
+        }));
     };
 
     useEffect(() => { loadDetail(); }, [id]);
@@ -161,6 +232,9 @@ export default function DeliveryOrderDetail() {
                                 <span className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all ${isDarkMode ? 'bg-white/10 text-white border-white/10' : 'bg-slate-100 text-slate-800 border-slate-200'}`}>
                                     Order #{assignment.id}
                                 </span>
+                                <span className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all ${isDarkMode ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' : 'bg-indigo-50 text-orange-500 border-orange-100'}`}>
+                                    {assignment.assignment_type === 'return' ? 'RETURN PICKUP' : 'STANDARD DELIVERY'}
+                                </span>
                                 <span className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all ${assignment.status === 'delivered' ? 'bg-orange-500/10 text-emerald-400 border-emerald-500/20' :
                                     assignment.status === 'failed' ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' :
                                         'bg-orange-500/10 text-indigo-400 border-orange-500/20'
@@ -193,17 +267,21 @@ export default function DeliveryOrderDetail() {
                                 </h3>
                                 <div className={`space-y-8 relative pl-8 md:pl-10 border-l-2 border-dashed ml-3 md:ml-4 transition-colors ${isDarkMode ? 'border-white/10' : 'border-slate-200'}`}>
                                     <div className="relative">
-                                        <div className={`absolute -left-[39px] md:-left-[51px] bg-emerald-500 w-7 h-7 md:w-8 md:h-8 rounded-full border-4 shadow-lg flex items-center justify-center transition-all ${isDarkMode ? 'border-[#0f172a]' : 'border-white'}`}>
-                                            <FaCheck className="text-white w-3 h-3" />
+                                        <div className={`absolute -left-[39px] md:-left-[51px] w-7 h-7 md:w-8 md:h-8 rounded-full border-4 shadow-lg flex items-center justify-center transition-all ${isDarkMode ? 'border-[#0f172a]' : 'border-white'} ${assignment.assignment_type === 'return' ? 'bg-orange-500' : 'bg-emerald-500'}`}>
+                                            {assignment.assignment_type === 'return' ? <FaMapMarkerAlt className="text-white w-2.5 h-2.5" /> : <FaCheck className="text-white w-3 h-3" />}
                                         </div>
-                                        <p className="text-[9px] text-emerald-400 font-bold uppercase tracking-widest mb-1.5 ">Pickup From</p>
+                                        <p className={`text-[9px] font-bold uppercase tracking-widest mb-1.5 ${assignment.assignment_type === 'return' ? 'text-indigo-400' : 'text-emerald-400'}`}>
+                                            {assignment.assignment_type === 'return' ? 'Pickup (Customer)' : 'Pickup From'}
+                                        </p>
                                         <p className={`font-bold leading-relaxed text-sm transition-colors ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>{assignment.pickup_address}</p>
                                     </div>
                                     <div className="relative">
-                                        <div className={`absolute -left-[42px] md:-left-[55px] w-7 h-7 md:w-8 md:h-8 rounded-full border-4 shadow-xl flex items-center justify-center transition-all ${isDarkMode ? 'bg-[#0f172a] border-indigo-500 ring-4 ring-orange-500/10' : 'bg-white border-orange-500 ring-4 ring-indigo-100'}`}>
-                                            <div className="w-2.5 h-2.5 bg-indigo-400 rounded-full animate-pulse"></div>
+                                        <div className={`absolute -left-[42px] md:-left-[55px] w-7 h-7 md:w-8 md:h-8 rounded-full border-4 shadow-xl flex items-center justify-center transition-all ${isDarkMode ? 'bg-[#0f172a] border-indigo-500 ring-4 ring-orange-500/10' : 'bg-white border-orange-500 ring-4 ring-indigo-100'} ${assignment.assignment_type === 'return' ? 'border-emerald-500' : 'border-orange-500'}`}>
+                                            <div className={`w-2.5 h-2.5 rounded-full animate-pulse ${assignment.assignment_type === 'return' ? 'bg-emerald-400' : 'bg-indigo-400'}`}></div>
                                         </div>
-                                        <p className="text-[9px] text-indigo-400 font-bold uppercase tracking-widest mb-1.5 ">Deliver To</p>
+                                        <p className={`text-[9px] font-bold uppercase tracking-widest mb-1.5 ${assignment.assignment_type === 'return' ? 'text-emerald-400' : 'text-indigo-400'}`}>
+                                            {assignment.assignment_type === 'return' ? 'Return To (Hub/Warehouse)' : 'Deliver To'}
+                                        </p>
                                         <p className={`font-bold text-xl md:text-2xl tracking-tight mb-1  transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{assignment.delivery_address}</p>
                                         <p className={`font-bold text-xs tracking-widest uppercase transition-colors ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>{assignment.delivery_city}</p>
                                     </div>
@@ -217,17 +295,38 @@ export default function DeliveryOrderDetail() {
                                 </h3>
                                 <div className="space-y-3">
                                     {assignment.items?.map((item, idx) => (
-                                        <div key={idx} className={`flex justify-between items-center p-4 rounded-2xl border transition-all ${isDarkMode ? 'bg-white/5 border-white/5 hover:border-orange-500/20' : 'bg-white border-slate-100 hover:border-indigo-200'}`}>
+                                        <div
+                                            key={idx}
+                                            onClick={() => toggleItemVerification(item.id || idx)}
+                                            className={`flex justify-between items-center p-4 rounded-2xl border transition-all cursor-pointer select-none group/item ${verifiedItems[item.id || idx]
+                                                ? (isDarkMode ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200')
+                                                : (isDarkMode ? 'bg-white/5 border-white/5 hover:border-orange-500/20' : 'bg-white border-slate-100 hover:border-indigo-200')
+                                                }`}
+                                        >
                                             <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 bg-orange-500 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-lg">
-                                                    {item.quantity}×
+                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs shadow-lg transition-all ${verifiedItems[item.id || idx]
+                                                    ? 'bg-emerald-500 text-white'
+                                                    : 'bg-orange-500 text-white'
+                                                    }`}>
+                                                    {verifiedItems[item.id || idx] ? <FaCheck /> : `${item.quantity}×`}
                                                 </div>
                                                 <div>
-                                                    <span className={`font-bold text-sm block tracking-tight  transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{item.product_name}</span>
-                                                    <span className={`text-[9px] font-bold uppercase tracking-widest  transition-colors ${isDarkMode ? 'text-slate-700' : 'text-slate-300'}`}>Verified</span>
+                                                    <span className={`font-bold text-sm block tracking-tight transition-colors ${verifiedItems[item.id || idx]
+                                                        ? 'text-emerald-500'
+                                                        : (isDarkMode ? 'text-white' : 'text-slate-900')
+                                                        }`}>{item.product_name}</span>
+                                                    <span className={`text-[9px] font-bold uppercase tracking-widest transition-colors ${verifiedItems[item.id || idx]
+                                                        ? 'text-emerald-400'
+                                                        : (isDarkMode ? 'text-slate-600' : 'text-slate-300')
+                                                        }`}>
+                                                        {verifiedItems[item.id || idx] ? 'Verified ✓' : 'Tap to Verify'}
+                                                    </span>
                                                 </div>
                                             </div>
-                                            <span className={`font-bold tracking-tight transition-colors ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>₹{item.price}</span>
+                                            <span className={`font-bold tracking-tight transition-colors ${verifiedItems[item.id || idx]
+                                                ? 'text-emerald-500'
+                                                : (isDarkMode ? 'text-slate-400' : 'text-slate-600')
+                                                }`}>₹{item.price}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -290,7 +389,7 @@ export default function DeliveryOrderDetail() {
                                         onClick={() => handleAction('In Transit', markInTransit)}
                                         className="w-full py-6 bg-orange-500 hover:bg-indigo-500 text-white font-bold text-[11px] uppercase tracking-widest rounded-2xl shadow-2xl shadow-orange-500/30 transition-all flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 "
                                     >
-                                        <FaShippingFast /> Start Delivery
+                                        <FaShippingFast /> {assignment.assignment_type === 'return' ? 'Start Return Trip' : 'Start Delivery'}
                                     </button>
                                 )}
 
@@ -300,11 +399,22 @@ export default function DeliveryOrderDetail() {
                                         onClick={() => handleAction('Arrived', markArrived)}
                                         className="w-full py-6 bg-amber-500 hover:bg-amber-400 text-white font-bold text-[11px] uppercase tracking-widest rounded-2xl shadow-2xl shadow-amber-900/20 transition-all flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 "
                                     >
-                                        <FaMapMarkerAlt /> I've Arrived
+                                        <FaMapMarkerAlt /> {assignment.assignment_type === 'return' ? "I'm at the Warehouse" : "I've Arrived"}
                                     </button>
                                 )}
 
-                                {assignment.status === 'arrived' && (
+                                {/* Return Verification (Visible from Pickup onwards for Returns) */}
+                                {['picked_up', 'in_transit', 'arrived'].includes(assignment.status) && assignment.assignment_type === 'return' && (
+                                    <ReturnVerificationPanel
+                                        orderId={assignment.id}
+                                        loading={actionLoading}
+                                        onVerify={handleAction}
+                                        isDarkMode={isDarkMode}
+                                    />
+                                )}
+
+                                {/* Delivery OTP Panel (Only for Standard Delivery when Arrived) */}
+                                {assignment.status === 'arrived' && assignment.assignment_type === 'delivery' && (
                                     <div className={`space-y-4 p-7 md:p-10 rounded-[32px] md:rounded-[40px] border-2 transition-all ${isDarkMode ? 'bg-[#0f172a] border-emerald-500/40' : 'bg-white border-emerald-500/40 shadow-xl'}`}>
                                         <div className="text-center">
                                             <h4 className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-2 ">🔐 Enter OTP Code</h4>
@@ -327,6 +437,7 @@ export default function DeliveryOrderDetail() {
                                         </button>
                                     </div>
                                 )}
+
 
                                 {['accepted', 'picked_up', 'in_transit', 'arrived'].includes(assignment.status) && (
                                     <button

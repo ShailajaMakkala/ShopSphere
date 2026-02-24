@@ -182,12 +182,30 @@ class OrderSerializer(serializers.ModelSerializer):
     billing_address = AddressSerializer(read_only=True)
     tracking_history = OrderTrackingSerializer(many=True, read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
+    can_be_returned = serializers.SerializerMethodField()
+    return_data = serializers.SerializerMethodField()
     
     class Meta:
         model = Order
         fields = ['id', 'order_number', 'payment_method', 'payment_status', 'transaction_id',
                   'subtotal', 'tax_amount', 'shipping_cost', 'total_amount', 
-                  'status', 'delivery_address', 'billing_address', 'created_at', 'items', 'tracking_history']
+                  'status', 'delivery_address', 'billing_address', 'created_at', 'items', 'tracking_history',
+                  'can_be_returned', 'return_data', 'delivered_at']
+
+    def get_can_be_returned(self, obj):
+        return obj.can_be_returned()
+
+    def get_return_data(self, obj):
+        if hasattr(obj, 'returns') and obj.returns.exists():
+            from .models import OrderReturn
+            # Just take the first one or a summary
+            ret = obj.returns.first()
+            return {
+                "status": ret.status,
+                "reason": ret.reason,
+                "created_at": ret.created_at,
+            }
+        return None
 
 
 class CartItemSerializer(serializers.ModelSerializer):

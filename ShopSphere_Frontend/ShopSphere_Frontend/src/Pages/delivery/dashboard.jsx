@@ -34,7 +34,7 @@ export default function DeliveryDashboard() {
             setStats(dashData.today_stats);
             // Filter only work-in-progress statuses
             const working = activeData.filter(a =>
-                ['accepted', 'picked_up', 'in_transit', 'arrived'].includes(a.status)
+                ['assigned', 'accepted', 'picked_up', 'in_transit', 'arrived'].includes(a.status)
             );
             setActiveAssignments(working);
             setApprovalStatus('approved');
@@ -211,6 +211,7 @@ export default function DeliveryDashboard() {
                                             <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4 mb-4 justify-center lg:justify-start">
                                                 <h4 className={`text-2xl font-bold tracking-tight  uppercase truncate ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{assignment.customer_name}</h4>
                                                 <span className={`px-5 py-1.5 rounded-xl text-[9px] font-bold uppercase tracking-widest border  self-center ${isDarkMode ? 'bg-orange-500/20 text-indigo-400 border-orange-500/20' : 'bg-indigo-50 text-orange-500 border-orange-100'}`}>
+                                                    {assignment.assignment_type === 'return' ? 'RETURN • ' : ''}
                                                     {assignment.status.replace('_', ' ')}
                                                 </span>
                                             </div>

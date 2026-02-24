@@ -56,7 +56,7 @@ class DeliveryAssignmentListSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'agent_name', 'order_id', 'customer_name',
             'delivery_city', 'delivery_address', 'pickup_address',
-            'status', 'estimated_delivery_date',
+            'status', 'assignment_type', 'estimated_delivery_date',
             'pickup_time', 'delivery_time', 'delivery_fee', 'assigned_at',
             'items', 'failure_reason'
         ]
@@ -76,6 +76,7 @@ class DeliveryAssignmentDetailSerializer(serializers.ModelSerializer):
     completed_at = serializers.DateTimeField(read_only=True)
     pickup_time = serializers.DateTimeField(read_only=True)
     delivery_time = serializers.DateTimeField(read_only=True)
+    items = serializers.SerializerMethodField()
 
     def get_estimated_delivery_date(self, obj):
         if not obj.estimated_delivery_date: return None
@@ -86,7 +87,7 @@ class DeliveryAssignmentDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = DeliveryAssignment
         fields = [
-            'id', 'agent', 'order_details', 'status', 'pickup_address',
+            'id', 'agent', 'order_details', 'status', 'assignment_type', 'pickup_address',
             'delivery_address', 'delivery_city', 'delivery_coordinates',
             'estimated_delivery_date', 'estimated_delivery_time', 'pickup_time',
             'delivery_time', 'attempts_count', 'special_instructions',
@@ -94,7 +95,7 @@ class DeliveryAssignmentDetailSerializer(serializers.ModelSerializer):
             'delivery_fee', 'customer_contact', 'agent_contact_allowed',
             'assigned_at', 'accepted_at', 'started_at', 'completed_at',
             'signature_image', 'delivery_photo', 'otp_verified',
-            'tracking_history', 'failure_reason'
+            'tracking_history', 'failure_reason', 'items'
         ]
         read_only_fields = [
             'id', 'assigned_at', 'accepted_at', 'started_at', 'completed_at',
@@ -109,6 +110,17 @@ class DeliveryAssignmentDetailSerializer(serializers.ModelSerializer):
             'vehicle_number': obj.agent.vehicle_number,
             'rating': float(obj.agent.average_rating),
         }
+    
+    def get_items(self, obj):
+        if not obj.order: return []
+        return [
+            {
+                'id': item.id,
+                'product_name': item.product_name,
+                'quantity': item.quantity,
+                'price': str(item.product_price)
+            } for item in obj.order.items.all()
+        ]
     
     def get_order_details(self, obj):
         return {
