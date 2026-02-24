@@ -283,11 +283,13 @@ def auto_assign_return(order, return_requests=None):
             vendor_addr = f"{v.shop_name}, {v.address or ''}"
     except: pass
 
-    # Link to the first return request if provided
-    first_ret = None
-    if return_requests and len(return_requests) > 0:
-        from user.models import OrderReturn
-        first_ret = OrderReturn.objects.filter(id=return_requests[0]).first()
+    # Link to the return requests if provided
+    from user.models import OrderReturn
+    relevant_returns = OrderReturn.objects.filter(id__in=return_requests or [])
+    first_ret = relevant_returns.first()
+
+    # Link the agent to the return request records immediately for Admin UI visibility
+    relevant_returns.update(pickup_agent=best_agent)
 
     assignment = DeliveryAssignment.objects.create(
         agent=best_agent,

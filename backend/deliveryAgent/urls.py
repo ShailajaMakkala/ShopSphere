@@ -16,6 +16,7 @@ urlpatterns = [
     path('delivery/start-transit/<int:order_id>/', views.start_transit, name='start_transit'),
     path('delivery/mark-arrived/<int:order_id>/', views.mark_arrived, name='mark_arrived'),
     path('delivery/complete-order/<int:order_id>/', views.complete_delivery_otp, name='complete_delivery_otp'),
+    path('delivery/complete-return/<int:order_id>/', views.complete_return_warehouse, name='complete_return_warehouse'),
     
     # Simulation/Redirects
     path('accept-order/<int:order_id>/', views.accept_order_sim, name='accept_order_sim'),

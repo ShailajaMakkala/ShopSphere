@@ -45,9 +45,9 @@ from .serializers import (
     AdminDeliveryAgentDetailSerializer, AdminDeliveryAgentListSerializer,
     ApproveDeliveryAgentSerializer, RejectDeliveryAgentSerializer,
     BlockDeliveryAgentSerializer, UnblockDeliveryAgentSerializer,
-    AdminOrderListSerializer, AdminOrderDetailSerializer
+    AdminOrderListSerializer, AdminOrderDetailSerializer, AdminOrderReturnSerializer
 )
-from user.models import Order
+from user.models import Order, OrderReturn
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -1384,3 +1384,94 @@ class WhoAmIView(APIView):
             'role': getattr(u, 'role', 'N/A'),
             'is_admin_eligible': u.is_staff or u.is_superuser,
         })
+
+
+class ReturnManagementViewSet(AdminLoginRequiredMixin, viewsets.ModelViewSet):
+    """
+    ViewSet for admin to manage order returns.
+    """
+    queryset = OrderReturn.objects.all().select_related('order', 'order_item', 'user', 'pickup_agent')
+    serializer_class = AdminOrderReturnSerializer
+    permission_classes = [IsAuthenticated, IsStaffOrSuperuser]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        status_param = self.request.query_params.get('status')
+        if status_param:
+            queryset = queryset.filter(status=status_param)
+        
+        search = self.request.query_params.get('search')
+        if search:
+            queryset = queryset.filter(
+                Q(order__order_number__icontains=search) |
+                Q(user__email__icontains=search)
+            )
+        return queryset.order_by('-created_at')
+
+    @action(detail=True, methods=['post'])
+    def approve(self, request, pk=None):
+        return_req = self.get_object()
+        if return_req.status != 'requested':
+            return Response({'error': 'Only requested returns can be approved.'}, status=400)
+        
+        return_req.status = 'approved'
+        return_req.approved_at = timezone.now()
+        return_req.save()
+        
+        # Log to tracking
+        from user.models import OrderTracking
+        OrderTracking.objects.create(
+            order=return_req.order,
+            status='Return Approved',
+            notes=f"Return request for {return_req.order_item.product_name} approved by admin."
+        )
+
+        # Trigger Auto-Assignment for the Return Pickup upon approval
+        try:
+            from deliveryAgent.services import auto_assign_return
+            assignment = auto_assign_return(return_req.order, [return_req.id])
+            if assignment:
+                # Update status to pickup_assigned if an agent was matched
+                return_req.status = 'pickup_assigned'
+                return_req.save(update_fields=['status'])
+        except Exception as e:
+            print(f"DEBUG: Auto-assignment failed for return approval: {str(e)}")
+        
+        return Response({'message': 'Return request approved and pickup assignment triggered.', 'status': return_req.status})
+
+    @action(detail=True, methods=['post'])
+    def reject(self, request, pk=None):
+        return_req = self.get_object()
+        reason = request.data.get('reason', 'Rejected by admin')
+        if return_req.status != 'requested':
+            return Response({'error': 'Only requested returns can be rejected.'}, status=400)
+        
+        return_req.status = 'rejected'
+        return_req.save()
+        
+        # Log to tracking
+        from user.models import OrderTracking
+        OrderTracking.objects.create(
+            order=return_req.order,
+            status='Return Rejected',
+            notes=f"Return request for {return_req.order_item.product_name} rejected. Reason: {reason}"
+        )
+        
+        return Response({'message': 'Return request rejected.', 'status': 'rejected'})
+
+    @action(detail=True, methods=['post'])
+    def process_refund(self, request, pk=None):
+        """Manually mark refund as processed and initiate financial reversal"""
+        return_req = self.get_object()
+        if return_req.status != 'received':
+            return Response({'error': 'Refund can only be processed after item is received and verified.'}, status=400)
+        
+        if return_req.refund_status == 'processed':
+             return Response({'error': 'Refund already processed for this request.'}, status=400)
+
+        from finance.services import FinanceService
+        try:
+            FinanceService.process_refund(return_req)
+            return Response({'message': 'Refund processed and customer credited.', 'status': 'completed'})
+        except Exception as e:
+            return Response({'error': f"Financial processing failed: {str(e)}"}, status=500)

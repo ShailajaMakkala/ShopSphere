@@ -51,10 +51,13 @@ class DeliveryAssignmentListSerializer(serializers.ModelSerializer):
             } for item in obj.order.items.all()
         ]
     
+    order_number = serializers.CharField(source='order.order_number', read_only=True)
+    customer_email = serializers.CharField(source='order.user.email', read_only=True)
+    
     class Meta:
         model = DeliveryAssignment
         fields = [
-            'id', 'agent_name', 'order_id', 'customer_name',
+            'id', 'agent_name', 'order_id', 'order_number', 'customer_name', 'customer_email',
             'delivery_city', 'delivery_address', 'pickup_address',
             'status', 'assignment_type', 'estimated_delivery_date',
             'pickup_time', 'delivery_time', 'delivery_fee', 'assigned_at',

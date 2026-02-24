@@ -312,50 +312,51 @@ class DeliveryAssignment(models.Model):
         self.save()
     
     def mark_delivered(self):
-        """Mark delivery as completed (Standard Delivery Only)"""
-        if self.assignment_type == 'return':
-            # Returns are finalized via verify_return action in views
-            return
-
-        from user.models import UserWallet, Order
+        """Mark delivery as completed (Finalize standard delivery OR return pickup)"""
+        from user.models import UserWallet, Order, OrderReturn
         from .models import DeliveryCommission, DeliveryDailyStats
         
         self.status = 'delivered'
         self.delivery_time = timezone.now()
         self.completed_at = timezone.now()
         self.save()
-        
-        # 1. Update order status
-        if self.order:
-            self.order.status = 'delivered'
-            self.order.delivered_at = self.delivery_time
-            self.order.save(update_fields=['status', 'delivered_at'])
+
+        if self.assignment_type == 'return':
+            # 1. Finalize all relevant Return Requests for this order
+            OrderReturn.objects.filter(
+                order=self.order, 
+                status='picked_up'
+            ).update(status='received')
             
-            # Create Tracking Records
+            # Create Tracking
             from user.models import OrderTracking
             OrderTracking.objects.create(
                 order=self.order,
-                status='Delivered',
+                status='Return Received at Warehouse',
                 location=self.delivery_city,
-                notes="Order successfully delivered and verified via OTP."
+                notes="Return package(s) received and verified at the hub/warehouse."
             )
+        else:
+            # Standard Delivery Finalization
+            if self.order:
+                self.order.status = 'delivered'
+                self.order.delivered_at = self.delivery_time
+                self.order.save(update_fields=['status', 'delivered_at'])
+                
+                from user.models import OrderTracking
+                OrderTracking.objects.create(
+                    order=self.order,
+                    status='Delivered',
+                    location=self.delivery_city,
+                    notes="Order successfully delivered and verified via OTP."
+                )
             
-            from django.apps import apps
-            DeliveryTracking = apps.get_model('deliveryAgent', 'DeliveryTracking')
-            DeliveryTracking.objects.create(
-                delivery_assignment=self,
-                latitude=0, longitude=0,
-                address=self.delivery_city,
-                status='Delivered',
-                notes="Delivery completed successfully."
-            )
-        
-        # 2. Settle Financials
-        try:
-            from finance.services import FinanceService
-            FinanceService.settle_order_financials(self.order)
-        except Exception as e:
-            print(f"DEBUG: Error settling financials: {str(e)}")
+            # Settle Vendor Ledger (sets 3-day window)
+            try:
+                from finance.services import FinanceService
+                FinanceService.settle_order_financials(self.order)
+            except Exception as e:
+                print(f"DEBUG: Financial settlement error: {str(e)}")
 
         # 2. Calculate Commission
         is_local = self.delivery_city.lower() == self.agent.city.lower()
