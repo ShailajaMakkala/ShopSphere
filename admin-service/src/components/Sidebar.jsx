@@ -11,7 +11,8 @@ import {
     ClipboardList,
     Sun,
     Moon,
-    LogOut
+    LogOut,
+    RefreshCcw
 } from 'lucide-react';
 import { motion as Motion } from 'framer-motion';
 
@@ -28,6 +29,7 @@ const Sidebar = ({ isSidebarOpen, activePage = 'Dashboard', onLogout }) => {
         { name: 'Vendors', icon: Store, path: '/vendors' },
         { name: 'Vendor Requests', icon: ClipboardList, path: '/vendors/requests' },
         { name: 'Orders', icon: ClipboardList, path: '/orders' },
+        { name: 'Returns', icon: RefreshCcw, path: '/returns' },
         { name: 'Delivery Agents', icon: Store, path: '/delivery/agents' },
 
         { name: 'Delivery Requests', icon: ClipboardList, path: '/delivery/requests' },

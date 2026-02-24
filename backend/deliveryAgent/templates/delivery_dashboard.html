@@ -184,29 +184,52 @@
 
                     <div class="flex gap-3">
                         {% if order.status == 'accepted' %}
-                        <form method="post" action="{% url 'pickup_order' order.order.id %}" class="flex-1">
-                            {% csrf_token %}
-                            <button type="submit"
-                                class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition">
-                                Mark as Picked Up
-                            </button>
-                        </form>
+                        <div class="w-full">
+                            <form method="post" action="{% url 'pickup_order' order.order.id %}" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                {% if order.assignment_type == 'return' %}
+                                <div class="mb-4 space-y-3 p-4 bg-amber-50 rounded-xl border border-amber-100">
+                                    <p class="text-[10px] font-black uppercase tracking-widest text-amber-700">Verification Required</p>
+                                    <textarea name="condition_notes" placeholder="Condition notes: (e.g. Orginal packing tag intact)" class="w-full p-3 text-sm rounded-lg border border-amber-200 outline-none focus:ring-2 focus:ring-amber-500/20" required></textarea>
+                                    <div>
+                                        <p class="text-[10px] font-black uppercase tracking-widest text-amber-600 mb-1">Upload Inspection Photo</p>
+                                        <input type="file" name="verification_images" class="text-xs text-slate-500">
+                                    </div>
+                                </div>
+                                {% endif %}
+                                <button type="submit"
+                                    class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition">
+                                    {% if order.assignment_type == 'return' %}Confirm & Pick Up{% else %}Mark as Picked Up{% endif %}
+                                </button>
+                            </form>
+                        </div>
                         {% elif order.status == 'picked_up' %}
-                        <form method="post" action="{% url 'start_transit' order.order.id %}" class="flex-1">
+                        <form method="post" action="{% if order.assignment_type == 'return' %}{% url 'complete_return_warehouse' order.order.id %}{% else %}{% url 'start_transit' order.order.id %}{% endif %}" class="flex-1">
                             {% csrf_token %}
                             <button type="submit"
-                                class="w-full bg-orange-500 text-white py-3 rounded-xl font-semibold hover:bg-orange-600 transition">
-                                Start Transit
+                                class="w-full {% if order.assignment_type == 'return' %}bg-emerald-600 hover:bg-emerald-700{% else %}bg-orange-500 hover:bg-orange-600{% endif %} text-white py-3 rounded-xl font-semibold transition">
+                                <i class="fas {% if order.assignment_type == 'return' %}fa-warehouse{% else %}fa-truck{% endif %} mr-2"></i>
+                                {% if order.assignment_type == 'return' %}Deliver to Warehouse{% else %}Start Transit{% endif %}
                             </button>
                         </form>
                         {% elif order.status == 'in_transit' %}
-                        <form method="post" action="{% url 'mark_arrived' order.order.id %}" class="flex-1">
-                            {% csrf_token %}
-                            <button type="submit"
-                                class="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition">
-                                Mark as Delivered (Reached)
-                            </button>
-                        </form>
+                            {% if order.assignment_type == 'return' %}
+                            <form method="post" action="{% url 'complete_return_warehouse' order.order.id %}" class="flex-1">
+                                {% csrf_token %}
+                                <button type="submit"
+                                    class="w-full bg-emerald-600 text-white py-3 rounded-xl font-semibold hover:bg-emerald-700 transition">
+                                    Deliver to Warehouse
+                                </button>
+                            </form>
+                            {% else %}
+                            <form method="post" action="{% url 'mark_arrived' order.order.id %}" class="flex-1">
+                                {% csrf_token %}
+                                <button type="submit"
+                                    class="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition">
+                                    Mark as Delivered (Reached)
+                                </button>
+                            </form>
+                            {% endif %}
                         {% elif order.status == 'arrived' %}
                         <div class="w-full p-4 bg-green-50 rounded-xl border border-green-200">
                             <p class="text-xs text-green-800 font-bold mb-2 text-center">🔐 VERIFY CUSTOMER OTP</p>

@@ -6,7 +6,7 @@ User = get_user_model()
 from vendor.models import VendorProfile, Product, ProductImage
 from .models import VendorApprovalLog, ProductApprovalLog, DeliveryAgentApprovalLog
 from deliveryAgent.models import DeliveryAgentProfile
-from user.models import Order, OrderItem, Address, OrderTracking
+from user.models import Order, OrderItem, Address, OrderTracking, OrderReturn
 from user.serializers import OrderItemSerializer, AddressSerializer, OrderTrackingSerializer
 
 class AdminOrderListSerializer(serializers.ModelSerializer):
@@ -245,3 +245,24 @@ class BlockDeliveryAgentSerializer(serializers.Serializer):
 
 class UnblockDeliveryAgentSerializer(serializers.Serializer):
     reason = serializers.CharField(required=False, allow_blank=True)
+class AdminOrderReturnSerializer(serializers.ModelSerializer):
+    customer_email = serializers.CharField(source='user.email', read_only=True)
+    order_number = serializers.CharField(source='order.order_number', read_only=True)
+    product_name = serializers.CharField(source='order_item.product_name', read_only=True)
+    product_price = serializers.DecimalField(source='order_item.product_price', max_digits=12, decimal_places=2, read_only=True)
+    quantity = serializers.IntegerField(source='order_item.quantity', read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    reason_display = serializers.CharField(source='get_reason_display', read_only=True)
+    pickup_agent_name = serializers.CharField(source='pickup_agent.user.username', read_only=True, allow_null=True)
+
+    class Meta:
+        model = OrderReturn
+        fields = [
+            'id', 'order', 'order_number', 'order_item', 'product_name', 
+            'product_price', 'quantity', 'customer_email', 'reason', 
+            'reason_display', 'description', 'status', 'status_display', 
+            'return_amount', 'refund_status', 'pickup_agent', 'pickup_agent_name',
+            'condition_notes', 'verification_images', 
+            'created_at', 'updated_at', 'approved_at', 'processed_at'
+        ]
+        read_only_fields = ['id', 'order', 'order_item', 'user', 'created_at']

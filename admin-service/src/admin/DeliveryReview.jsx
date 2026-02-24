@@ -91,7 +91,7 @@ const DeliveryReview = () => {
                     </div>
                     <h2 className={`text-2xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Node Disconnected</h2>
                     <p className="text-slate-500 text-sm mb-8">The requested logistics agent protocol could not be retrieved from the central index.</p>
-                    <button onClick={() => navigate(-1)} className="px-8 py-3 bg-blue-600 text-white rounded-2xl text-[10px] font-semibold uppercase tracking-normal hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20">Return to Registry</button>
+                    <button onClick={() => navigate('/delivery/requests')} className="px-8 py-3 bg-blue-600 text-white rounded-2xl text-[10px] font-semibold uppercase tracking-normal hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20">Return to Registry</button>
                 </div>
             </div>
         );
@@ -109,7 +109,7 @@ const DeliveryReview = () => {
             <div className="flex-1 flex flex-col min-w-0 relative">
                 <header className={`border-b px-8 h-20 flex items-center justify-between sticky top-0 z-20 transition-colors duration-300 ${isDarkMode ? 'bg-[#0f172a]/80 border-slate-800 backdrop-blur-md' : 'bg-white border-slate-100 shadow-sm'}`}>
                     <div className="flex items-center gap-4">
-                        <button onClick={() => navigate(-1)} className={`p-2 rounded-xl border transition-all ${isDarkMode ? 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white' : 'bg-white border-slate-200 text-slate-400 hover:text-blue-600 shadow-sm'}`}>
+                        <button onClick={() => navigate('/delivery/requests')} className={`p-2 rounded-xl border transition-all ${isDarkMode ? 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white' : 'bg-white border-slate-200 text-slate-400 hover:text-blue-600 shadow-sm'}`}>
                             <ArrowLeft className="w-5 h-5" />
                         </button>
                         <div>

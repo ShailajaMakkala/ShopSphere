@@ -375,12 +375,11 @@ class DeliveryAssignmentViewSet(viewsets.ViewSet):
                 assignment.completed_at = timezone.now()
                 assignment.save()
 
-                from finance.services import FinanceService
-                for item in return_request.order.items.all():
-                    FinanceService.process_refund(item, item.subtotal, reason="Product Return Verified")
-                
-                return_request.status = 'completed'
-                return_request.save()
+                if return_request:
+                    from finance.services import FinanceService
+                    FinanceService.process_refund(return_request)
+
+                # Return request status is already updated to 'completed' inside FinanceService.process_refund
 
             return Response({'message': 'Return verified and refund initiated'}, status=200)
         except Exception as e:

@@ -281,3 +281,35 @@ export const completeDeliveryOTP = async (assignmentId, otpCode) => {
     });
     return response.data;
 };
+// ── Orders ────────────────────────────────────────────────────────────────────
+// ... (existing order exports)
+
+// ── Returns ───────────────────────────────────────────────────────────────────
+
+export const fetchAdminReturns = async ({ status = '', search = '' } = {}) => {
+    const params = {};
+    if (status) params.status = status;
+    if (search) params.search = search;
+    const response = await axiosInstance.get('/superAdmin/api/order-returns/', { params });
+    return response.data;
+};
+
+export const approveReturn = async (id) => {
+    const response = await axiosInstance.post(`/superAdmin/api/order-returns/${id}/approve/`, {});
+    return response.data;
+};
+
+export const fetchReturnDetail = async (id) => {
+    const response = await axiosInstance.get(`/superAdmin/api/order-returns/${id}/`);
+    return response.data;
+};
+
+export const rejectReturn = async (id, reason) => {
+    const response = await axiosInstance.post(`/superAdmin/api/order-returns/${id}/reject/`, { reason });
+    return response.data;
+};
+
+export const processRefund = async (id) => {
+    const response = await axiosInstance.post(`/superAdmin/api/order-returns/${id}/process_refund/`, {});
+    return response.data;
+};

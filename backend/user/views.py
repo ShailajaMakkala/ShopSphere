@@ -1103,14 +1103,9 @@ def request_return_api(request, order_id):
             notes=f"Return initiated for all items. Reason: {reason}"
         )
         
-        # Trigger Auto-Assignment for the Return Pickup
-        try:
-            from deliveryAgent.services import auto_assign_return
-            auto_assign_return(order, returns_created)
-        except Exception as e:
-            print(f"DEBUG: Auto-assignment failed for return: {str(e)}")
+        # Return will be auto-assigned after admin approval
 
     return Response({
-        "message": "Return request submitted successfully. We have assigned a pickup agent to collect the items.",
+        "message": "Return request submitted successfully. Once approved by the administrator, a pickup agent will be assigned to collect the items.",
         "return_ids": returns_created
     }, status=201)

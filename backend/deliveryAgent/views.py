@@ -155,9 +155,41 @@ def pickup_order(request, order_id):
             assignment = get_object_or_404(DeliveryAssignment, order__id=order_id, agent=agent)
             if assignment.status == 'accepted':
                 assignment.start_delivery() # Sets to picked_up
+                
+                # If it's a return, save verification data
+                if assignment.assignment_type == 'return':
+                    notes = request.POST.get('condition_notes')
+                    images = request.FILES.get('verification_images')
+                    
+                    from user.models import OrderReturn
+                    returns = OrderReturn.objects.filter(order=assignment.order).exclude(status__in=['completed', 'rejected', 'cancelled'])
+                    
+                    for ret in returns:
+                        if notes: ret.condition_notes = notes
+                        if images: ret.verification_images = images
+                        ret.status = 'picked_up'
+                        ret.pickup_agent = agent
+                        ret.save()
+                
                 messages.success(request, f"Order #{assignment.order.order_number} marked as Picked Up.")
             else:
                 messages.error(request, "Order must be accepted before pickup.")
+        except Exception as e:
+            messages.error(request, str(e))
+    return redirect('delivery_dashboard')
+
+@login_required
+def complete_return_warehouse(request, order_id):
+    """Mark a return as delivered to the vendor/warehouse"""
+    if request.method == 'POST':
+        try:
+            agent = DeliveryAgentProfile.objects.get(user=request.user)
+            assignment = get_object_or_404(DeliveryAssignment, order__id=order_id, agent=agent, assignment_type='return')
+            if assignment.status in ['picked_up', 'in_transit']:
+                assignment.mark_delivered() # This sets return status to 'received'
+                messages.success(request, f"Return #{assignment.order.order_number} delivered to warehouse successfully.")
+            else:
+                messages.error(request, "Return must be picked up before final delivery.")
         except Exception as e:
             messages.error(request, str(e))
     return redirect('delivery_dashboard')

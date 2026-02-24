@@ -116,7 +116,7 @@ const OrderDetail = () => {
                         <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className={`p-2 rounded-xl border transition-all ${isDarkMode ? 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white' : 'bg-white border-slate-200 text-slate-400 hover:text-blue-600 shadow-sm'}`}>
                             {isSidebarOpen ? <PanelLeftClose className="w-5 h-5" /> : <PanelLeftOpen className="w-5 h-5" />}
                         </button>
-                        <button onClick={() => navigate(-1)} className={`p-2 rounded-xl transition-all ${isDarkMode ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-400 hover:text-blue-600 hover:bg-slate-50'}`}>
+                        <button onClick={() => navigate('/orders')} className={`p-2 rounded-xl transition-all ${isDarkMode ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-400 hover:text-blue-600 hover:bg-slate-50'}`}>
                             <ArrowLeft className="w-5 h-5" />
                         </button>
                         <div>
