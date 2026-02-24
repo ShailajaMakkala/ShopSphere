@@ -1,0 +1,58 @@
+# Python / Django
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+*.sqlite3
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Media & collected static
+media/
+staticfiles/
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Misc debug / test scripts (not needed in production)
+debug_*.py
+check_*.py
+insert_*.py
+populate_*.py
+reset_*.py
+run_migrate.py
+run_migrations.py
+search_*.py
+test_*.py
+verify_*.py
+backfill_*.py
+sync_*.py
+read_*.py
+repair_*.py
+fix_*.py
+update_*.py
+list_*.py
+approve_*.py
+create_admin.py
+runserver.py
+debug_email.py
+*.txt
+!requirements.txt
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

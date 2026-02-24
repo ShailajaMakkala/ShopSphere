@@ -1,5 +1,0 @@
-5 | jay@gmail.com | status=approved
-4 | achyuth@gmail.com | status=approved
-3 | sahithiallam29@gmail.com | status=pending
-2 | new_agent@test.com | status=pending
-1 | pmohana1022@gmail.com | status=approved

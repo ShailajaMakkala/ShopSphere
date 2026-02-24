@@ -1,11 +1,11 @@
 services:
-  # Backend Web Service
+  # ── ShopSphere Django Backend ─────────────────────────────────────────────────
   - type: web
     name: shopsphere-backend
     runtime: python
-    rootDir: Duplicate/ShopSphere
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn ShopSphere.wsgi:application
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate --no-input
+    startCommand: gunicorn ShopSphere.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
     envVars:
       - key: DEBUG
         value: "False"
@@ -16,19 +16,20 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: ALLOWED_HOSTS
-        value: "*" # Update this with your actual Render URL after deployment
-
-  # Frontend Static Site
-  - type: static
-    name: shopsphere-frontend
-    runtime: node
-    rootDir: ShopSphere_Frontend/ShopSphere_Frontend
-    buildCommand: npm install && npm run build
-    publishDir: dist
-    envVars:
-      - key: VITE_API_URL
-        value: https://shopsphere-backend.onrender.com # Update with your backend URL
+        value: "*"
+      # Set CORS_ALLOWED_ORIGINS after you get Vercel URLs, e.g.:
+      # value: "https://your-shopsphere.vercel.app,https://your-admin.vercel.app"
+      - key: CORS_ALLOWED_ORIGINS
+        value: ""
+      - key: EMAIL_HOST_USER
+        value: "nandhuuppalapati@gmail.com"
+      - key: EMAIL_HOST_PASSWORD
+        value: "jzfc arto roxz wgwj"
+      - key: PYTHON_VERSION
+        value: "3.11.0"
 
 databases:
   - name: shopsphere-db
     plan: free
+    databaseName: shopsphere
+    user: shopsphere_user

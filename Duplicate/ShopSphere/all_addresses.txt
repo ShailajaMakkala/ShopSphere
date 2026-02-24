@@ -1,5 +1,0 @@
-ID: 6, User: madhu@gmail.com, Name: Madhu, Phone: 3545555555, City: Hyderabad
-ID: 5, User: 21e11a0456@biet.ac.in, Name: sandhya, Phone: 1655555555, City: Hyderabad
-ID: 4, User: balajirekha9999@gmail.com, Name: Rekha Balaji, Phone: 9876543210, City: Hyderabad
-ID: 3, User: rekhabalaji37@gmail.com, Name: Rekha Balaji, Phone: 8096730734, City: Hyderabad
-ID: 1, User: pmohana1022@gmail.com, Name: mohana, Phone: 1111111111, City: Hyderabad

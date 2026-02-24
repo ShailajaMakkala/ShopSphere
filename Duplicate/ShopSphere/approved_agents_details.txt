@@ -1,3 +1,0 @@
-ID: 5 | Email: jay@gmail.com | City: Hyderabad | SvcCities: ['hyderabad'] | SvcPincodes: [] | Available: offline | Blocked: False | Active: True
-ID: 4 | Email: achyuth@gmail.com | City: Hyderabad | SvcCities: ['banglore'] | SvcPincodes: [] | Available: offline | Blocked: False | Active: True
-ID: 1 | Email: pmohana1022@gmail.com | City: Hyderabad | SvcCities: ['hyderabad'] | SvcPincodes: [] | Available: offline | Blocked: False | Active: True
