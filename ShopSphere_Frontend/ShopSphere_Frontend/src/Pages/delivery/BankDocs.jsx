@@ -143,7 +143,7 @@ export default function DeliveryBankDocs() {
             localStorage.removeItem("delivery_verify_email");
             localStorage.removeItem("delivery_email_otp");
 
-            navigate("/delivery/dashboard");
+            navigate("/delivery/login");
         } catch (error) {
             console.error(error);
             toast.error(error.response?.data?.error || "Transmission Failed.");
