@@ -145,6 +145,7 @@ SIMPLE_JWT = {
 
 # CORS Configuration
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = True # Set to True to resolve "*" issues
 
 # Default local origins for development
 _default_cors = [
@@ -159,7 +160,6 @@ _default_cors = [
     "http://127.0.0.1:5176",
     "http://127.0.0.1:5177",
     "https://shop-sphere-admin-ndy9.vercel.app",
-    "*",
 ]
 
 # In production, set CORS_ALLOWED_ORIGINS env var as comma-separated URLs
@@ -176,7 +176,6 @@ CSRF_TRUSTED_ORIGINS = list(set([
     "http://127.0.0.1:5174",
     "http://127.0.0.1:5175",
     "https://shop-sphere-admin-ndy9.vercel.app",
-    "*",
 ] + _extra_cors))
 
 
