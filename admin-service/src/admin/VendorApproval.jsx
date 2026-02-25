@@ -294,7 +294,7 @@ const VendorApproval = () => {
                                         </tr>
                                     </thead>
                                     <tbody className={`divide-y transition-colors duration-300 ${isDarkMode ? 'divide-slate-800' : 'divide-slate-50'}`}>
-                                        <AnimatePresence mode="wait">
+                                        <AnimatePresence>
                                             {isLoading ? (
                                                 Array(5).fill(0).map((_, i) => (
                                                     <tr key={i} className="animate-pulse">

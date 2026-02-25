@@ -42,12 +42,12 @@ const values = [
 ];
 
 const teamData = [
-    { name: "Vishnu", role: "", avatar: "VI", img: "/team/vishnu.jpg" },
+    { name: "Vishnu", role: "", avatar: "VI", img: "/team/vishnu.png" },
     { name: "Sriram", role: "", avatar: "SR", img: "/team/sriram.png" },
     { name: "Mohana", role: "", avatar: "MO", img: "/team/mohana.png" },
     { name: "Balaji", role: "", avatar: "BA", img: "/team/balaji.png" },
     { name: "Subham", role: "", avatar: "SU", img: "/team/subham.png" },
-    { name: "Sahithi", role: "", avatar: "SA", img: "/team/sahithi.png", align: "top" },
+    { name: "Sahithi", role: "", avatar: "SA", img: "/team/sahithi.png" },
     { name: "Siri", role: "", avatar: "SI", img: "/team/siri.png" },
     { name: "Nandini", role: "", avatar: "NA", img: "/team/nandini.jpg" },
     { name: "Arjun", role: "", avatar: "AR", img: "/team/arjun.png" },
@@ -124,25 +124,33 @@ export default function AboutUs() {
                     <p className="text-center text-purple-300/60 text-sm mb-12">The passionate people behind ShopSphere.</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
                         {teamData.map((m, i) => (
-                            <div key={i} className="flex flex-col items-center group">
-                                <div className="relative w-full aspect-[4/5] rounded-[2.5rem] bg-white/5 border border-white/10 flex items-center justify-center text-white font-black text-5xl mx-auto mb-6 group-hover:scale-[1.02] transition-all duration-500 overflow-hidden shadow-2xl group-hover:border-orange-400/50">
+                            <div key={i} className="flex flex-col items-center group text-center">
+                                <div className="relative w-full aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-2xl transition-all duration-700 bg-[#1a0a35] group-hover:shadow-orange-500/20 group-hover:scale-[1.02]">
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#0f0720] via-transparent to-transparent opacity-60 z-10" />
                                     {m.img ? (
                                         <img
                                             src={m.img}
                                             alt={m.name}
-                                            className={`w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ${m.align === 'top' ? 'object-top' : ''}`}
+                                            className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 
+                                                ${m.align === 'top' ? 'object-top' : 'object-center'} 
+                                                ${m.zoom ? 'scale-[2.4] group-hover:scale-[2.6]' : 'group-hover:scale-110'}`}
                                         />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-400/10 to-purple-600/10">
+                                        <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-400/10 to-purple-600/10 text-white font-black text-5xl">
                                             <span className="bg-gradient-to-br from-orange-400 to-purple-400 bg-clip-text text-transparent">
                                                 {m.avatar}
                                             </span>
                                         </div>
                                     )}
                                 </div>
-                                <div className="text-2xl font-bold text-white mb-1 group-hover:text-orange-400 transition-colors duration-300">{m.name}</div>
-                                <div className="text-purple-300/40 text-xs font-black tracking-[0.2em] uppercase">{m.role || "Core Team"}</div>
+                                <div className="mt-3">
+                                    <div className="text-2xl font-bold text-white mb-1 group-hover:text-orange-400 transition-colors duration-300">
+                                        {m.name}
+                                    </div>
+                                    <div className="text-purple-300/40 text-[10px] font-black tracking-[0.3em] uppercase">
+                                        {m.role || "CORE TEAM"}
+                                    </div>
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -153,4 +161,3 @@ export default function AboutUs() {
         </div>
     );
 }
-

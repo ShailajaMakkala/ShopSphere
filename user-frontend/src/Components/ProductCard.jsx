@@ -91,7 +91,7 @@ export default function ProductCard({
                         </div>
                     </div>
 
-                    <p className="text-gray-500 text-xs sm:text-sm line-clamp-2 mt-2 sm:mt-3 hidden sm:block">{item.description}</p>
+                    <p className="text-gray-500 text-xs sm:text-sm line-clamp-1 mt-2 sm:mt-3">{item.description}</p>
 
                     {/* Brand Badge - visible below description */}
                     {item.brand && (
@@ -113,6 +113,17 @@ export default function ProductCard({
                         <span className="font-black text-base sm:text-lg md:text-xl text-gray-900">₹{parseFloat(item.price).toFixed(2)}</span>
                     </div>
                     <div className="flex gap-2">
+                        {handleAddToCartClick && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleAddToCartClick(item);
+                                }}
+                                className="bg-gradient-to-r from-orange-400 to-purple-500 text-white p-3 rounded-xl hover:from-orange-600 hover:to-purple-700 transition-all shadow-lg active:scale-95 flex items-center justify-center min-w-[44px]"
+                            >
+                                <FaShoppingBag />
+                            </button>
+                        )}
                         {handleBuyNow && (
                             <button
                                 onClick={(e) => {
@@ -124,25 +135,7 @@ export default function ProductCard({
                                 <FaBolt size={12} /> Buy Now
                             </button>
                         )}
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleAddToCartClick(item);
-                            }}
-                            className="bg-gradient-to-r from-orange-400 to-purple-500 text-white p-3 rounded-xl hover:from-orange-600 hover:to-purple-700 transition-all shadow-lg active:scale-95 flex items-center justify-center min-w-[44px]"
-                        >
-                            <FaShoppingBag />
-                        </button>
                     </div>
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            handleAddToCartClick(item);
-                        }}
-                        className="bg-gradient-to-r from-orange-400 to-purple-500 text-white p-3 sm:p-4 rounded-xl sm:rounded-2xl hover:from-orange-600 hover:to-purple-700 transition-all shadow-lg active:scale-95 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                    >
-                        <FaShoppingBag />
-                    </button>
                 </div>
             </div>
         </motion.div>

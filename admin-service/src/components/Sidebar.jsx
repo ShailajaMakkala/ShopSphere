@@ -11,7 +11,7 @@ import {
     Sun,
     Moon,
     LogOut,
-    MessageSquare
+    MessageSquare,
     RefreshCcw,
     X
 } from 'lucide-react';

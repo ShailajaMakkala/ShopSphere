@@ -306,7 +306,6 @@ function Navbar() {
                                         <div className="absolute right-0 mt-3 w-60 bg-[#581c87] border border-white/10 rounded-2xl shadow-2xl py-2 z-50">
                                             <div className="px-5 py-4 border-b border-white/10"><p className="text-sm font-bold text-white">{user.username}</p><p className="text-xs text-orange-200">{user.email}</p></div>
                                             <Link to="/profile" onClick={() => setProfileDropdownOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-orange-100 hover:bg-white/10">My Profile</Link>
-                                            <Link to="/orders" onClick={() => setProfileDropdownOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-orange-100 hover:bg-white/10">My Orders</Link>
                                             <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-400 hover:bg-white/10 text-left">Log Out</button>
                                         </div>
                                     )}
@@ -419,9 +418,6 @@ function Navbar() {
                             <>
                                 <Link to="/profile" onClick={() => setIsOpen(false)} className="flex items-center gap-4 px-5 py-3.5 text-sm font-bold text-white/80 hover:bg-white/10 hover:text-white transition-all min-h-[48px]">
                                     <FaUser size={18} /> My Profile
-                                </Link>
-                                <Link to="/orders" onClick={() => setIsOpen(false)} className="flex items-center gap-4 px-5 py-3.5 text-sm font-bold text-white/80 hover:bg-white/10 hover:text-white transition-all min-h-[48px]">
-                                    <FaBox size={18} /> My Orders
                                 </Link>
                                 <Link to="/wishlist" onClick={() => setIsOpen(false)} className="flex items-center gap-4 px-5 py-3.5 text-sm font-bold text-white/80 hover:bg-white/10 hover:text-white transition-all min-h-[48px]">
                                     <FaHeart size={18} /> Wishlist {wishlistCount > 0 && <span className="ml-auto bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{wishlistCount}</span>}

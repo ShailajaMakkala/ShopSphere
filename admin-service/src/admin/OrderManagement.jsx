@@ -221,7 +221,7 @@ const OrderManagement = () => {
                         {/* Orders - Cards on mobile, Table on desktop */}
                         {/* Mobile Card View */}
                         <div className="block lg:hidden space-y-3">
-                            <AnimatePresence mode="wait">
+                            <AnimatePresence>
                                 {isLoading ? (
                                     Array(3).fill(0).map((_, i) => (
                                         <div key={i} className={`animate-pulse p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-100'}`}>
@@ -251,7 +251,7 @@ const OrderManagement = () => {
                                         </tr>
                                     </thead>
                                     <tbody className={`divide-y transition-colors duration-300 ${isDarkMode ? 'divide-slate-800' : 'divide-slate-50'}`}>
-                                        <AnimatePresence mode="wait">
+                                        <AnimatePresence>
                                             {isLoading ? (
                                                 Array(5).fill(0).map((_, i) => (
                                                     <tr key={i} className="animate-pulse">

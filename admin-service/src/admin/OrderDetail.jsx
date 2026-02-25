@@ -84,10 +84,10 @@ const OrderDetail = () => {
 
     if (isLoading) {
         return (
-            <div className={`flex h - screen items - center justify - center transition - colors duration - 300 ${isDarkMode ? 'bg-[#0f172a]' : 'bg-[#F8FAFC]'} `}>
+            <div className={`flex h-screen items-center justify-center transition-colors duration-300 ${isDarkMode ? 'bg-[#0f172a]' : 'bg-[#F8FAFC]'}`}>
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                    <p className={`text - [10px] font - semibold uppercase tracking - normal ${isDarkMode ? 'text-slate-500' : 'text-slate-400'} `}>Loading order details...</p>
+                    <p className={`text-[10px] font-semibold uppercase tracking-normal ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>Loading order details...</p>
                 </div>
             </div>
         );
@@ -95,12 +95,12 @@ const OrderDetail = () => {
 
     if (!order) {
         return (
-            <div className={`flex h - screen items - center justify - center transition - colors duration - 300 ${isDarkMode ? 'bg-[#0f172a]' : 'bg-[#F8FAFC]'} `}>
+            <div className={`flex h-screen items-center justify-center transition-colors duration-300 ${isDarkMode ? 'bg-[#0f172a]' : 'bg-[#F8FAFC]'}`}>
                 <div className="text-center">
-                    <div className={`w - 20 h - 20 rounded - full mx - auto mb - 6 flex items - center justify - center ${isDarkMode ? 'bg-slate-900 text-slate-700' : 'bg-slate-100 text-slate-300'} `}>
+                    <div className={`w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center ${isDarkMode ? 'bg-slate-900 text-slate-700' : 'bg-slate-100 text-slate-300'}`}>
                         <HelpCircle size={40} />
                     </div>
-                    <h2 className={`text - xl font - semibold uppercase tracking - normal mb - 2 ${isDarkMode ? 'text-white' : 'text-slate-800'} `}>Order Not Found</h2>
+                    <h2 className={`text-xl font-semibold uppercase tracking-normal mb-2 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Order Not Found</h2>
                     <p className="text-slate-500 text-xs font-bold uppercase tracking-normal mb-6">This order does not exist in the system.</p>
                     <button onClick={() => navigate('/orders')} className="px-8 py-3 bg-blue-600 text-white rounded-xl text-[10px] font-semibold uppercase tracking-normal hover:bg-blue-500 transition-all">Back to Grid</button>
                 </div>
@@ -109,29 +109,29 @@ const OrderDetail = () => {
     }
 
     return (
-        <div className={`flex h - screen font - sans overflow - hidden transition - colors duration - 300 ${isDarkMode ? 'bg-[#0f172a] text-slate-100' : 'bg-[#F8FAFC] text-slate-900'} `}>
+        <div className={`flex h-screen font-sans overflow-hidden transition-colors duration-300 ${isDarkMode ? 'bg-[#0f172a] text-slate-100' : 'bg-[#F8FAFC] text-slate-900'}`}>
             <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} activePage="Orders" onLogout={logout} />
 
             <main className="flex-1 overflow-y-auto">
-                <header className={`border - b px - 4 sm: px - 6 lg: px - 8 h - 14 sm: h - 16 lg: h - 20 flex items - center justify - between sticky top - 0 z - 40 transition - all duration - 300 ${isDarkMode ? 'bg-[#0f172a]/80 border-slate-800 backdrop-blur-md' : 'bg-white border-slate-100 shadow-sm'} `}>
+                <header className={`border-b px-4 sm:px-6 lg:px-8 h-14 sm:h-16 lg:h-20 flex items-center justify-between sticky top-0 z-40 transition-all duration-300 ${isDarkMode ? 'bg-[#0f172a]/80 border-slate-800 backdrop-blur-md' : 'bg-white border-slate-100 shadow-sm'}`}>
                     <div className="flex items-center gap-4">
-                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className={`p - 2 rounded - xl border transition - all ${isDarkMode ? 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white' : 'bg-white border-slate-200 text-slate-400 hover:text-blue-600 shadow-sm'} `}>
+                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className={`p-2 rounded-xl border transition-all ${isDarkMode ? 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white' : 'bg-white border-slate-200 text-slate-400 hover:text-blue-600 shadow-sm'}`}>
                             <span className="md:hidden"><Menu className="w-5 h-5" /></span>
                             <span className="hidden md:block">{isSidebarOpen ? <PanelLeftClose className="w-5 h-5" /> : <PanelLeftOpen className="w-5 h-5" />}</span>
                         </button>
-                        <button onClick={() => navigate('/orders')} className={`p - 2 rounded - xl transition - all ${isDarkMode ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-400 hover:text-blue-600 hover:bg-slate-50'} `}>
+                        <button onClick={() => navigate('/orders')} className={`p-2 rounded-xl transition-all ${isDarkMode ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-400 hover:text-blue-600 hover:bg-slate-50'}`}>
                             <ArrowLeft className="w-5 h-5" />
                         </button>
                         <div>
                             <div className="flex items-center gap-2">
-                                <h1 className={`text - sm sm: text - base lg: text - lg font - semibold tracking - normal ${isDarkMode ? 'text-white' : 'text-slate-900'} `}>Order #{order.order_number}</h1>
-                                <span className={`text - [8px] font - semibold px - 1.5 py - 0.5 rounded - md uppercase tracking - normal ${isDarkMode ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-blue-50 text-blue-600 border border-blue-100'} `}>Active</span>
+                                <h1 className={`text-sm sm:text-base lg:text-lg font-semibold tracking-normal ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Order #{order.order_number}</h1>
+                                <span className={`text-[8px] font-semibold px-1.5 py-0.5 rounded-md uppercase tracking-normal ${isDarkMode ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-blue-50 text-blue-600 border border-blue-100'}`}>Active</span>
                             </div>
                             <p className="text-[9px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-normal hidden sm:block">Order Details &amp; Delivery Status</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
-                        <div className={`hidden xl:flex items - center border rounded - lg px - 3 py - 1.5 text - [10px] font - bold uppercase tracking - normal gap - 2 ${isDarkMode ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-slate-50 border-slate-200 text-slate-500'} `}>
+                        <div className={`hidden xl:flex items-center border rounded-lg px-3 py-1.5 text-[10px] font-bold uppercase tracking-normal gap-2 ${isDarkMode ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-slate-50 border-slate-200 text-slate-500'}`}>
                             <ShieldCheck className="w-3.5 h-3.5" /> Verified
                         </div>
                     </div>
@@ -141,15 +141,15 @@ const OrderDetail = () => {
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className={`rounded - [2.5rem] p - 8 border flex flex - wrap items - center justify - between gap - 8 transition - all duration - 300 ${isDarkMode ? 'bg-[#1e293b]/50 border-slate-800 shadow-2xl shadow-blue-500/5' : 'bg-white border-slate-100 shadow-sm'} `}
+                        className={`rounded-[2.5rem] p-8 border flex flex-wrap items-center justify-between gap-8 transition-all duration-300 ${isDarkMode ? 'bg-[#1e293b]/50 border-slate-800 shadow-2xl shadow-blue-500/5' : 'bg-white border-slate-100 shadow-sm'}`}
                     >
                         <div className="flex items-center gap-8">
-                            <div className={`w - 20 h - 20 rounded - [2rem] flex items - center justify - center border transition - all ${isDarkMode ? 'bg-slate-900 border-slate-800 text-blue-400' : 'bg-blue-50 border-blue-100 text-blue-600'} `}>
+                            <div className={`w-20 h-20 rounded-[2rem] flex items-center justify-center border transition-all ${isDarkMode ? 'bg-slate-900 border-slate-800 text-blue-400' : 'bg-blue-50 border-blue-100 text-blue-600'}`}>
                                 <Package className="w-10 h-10" />
                             </div>
                             <div>
                                 <div className="flex flex-wrap items-center gap-4 mb-3">
-                                    <span className={`px - 4 py - 1.5 rounded - xl text - [10px] font - semibold uppercase tracking - normal border transition - all ${getStatusColor(order.status)} `}>
+                                    <span className={`px-4 py-1.5 rounded-xl text-[10px] font-semibold uppercase tracking-normal border transition-all ${getStatusColor(order.status)}`}>
                                         {order.status}
                                     </span>
                                     <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-normal">
@@ -157,34 +157,34 @@ const OrderDetail = () => {
                                         {new Date(order.created_at).toLocaleString()}
                                     </div>
                                 </div>
-                                <h2 className={`text - 4xl font - semibold ${isDarkMode ? 'text-white' : 'text-slate-900'} `}>₹{order.total_amount}</h2>
+                                <h2 className={`text-4xl font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>₹{order.total_amount}</h2>
                             </div>
                         </div>
 
                         <div className="flex flex-wrap items-center gap-4">
-                            <div className={`p - 6 rounded - [2rem] border transition - all ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-50 border-slate-100 shadow-inner'} `}>
+                            <div className={`p-6 rounded-[2rem] border transition-all ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-50 border-slate-100 shadow-inner'}`}>
                                 <p className="text-[9px] font-semibold text-slate-500 uppercase tracking-normal mb-2">Payment Method</p>
-                                <p className={`text - sm font - semibold flex items - center gap - 2 ${isDarkMode ? 'text-slate-300' : 'text-slate-800'} `}>
+                                <p className={`text-sm font-semibold flex items-center gap-2 ${isDarkMode ? 'text-slate-300' : 'text-slate-800'}`}>
                                     <CreditCard className="w-4 h-4 text-blue-500" />
                                     {order.payment_method?.toUpperCase()}
                                 </p>
                             </div>
-                            <div className={`p - 6 rounded - [2rem] border transition - all ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-50 border-slate-100 shadow-inner'} `}>
+                            <div className={`p-6 rounded-[2rem] border transition-all ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-50 border-slate-100 shadow-inner'}`}>
                                 <p className="text-[9px] font-semibold text-slate-500 uppercase tracking-normal mb-2">Payment Status</p>
-                                <p className={`text - sm font - semibold uppercase tracking - normal ${order.payment_status === 'paid' ? 'text-emerald-500' : 'text-amber-500'} `}>{order.payment_status}</p>
+                                <p className={`text-sm font-semibold uppercase tracking-normal ${order.payment_status === 'paid' ? 'text-emerald-500' : 'text-amber-500'}`}>{order.payment_status}</p>
                             </div>
                         </div>
                     </motion.div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-2 space-y-8">
-                            <section className={`rounded - [2.5rem] border overflow - hidden transition - all duration - 300 ${isDarkMode ? 'bg-[#1e293b]/50 border-slate-800 shadow-sm' : 'bg-white border-slate-100 shadow-sm'} `}>
-                                <div className={`px - 8 py - 6 border - b flex items - center justify - between ${isDarkMode ? 'bg-slate-900/40 border-slate-800' : 'bg-slate-50/50 border-slate-100'} `}>
+                            <section className={`rounded-[2.5rem] border overflow-hidden transition-all duration-300 ${isDarkMode ? 'bg-[#1e293b]/50 border-slate-800 shadow-sm' : 'bg-white border-slate-100 shadow-sm'}`}>
+                                <div className={`px-8 py-6 border-b flex items-center justify-between ${isDarkMode ? 'bg-slate-900/40 border-slate-800' : 'bg-slate-50/50 border-slate-100'}`}>
                                     <div className="flex items-center gap-3">
                                         <Activity className="w-5 h-5 text-blue-500" />
                                         <h3 className="text-[10px] font-semibold uppercase tracking-normal text-slate-500">Order Items</h3>
                                     </div>
-                                    <span className={`px - 3 py - 1 rounded - lg text - [9px] font - semibold uppercase tracking - normal ${isDarkMode ? 'bg-slate-900 text-slate-500' : 'bg-white text-slate-400'} `}>{order.items?.length} items</span>
+                                    <span className={`px-3 py-1 rounded-lg text-[9px] font-semibold uppercase tracking-normal ${isDarkMode ? 'bg-slate-900 text-slate-500' : 'bg-white text-slate-400'}`}>{order.items?.length} items</span>
                                 </div>
                                 <div className="p-8 space-y-4">
                                     {order.items?.map((item, idx) => (
@@ -193,10 +193,10 @@ const OrderDetail = () => {
                                             initial={{ opacity: 0, x: -20 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: idx * 0.1 }}
-                                            className={`flex items - center justify - between p - 6 rounded - 3xl border transition - all group ${isDarkMode ? 'bg-slate-900/30 border-slate-800 hover:border-blue-500/30' : 'bg-slate-50 border-transparent hover:border-blue-200'} `}
+                                            className={`flex items-center justify-between p-6 rounded-3xl border transition-all group ${isDarkMode ? 'bg-slate-900/30 border-slate-800 hover:border-blue-500/30' : 'bg-slate-50 border-transparent hover:border-blue-200'}`}
                                         >
                                             <div className="flex items-center gap-6">
-                                                <div className={`w - 16 h - 16 rounded - 2xl overflow - hidden border transition - all ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm group-hover:scale-105'} `}>
+                                                <div className={`w-16 h-16 rounded-2xl overflow-hidden border transition-all ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm group-hover:scale-105'}`}>
                                                     {item.product_image ? (
                                                         <img
                                                             src={item.product_image.startsWith('http') ? item.product_image : `http://localhost:8000${item.product_image}`}
@@ -208,14 +208,14 @@ const OrderDetail = () => {
                                                             <Package size={24} />
                                                         </div>
                                                     )}
-                                                </div >
+                                                </div>
                                                 <div>
                                                     <p className={`text-base font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{item.product_name}</p>
                                                     <p className="text-xs text-slate-500 font-bold uppercase tracking-normal mt-1">Qty: <span className={isDarkMode ? 'text-slate-300' : 'text-slate-700'}>{item.quantity}</span> × ₹{item.product_price}</p>
                                                 </div>
-                                            </div >
+                                            </div>
                                             <p className={`text-sm sm:text-base lg:text-lg font-semibold ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>₹{item.subtotal}</p>
-                                        </motion.div >
+                                        </motion.div>
                                     ))}
                                 </div >
                                 <div className={`p-8 border-t space-y-4 transition-colors ${isDarkMode ? 'bg-slate-900/20 border-slate-800' : 'bg-slate-50/20 border-slate-100'}`}>

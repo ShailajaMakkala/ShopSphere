@@ -46,8 +46,8 @@ from .serializers import (
     ApproveDeliveryAgentSerializer, RejectDeliveryAgentSerializer,
     BlockDeliveryAgentSerializer, UnblockDeliveryAgentSerializer,
     AdminOrderListSerializer, AdminOrderDetailSerializer,
-    ContactQuerySerializer
-    AdminOrderListSerializer, AdminOrderDetailSerializer, AdminOrderReturnSerializer
+    ContactQuerySerializer,
+    AdminOrderDetailSerializer, AdminOrderReturnSerializer
 )
 from user.models import Order, OrderReturn
 
