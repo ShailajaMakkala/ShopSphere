@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { clearCart, clearWishlist, clearOrders, syncCart, syncWishlist } from "../../Store";
+import { resetCart, resetWishlist, clearOrders, syncCart, syncWishlist } from "../../Store";
 import { logout as apiLogout } from "../../api/axios";
 import {
     FaShoppingCart,
@@ -68,18 +68,9 @@ function Navbar() {
     }, [location.pathname, dispatch]);
 
     const handleLogout = () => {
-        try {
-            const storedUser = localStorage.getItem("user");
-            if (storedUser) {
-                const userEmail = JSON.parse(storedUser).email;
-                if (userEmail) {
-                    localStorage.removeItem(`cart_${userEmail}`);
-                }
-            }
-        } catch { /* ignore */ }
-
-        dispatch(clearCart());
-        dispatch(clearWishlist());
+        // We no longer remove the cart/wishlist keys here so they persist for the next login
+        dispatch(resetCart());    // ✅ Soft clear (Redux only)
+        dispatch(resetWishlist());// ✅ Soft clear (Redux only)
         dispatch(clearOrders());
         apiLogout();
         localStorage.removeItem("user");
@@ -93,6 +84,7 @@ function Navbar() {
         toast.success("Logged out successfully");
         navigate('/login');
     };
+
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 10);

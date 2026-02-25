@@ -11,6 +11,7 @@ import {
     Sun,
     Moon,
     LogOut,
+    MessageSquare
     RefreshCcw,
     X
 } from 'lucide-react';
@@ -38,6 +39,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, activePage = 'Dashboard', on
         { name: 'Reports', icon: BarChart3, path: '/reports' },
         { name: 'Deletion Requests', icon: ClipboardList, path: '/deletion-requests' },
         { name: 'Commission Settings', icon: Settings, path: '/settings/commission' },
+        { name: 'Queries', icon: MessageSquare, path: '/queries' },
     ];
 
     // Determine device type based on window width
@@ -308,7 +310,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, activePage = 'Dashboard', on
         >
             <div className={`flex flex-col h-full w-64 ${isDarkMode ? 'bg-[#0f172a]' : 'bg-white'}`}>
                 <div className={`flex items-center justify-between p-6 border-b transition-colors duration-300 ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
-                    <div className="flex items-center gap-0 group cursor-pointer" onClick={() => navigate('/dashboard')}>
+                    <div className="flex items-center gap-0 group cursor-pointer relative -translate-y-1.5" onClick={() => navigate('/dashboard')}>
                         <img src="/s_logo.png" alt="ShopSphere" className="w-16 h-16 object-contain transition-transform duration-300 group-hover:scale-105" />
                         <div className="flex flex-col -ml-5">
                             <span className={`text-xl font-bold leading-none tracking-wide transition-colors duration-300 group-hover:text-blue-400 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>

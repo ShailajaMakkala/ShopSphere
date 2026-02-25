@@ -249,6 +249,15 @@ const Home = () => {
     toast.success("Added to cart");
   };
 
+  const handleBuyNow = (item) => {
+    if (!localStorage.getItem("accessToken")) {
+      toast.error("Please login to purchase");
+      navigate("/login"); return;
+    }
+    dispatch(AddToCart(item));
+    navigate("/checkout");
+  };
+
   const isInWishlist = (itemName) => wishlist.some(w => w.name === itemName);
   const paginate = (page) => {
     setCurrentPage(page);
@@ -324,6 +333,7 @@ const Home = () => {
         navigate={navigate}
         handleWishlistClick={handleWishlistClick}
         handleAddToCartClick={handleAddToCartClick}
+        handleBuyNow={handleBuyNow}
         isInWishlist={isInWishlist}
       />
 
@@ -442,6 +452,7 @@ const Home = () => {
               navigate={navigate}
               handleWishlistClick={handleWishlistClick}
               handleAddToCartClick={handleAddToCartClick}
+              handleBuyNow={handleBuyNow}
               isInWishlist={isInWishlist}
             />
           ))}
@@ -485,7 +496,6 @@ const Home = () => {
 
       {/* ── DISCOVERY & NEWSLETTER ────────────────────────────────────────────── */}
       <DiscoverySection />
-      <Newsletter />
 
       {/* ══ FILTER DRAWER OVERLAY ═══════════════════════════════════════════════ */}
       <AnimatePresence>

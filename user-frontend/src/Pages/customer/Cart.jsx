@@ -625,6 +625,27 @@ function Cart() {
                     </span>
                   </div>
                 </div>
+
+                {/* Support Team */}
+                <div className="mt-8 pt-8 border-t border-gray-100">
+                  <h3 className="text-sm font-black text-gray-900 mb-4 flex items-center gap-2">
+                    <span className="text-orange-400">💬</span> Need Help? Talk to us
+                  </h3>
+                  <div className="flex items-center gap-4">
+                    <div className="flex -space-x-3">
+                      <div className="w-12 h-12 rounded-full border-2 border-white overflow-hidden shadow-sm">
+                        <img src="/team/siri.png" alt="Siri" className="w-full h-full object-cover" />
+                      </div>
+                      <div className="w-12 h-12 rounded-full border-2 border-white overflow-hidden shadow-sm">
+                        <img src="/team/kushala.png" alt="Kushala" className="w-full h-full object-cover" />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-sm font-bold text-gray-900">Siri & Kushala</div>
+                      <div className="text-xs text-gray-500">Support Experts</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           )}

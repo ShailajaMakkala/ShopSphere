@@ -48,8 +48,14 @@ export const ProductProvider = ({ children }) => {
 
     // Initial load
     useEffect(() => {
-        loadProducts({ page: 1, search: '' });
+        const token = localStorage.getItem("accessToken") || localStorage.getItem("authToken");
+        if (token) {
+            loadProducts({ page: 1, search: '' });
+        } else {
+            setIsLoading(false);
+        }
     }, [loadProducts]);
+
 
     // Go to a specific page (keeps current search + status)
     const goToPage = useCallback((page) => {

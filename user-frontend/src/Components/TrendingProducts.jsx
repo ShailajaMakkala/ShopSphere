@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaHeart, FaShoppingBag, FaFire, FaStar, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaHeart, FaShoppingBag, FaFire, FaStar, FaChevronLeft, FaChevronRight, FaBolt } from "react-icons/fa";
 import { getTrendingProducts } from "../api/axios";
 
 const RANK_COLORS = [
@@ -43,6 +43,7 @@ export default function TrendingProducts({
     navigate,
     handleWishlistClick,
     handleAddToCartClick,
+    handleBuyNow,
     isInWishlist,
 }) {
     const [trendingProducts, setTrendingProducts] = useState([]);
@@ -280,6 +281,17 @@ export default function TrendingProducts({
                                             </div>
 
                                             <div className="flex items-center gap-1.5">
+                                                {handleBuyNow && (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleBuyNow(item);
+                                                        }}
+                                                        className="px-2.5 py-2 rounded-xl bg-orange-500 text-white hover:bg-orange-600 transition-all duration-300 shadow-md flex items-center gap-1 text-[9px] font-black"
+                                                    >
+                                                        <FaBolt size={8} /> BUY
+                                                    </button>
+                                                )}
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();

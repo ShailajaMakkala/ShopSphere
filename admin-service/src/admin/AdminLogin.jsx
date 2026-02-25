@@ -51,7 +51,7 @@ const AdminLogin = () => {
                 <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[300px] h-[300px] rounded-full bg-blue-500/5 blur-[80px] pointer-events-none" />
 
                 {/* Logo */}
-                <div className="relative z-10 flex items-center gap-0">
+                <div className="relative z-10 flex items-center gap-0 -translate-y-1.5">
                     <img src="/s_logo.png" alt="ShopSphere" className="w-16 h-16 object-contain transition-transform duration-300 hover:scale-110" />
                     <div className="flex flex-col -ml-5">
                         <h1 className="text-2xl font-bold text-white tracking-wide leading-none">
@@ -115,7 +115,7 @@ const AdminLogin = () => {
                 <div className="relative z-10 w-full max-w-md">
 
                     {/* Mobile Logo */}
-                    <div className="lg:hidden flex items-center gap-0 mb-10 justify-center">
+                    <div className="lg:hidden flex items-center gap-0 mb-10 justify-center -translate-y-1.5">
                         <img src="/s_logo.png" alt="ShopSphere" className="w-14 h-14 object-contain" />
                         <h1 className="text-xl font-bold text-white tracking-wide -ml-4">
                             hopSphere

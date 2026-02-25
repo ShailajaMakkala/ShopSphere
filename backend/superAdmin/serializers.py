@@ -4,7 +4,7 @@ from finance.serializers import GlobalCommissionSerializer, CategoryCommissionSe
 from django.contrib.auth import get_user_model
 User = get_user_model()
 from vendor.models import VendorProfile, Product, ProductImage
-from .models import VendorApprovalLog, ProductApprovalLog, DeliveryAgentApprovalLog
+from .models import VendorApprovalLog, ProductApprovalLog, DeliveryAgentApprovalLog, ContactQuery
 from deliveryAgent.models import DeliveryAgentProfile
 from user.models import Order, OrderItem, Address, OrderTracking, OrderReturn
 from user.serializers import OrderItemSerializer, AddressSerializer, OrderTrackingSerializer
@@ -245,6 +245,13 @@ class BlockDeliveryAgentSerializer(serializers.Serializer):
 
 class UnblockDeliveryAgentSerializer(serializers.Serializer):
     reason = serializers.CharField(required=False, allow_blank=True)
+
+
+class ContactQuerySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactQuery
+        fields = '__all__'
+        read_only_fields = ['id', 'created_at']
 class AdminOrderReturnSerializer(serializers.ModelSerializer):
     customer_email = serializers.CharField(source='user.email', read_only=True)
     order_number = serializers.CharField(source='order.order_number', read_only=True)

@@ -32,7 +32,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from finance.models import GlobalCommission, CategoryCommission
 from vendor.models import VendorProfile, Product
-from .models import VendorApprovalLog, ProductApprovalLog, DeliveryAgentApprovalLog
+from .models import VendorApprovalLog, ProductApprovalLog, DeliveryAgentApprovalLog, ContactQuery
 from deliveryAgent.models import DeliveryAgentProfile, DeliveryAssignment
 from deliveryAgent.serializers import DeliveryAssignmentDetailSerializer, DeliveryAssignmentListSerializer
 from .serializers import (
@@ -45,6 +45,8 @@ from .serializers import (
     AdminDeliveryAgentDetailSerializer, AdminDeliveryAgentListSerializer,
     ApproveDeliveryAgentSerializer, RejectDeliveryAgentSerializer,
     BlockDeliveryAgentSerializer, UnblockDeliveryAgentSerializer,
+    AdminOrderListSerializer, AdminOrderDetailSerializer,
+    ContactQuerySerializer
     AdminOrderListSerializer, AdminOrderDetailSerializer, AdminOrderReturnSerializer
 )
 from user.models import Order, OrderReturn
@@ -1325,18 +1327,26 @@ class AdminLoginView(APIView):
         User = get_user_model()
 
         # Resolve username → email (our AUTH backend uses email as USERNAME_FIELD)
-        auth_email = username_or_email
-        if '@' not in username_or_email:
+        auth_email = username_or_email.strip().lower()
+        if '@' not in auth_email:
             try:
-                user_obj = User.objects.get(username=username_or_email)
-                auth_email = user_obj.email
-            except User.DoesNotExist:
-                return Response({'error': 'Invalid credentials.'}, status=401)
+                # Case-insensitive resolution
+                user_obj = User.objects.filter(username__iexact=username_or_email.strip()).first()
+                if user_obj:
+                    auth_email = user_obj.email
+                else:
+                    # Fallback to authenticating with what they provided (might fail)
+                    pass
+            except Exception:
+                pass
 
         user = authenticate(username=auth_email, password=password)
 
         if user is None:
-            return Response({'error': 'Invalid credentials.'}, status=401)
+            # Check if account exists to give better feedback
+            if User.objects.filter(email=auth_email).exists():
+                return Response({'error': 'Incorrect password.'}, status=401)
+            return Response({'error': 'No administrator account found with this email/username.'}, status=401)
 
         if not user.is_active:
             return Response({'error': 'This account is inactive.'}, status=403)
@@ -1385,6 +1395,21 @@ class WhoAmIView(APIView):
             'is_admin_eligible': u.is_staff or u.is_superuser,
         })
 
+class ContactQueryViewSet(viewsets.ModelViewSet):
+    queryset = ContactQuery.objects.all()
+    serializer_class = ContactQuerySerializer
+    
+    def get_permissions(self):
+        if self.action == 'create':
+            return [] # Allow anyone to submit a contact query
+        return [IsAuthenticated(), IsStaffOrSuperuser()]
+
+    @action(detail=True, methods=['post'])
+    def mark_read(self, request, pk=None):
+        query = self.get_object()
+        query.is_read = True
+        query.save()
+        return Response({'status': 'marked as read'})
 
 class ReturnManagementViewSet(AdminLoginRequiredMixin, viewsets.ModelViewSet):
     """

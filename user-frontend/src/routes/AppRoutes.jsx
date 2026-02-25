@@ -28,7 +28,8 @@ import VerifyGST from "../Pages/customer/VerifyGST";
 import VerifyPAN from "../Pages/customer/VerifyPAN";
 import Sidebar from "../Pages/vendor/Sidebar";
 import Dashboard from "../Pages/vendor/Dashboard";
-import Orders from "../Pages/vendor/Orders";
+import VendorOrders from "../Pages/vendor/Orders";
+import CustomerOrders from "../Pages/customer/Orders";
 import AddProduct from "../Pages/vendor/AddProduct";
 import Products from "../Pages/vendor/Products";
 import Earnings from "../Pages/vendor/Earnings";
@@ -48,6 +49,11 @@ import DeliveryBankDocs from "../Pages/delivery/BankDocs";
 import CategoryProducts from "../Pages/customer/CategoryProducts";
 import BrandProducts from "../Pages/customer/BrandProducts";
 import OfferZone from "../Pages/customer/OfferZone";
+import AboutUs from "../Pages/customer/AboutUs";
+import ContactUs from "../Pages/customer/ContactUs";
+import FAQ from "../Pages/customer/FAQ";
+import Returns from "../Pages/customer/Returns";
+import Shop from "../Pages/customer/Shop";
 
 function AppRoutes() {
     const hasSeenLanding = sessionStorage.getItem("hasSeenLanding");
@@ -74,10 +80,14 @@ function AppRoutes() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/place-order" element={<PlaceOrder />} />
+            <Route path="/orders" element={<CustomerOrders />} />
 
 
-            {/* <Route path="/about" element={<AboutUs />} /> */}
-            {/* <Route path="/contact" element={<ContactUs />} /> */}
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/contact" element={<ContactUs />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/returns" element={<Returns />} />
+            <Route path="/shop" element={<Shop />} />
 
             {/* Nested Profile Routes */}
             <Route path="/profile" element={<Profile />}>
@@ -109,7 +119,7 @@ function AppRoutes() {
                 <Route path="/welcome" element={<Dashboard />} />
                 <Route path="/vendorallproducts" element={<Products />} />
                 <Route path="/vendoraddproduct" element={<AddProduct />} />
-                <Route path="/vendororders" element={<Orders />} />
+                <Route path="/vendororders" element={<VendorOrders />} />
                 <Route path="/vendorearning" element={<Earnings />} />
                 <Route path="/vendorfeestructure" element={<FeeStructure />} />
                 <Route path="/vendorprofile" element={<VendorProfile />} />

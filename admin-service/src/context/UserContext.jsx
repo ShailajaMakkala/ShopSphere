@@ -38,8 +38,14 @@ export const UserProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {
-        loadUsers();
+        const token = localStorage.getItem("accessToken") || localStorage.getItem("authToken");
+        if (token) {
+            loadUsers();
+        } else {
+            setIsLoading(false);
+        }
     }, [loadUsers]);
+
 
     const updateUserStatus = useCallback(async (userId, newStatus, reason = '') => {
         const action = newStatus === 'BLOCKED' ? 'BLOCK' : 'UNBLOCK';

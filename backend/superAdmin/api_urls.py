@@ -7,7 +7,9 @@ from .api_views import (
     UserManagementView, UserBlockToggleView,
     TriggerAssignmentView, UnassignedOrdersView,
     AdminOrderTrackingViewSet, AdminOrderViewSet, DeletionRequestViewSet,
+    AdminLoginView, WhoAmIView, ContactQueryViewSet
     AdminLoginView, WhoAmIView, ReturnManagementViewSet
+
 )
 
 router = DefaultRouter()
@@ -20,6 +22,7 @@ router.register(r'commission-settings', CommissionSettingsViewSet, basename='com
 router.register(r'tracking', AdminOrderTrackingViewSet, basename='order_tracking')
 router.register(r'orders', AdminOrderViewSet, basename='admin_orders')
 router.register(r'deletion-requests', DeletionRequestViewSet, basename='deletion_requests')
+router.register(r'contact-queries', ContactQueryViewSet, basename='contact_queries')
 router.register(r'order-returns', ReturnManagementViewSet, basename='order_returns')
 
 

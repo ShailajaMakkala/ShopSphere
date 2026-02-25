@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaHeart, FaShoppingBag, FaStar } from "react-icons/fa";
+import { FaHeart, FaShoppingBag, FaStar, FaBolt } from "react-icons/fa";
 
 export default function ProductCard({
     item,
     navigate,
     handleWishlistClick,
     handleAddToCartClick,
+    handleBuyNow,
     isInWishlist,
 }) {
     const [currentImgIndex, setCurrentImgIndex] = useState(0);
@@ -110,6 +111,28 @@ export default function ProductCard({
                     <div className="flex flex-col">
                         <span className="text-[9px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider">Price</span>
                         <span className="font-black text-base sm:text-lg md:text-xl text-gray-900">₹{parseFloat(item.price).toFixed(2)}</span>
+                    </div>
+                    <div className="flex gap-2">
+                        {handleBuyNow && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleBuyNow(item);
+                                }}
+                                className="bg-orange-500 text-white px-4 py-2 rounded-xl hover:bg-orange-600 transition-all shadow-md active:scale-95 flex items-center gap-2 text-xs font-bold"
+                            >
+                                <FaBolt size={12} /> Buy Now
+                            </button>
+                        )}
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleAddToCartClick(item);
+                            }}
+                            className="bg-gradient-to-r from-orange-400 to-purple-500 text-white p-3 rounded-xl hover:from-orange-600 hover:to-purple-700 transition-all shadow-lg active:scale-95 flex items-center justify-center min-w-[44px]"
+                        >
+                            <FaShoppingBag />
+                        </button>
                     </div>
                     <button
                         onClick={(e) => {

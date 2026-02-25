@@ -185,7 +185,12 @@ const cartSlice = createSlice({
     },
 
     clearCart: () => {
-      clearFromStorage('cart'); // ✅ Also clear from localStorage
+      clearFromStorage('cart'); // ✅ Deletes EVERYTHING from storage (use sparingly)
+      return [];
+    },
+
+    resetCart: () => {
+      // ✅ Only clears the Redux state UI, doesn't touch localStorage
       return [];
     },
 
@@ -201,6 +206,7 @@ export const {
   DecrCart,
   RemoveFromCart,
   clearCart,
+  resetCart,
   syncCart
 } = cartSlice.actions;
 
@@ -221,6 +227,9 @@ const wishlistSlice = createSlice({
       clearFromStorage('wishlist');
       return [];
     },
+    resetWishlist: () => {
+      return [];
+    },
     syncWishlist: () => {
       return loadFromStorage('wishlist');
     },
@@ -231,6 +240,7 @@ export const {
   AddToWishlist,
   RemoveFromWishlist,
   clearWishlist,
+  resetWishlist,
   syncWishlist
 } = wishlistSlice.actions;
 
