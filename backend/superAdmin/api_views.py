@@ -1317,58 +1317,64 @@ class AdminLoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        username_or_email = request.data.get('username') or request.data.get('email', '')
-        password = request.data.get('password', '')
+        try:
+            username_or_email = request.data.get('username') or request.data.get('email', '')
+            password = request.data.get('password', '')
 
-        if not username_or_email or not password:
-            return Response({'error': 'Username/email and password are required.'}, status=400)
+            if not username_or_email or not password:
+                return Response({'error': 'Username/email and password are required.'}, status=400)
 
-        User = get_user_model()
+            User = get_user_model()
 
-        # Resolve username → email (our AUTH backend uses email as USERNAME_FIELD)
-        auth_email = username_or_email.strip().lower()
-        if '@' not in auth_email:
-            try:
-                # Case-insensitive resolution
-                user_obj = User.objects.filter(username__iexact=username_or_email.strip()).first()
-                if user_obj:
-                    auth_email = user_obj.email
-                else:
-                    # Fallback to authenticating with what they provided (might fail)
+            # Resolve username → email (our AUTH backend uses email as USERNAME_FIELD)
+            auth_email = username_or_email.strip().lower()
+            if '@' not in auth_email:
+                try:
+                    # Case-insensitive resolution
+                    user_obj = User.objects.filter(username__iexact=username_or_email.strip()).first()
+                    if user_obj:
+                        auth_email = user_obj.email
+                    else:
+                        # Fallback to authenticating with what they provided (might fail)
+                        pass
+                except Exception:
                     pass
-            except Exception:
-                pass
 
-        user = authenticate(username=auth_email, password=password)
+            user = authenticate(username=auth_email, password=password)
 
-        if user is None:
-            # Check if account exists to give better feedback
-            if User.objects.filter(email=auth_email).exists():
-                return Response({'error': 'Incorrect password.'}, status=401)
-            return Response({'error': 'No administrator account found with this email/username.'}, status=401)
+            if user is None:
+                # Check if account exists to give better feedback
+                if User.objects.filter(email=auth_email).exists():
+                    return Response({'error': 'Incorrect password.'}, status=401)
+                return Response({'error': 'No administrator account found with this email/username.'}, status=401)
 
-        if not user.is_active:
-            return Response({'error': 'This account is inactive.'}, status=403)
+            if not user.is_active:
+                return Response({'error': 'This account is inactive.'}, status=403)
 
-        if not (user.is_staff or user.is_superuser):
+            if not (user.is_staff or user.is_superuser):
+                return Response({
+                    'error': 'Access denied. This login is for admin/staff accounts only.'
+                }, status=403)
+
+            refresh = RefreshToken.for_user(user)
+            refresh['is_staff'] = user.is_staff
+            refresh['is_superuser'] = user.is_superuser
+            refresh['role'] = 'ADMIN' # Explicitly set role for frontend compatibility
+            refresh['username'] = user.username
+
             return Response({
-                'error': 'Access denied. This login is for admin/staff accounts only.'
-            }, status=403)
-
-        refresh = RefreshToken.for_user(user)
-        refresh['is_staff'] = user.is_staff
-        refresh['is_superuser'] = user.is_superuser
-        refresh['role'] = 'ADMIN' # Explicitly set role for frontend compatibility
-        refresh['username'] = user.username
-
-        return Response({
-            'access': str(refresh.access_token),
-            'refresh': str(refresh),
-            'username': user.username,
-            'email': user.email,
-            'is_staff': user.is_staff,
-            'is_superuser': user.is_superuser,
-        })
+                'access': str(refresh.access_token),
+                'refresh': str(refresh),
+                'username': user.username,
+                'email': user.email,
+                'is_staff': user.is_staff,
+                'is_superuser': user.is_superuser,
+            })
+        except Exception as e:
+            print(f"CRITICAL LOGIN ERROR: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return Response({'error': f"Internal Server Error: {str(e)}"}, status=500)
 
 
 # ═══════════════════ DEBUG / WHOAMI ═══════════════════
