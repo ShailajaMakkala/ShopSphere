@@ -81,8 +81,6 @@ WSGI_APPLICATION = 'ShopSphere.wsgi.application'
 # Database
 _DATABASE_URL = os.environ.get('DATABASE_URL', '').strip()
 
-import dj_database_url
-
 DATABASES = {
     "default": dj_database_url.parse(
         os.environ.get("DATABASE_URL"),
@@ -90,14 +88,7 @@ DATABASES = {
         ssl_require=False
     )
 }
-else:
-    # Local development: SQLite (no DATABASE_URL needed)
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+
 
 SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'False').lower() == 'true'
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
