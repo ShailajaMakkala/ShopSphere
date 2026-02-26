@@ -5,19 +5,17 @@ Django settings for ShopSphere project.
 from pathlib import Path
 from datetime import timedelta
 import os
-import dj_database_url
-from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-r91l8)q8sv%mg9mem%^emum4&*&d-ewt7tt6_=e%1h8vr@nrp=')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-r91l8)q8sv%mg9mem%^emum4&*&d-ewt7tt6_=e%1h8vr@nrp=')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*', cast=lambda v: [s.strip() for s in v.split(',')])
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 
 # Application definition
 INSTALLED_APPS = [
@@ -74,12 +72,24 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ShopSphere.wsgi.application'
 
 # Database
-DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600
-    )
-}
+_DATABASE_URL = os.environ.get('DATABASE_URL', '').strip()
+
+if _DATABASE_URL:
+    # Production: PostgreSQL on Render with SSL
+    import dj_database_url as _dj
+    DATABASES = {
+        'default': _dj.parse(_DATABASE_URL, conn_max_age=600, ssl_require=True)
+    }
+else:
+    # Local development: SQLite (no DATABASE_URL needed)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'False').lower() == 'true'
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -186,7 +196,7 @@ _default_cors = [
 
 # In production, set CORS_ALLOWED_ORIGINS env var as comma-separated URLs
 # e.g. CORS_ALLOWED_ORIGINS=https://shopsphere.vercel.app,https://admin.vercel.app
-_env_cors = config('CORS_ALLOWED_ORIGINS', default='')
+_env_cors = os.environ.get('CORS_ALLOWED_ORIGINS', '')
 _extra_cors = [u.strip() for u in _env_cors.split(',') if u.strip()]
 CORS_ALLOWED_ORIGINS = list(set(_default_cors + _extra_cors))
 
@@ -217,6 +227,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='nandhuuppalapati@gmail.com')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='jzfc arto roxz wgwj')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'nandhuuppalapati@gmail.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'jzfc arto roxz wgwj')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

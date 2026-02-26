@@ -98,8 +98,7 @@ const Footer = () => {
             <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 md:gap-12">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 sm:gap-8 md:gap-12 text-center md:text-left">
                     <div>
                         <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-orange-400 to-purple-400 bg-clip-text text-transparent">ShopSphere</h3>
                         <p className="text-purple-300/70 text-xs sm:text-sm leading-relaxed">Your one-stop shop for everything you need. Quality products, best prices.</p>
@@ -166,21 +165,16 @@ const Footer = () => {
                             </div>
                         </>
                     )}
-
                 </AnimatePresence>
 
-                <div className="border-t border-white/5 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-
-                </div>
                 <div className="border-t border-white/5 mt-8 sm:mt-12 pt-6 sm:pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-
                     <p className="text-purple-400/60 text-sm">&copy; {new Date().getFullYear()} ShopSphere. All rights reserved.</p>
                     <p className="text-purple-400/60 text-sm flex items-center gap-1.5">
                         Made with <FaHeart className="text-orange-400 text-xs" /> by ShopSphere Team
                     </p>
                 </div>
             </div>
-        </footer >
+        </footer>
     );
 };
 

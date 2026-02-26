@@ -180,27 +180,27 @@ const CommissionSettings = () => {
     };
 
     return (
-        <div className={`flex h - screen font - sans selection: bg - blue - 100 overflow - hidden transition - colors duration - 300 ${isDarkMode ? 'bg-[#0f172a] text-slate-100' : 'bg-[#F8FAFC] text-slate-900'} `}>
+        <div className={`flex h-screen font-sans selection:bg-blue-100 overflow-hidden transition-colors duration-300 ${isDarkMode ? 'bg-[#0f172a] text-slate-100' : 'bg-[#F8FAFC] text-slate-900'}`}>
             <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} activePage="Settings" onLogout={logout} />
 
             <div className="flex-1 flex flex-col min-w-0">
-                <header className={`border - b px - 4 sm: px - 6 lg: px - 8 h - 14 sm: h - 16 lg: h - 20 flex items - center justify - between sticky top - 0 z - 20 transition - colors duration - 300 ${isDarkMode ? 'bg-[#0f172a]/80 border-slate-800 backdrop-blur-md' : 'bg-white border-slate-100 shadow-sm'} `}>
+                <header className={`border-b px-4 sm:px-6 lg:px-8 h-14 sm:h-16 lg:h-20 flex items-center justify-between sticky top-0 z-20 transition-colors duration-300 ${isDarkMode ? 'bg-[#0f172a]/80 border-slate-800 backdrop-blur-md' : 'bg-white border-slate-100 shadow-sm'}`}>
                     <div className="flex items-center gap-4">
-                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className={`p - 2 rounded - xl border transition - all ${isDarkMode ? 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white' : 'bg-white border-slate-200 text-slate-400 hover:text-blue-600 shadow-sm'} `}>
+                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className={`p-2 rounded-xl border transition-all ${isDarkMode ? 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white' : 'bg-white border-slate-200 text-slate-400 hover:text-blue-600 shadow-sm'}`}>
                             <span className="md:hidden"><Menu className="w-5 h-5" /></span>
                             <span className="hidden md:block">{isSidebarOpen ? <PanelLeftClose className="w-5 h-5" /> : <PanelLeftOpen className="w-5 h-5" />}</span>
                         </button>
                         <div>
                             <div className="flex items-center gap-2">
-                                <h1 className={`text - sm sm: text - base lg: text - lg font - semibold tracking - normal ${isDarkMode ? 'text-white' : 'text-slate-900'} `}>Commission Settings</h1>
-                                <span className={`text - [8px] font - semibold px - 1.5 py - 0.5 rounded - md uppercase tracking - normal ${isDarkMode ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' : 'bg-amber-50 text-amber-600 border border-amber-100'} `}>Admin Only</span>
+                                <h1 className={`text-sm sm:text-base lg:text-lg font-semibold tracking-normal ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Commission Settings</h1>
+                                <span className={`text-[8px] font-semibold px-1.5 py-0.5 rounded-md uppercase tracking-normal ${isDarkMode ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' : 'bg-amber-50 text-amber-600 border border-amber-100'}`}>Admin Only</span>
                             </div>
                             <p className="text-[9px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-normal hidden sm:block">Set commission rates for all vendors on the platform</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-6">
                         <NotificationBell />
-                        <div className={`hidden xl:flex items - center border rounded - lg px - 3 py - 1.5 text - [10px] font - bold uppercase tracking - normal gap - 2 ${isDarkMode ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-slate-50 border-slate-200 text-slate-500'} `}>
+                        <div className={`hidden xl:flex items-center border rounded-lg px-3 py-1.5 text-[10px] font-bold uppercase tracking-normal gap-2 ${isDarkMode ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-slate-50 border-slate-200 text-slate-500'}`}>
                             <Activity className="w-3.5 h-3.5" /> Live
                         </div>
                     </div>
@@ -214,10 +214,10 @@ const CommissionSettings = () => {
                                     initial={{ opacity: 0, height: 0 }}
                                     animate={{ opacity: 1, height: 'auto' }}
                                     exit={{ opacity: 0, height: 0 }}
-                                    className={`p - 4 rounded - 2xl border flex items - center gap - 3 overflow - hidden ${message.type === 'success'
-                                            ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'
-                                            : 'bg-rose-500/10 border-rose-500/20 text-rose-500'
-                                        } `}
+                                    className={`p-4 rounded-2xl border flex items-center gap-3 overflow-hidden ${message.type === 'success'
+                                        ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'
+                                        : 'bg-rose-500/10 border-rose-500/20 text-rose-500'
+                                    }`}
                                 >
                                     {message.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
                                     <span className="text-xs font-semibold uppercase tracking-normal">{message.text}</span>
@@ -226,13 +226,13 @@ const CommissionSettings = () => {
                         </AnimatePresence>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-                            <div className={`p - 8 rounded - [2.5rem] border col - span - 2 transition - all duration - 300 ${isDarkMode ? 'bg-[#1e293b]/50 border-slate-800 shadow-2xl shadow-blue-500/5' : 'bg-white border-slate-100 shadow-sm'} `}>
+                            <div className={`p-8 rounded-[2.5rem] border col-span-2 transition-all duration-300 ${isDarkMode ? 'bg-[#1e293b]/50 border-slate-800 shadow-2xl shadow-blue-500/5' : 'bg-white border-slate-100 shadow-sm'}`}>
                                 <div className="flex items-center gap-4 mb-10">
-                                    <div className={`w - 14 h - 14 rounded - 2xl flex items - center justify - center border transition - all ${isDarkMode ? 'bg-slate-900 border-slate-800 text-blue-400' : 'bg-blue-50 border-blue-100 text-blue-600'} `}>
+                                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border transition-all ${isDarkMode ? 'bg-slate-900 border-slate-800 text-blue-400' : 'bg-blue-50 border-blue-100 text-blue-600'}`}>
                                         <Percent className="w-7 h-7" />
                                     </div>
                                     <div>
-                                        <h2 className={`text - xl font - semibold ${isDarkMode ? 'text-white' : 'text-slate-900'} `}>Global Commission Rate</h2>
+                                        <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Global Commission Rate</h2>
                                         <p className="text-[9px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-normal hidden sm:block">Default rate applied to all vendor sales</p>
                                     </div>
                                 </div>
@@ -247,23 +247,23 @@ const CommissionSettings = () => {
                                                     value={inputValue}
                                                     onChange={(e) => setInputValue(e.target.value)}
                                                     step="0.1"
-                                                    className={`w - full pl - 8 pr - 14 py - 6 rounded - [2rem] border transition - all text - 4xl font - semibold ${isDarkMode
-                                                            ? 'bg-slate-900 border-slate-800 text-white focus:border-blue-500'
-                                                            : 'bg-slate-50 border-transparent text-slate-900 focus:bg-white focus:border-blue-600'
-                                                        } `}
+                                                    className={`w-full pl-8 pr-14 py-6 rounded-[2rem] border transition-all text-4xl font-semibold ${isDarkMode
+                                                        ? 'bg-slate-900 border-slate-800 text-white focus:border-blue-500'
+                                                        : 'bg-slate-50 border-transparent text-slate-900 focus:bg-white focus:border-blue-600'
+                                                    }`}
                                                 />
                                                 <div className="absolute right-8 top-1/2 -translate-y-1/2 text-slate-400 font-semibold text-2xl">%</div>
                                             </div>
                                         </div>
-                                        <div className={`p - 6 rounded - [2rem] border - 2 border - dashed transition - all hidden sm:block ${isDarkMode ? 'border-slate-800 text-slate-500' : 'border-slate-100 text-slate-400'} `}>
+                                        <div className={`p-6 rounded-[2rem] border-2 border-dashed transition-all hidden sm:block ${isDarkMode ? 'border-slate-800 text-slate-500' : 'border-slate-100 text-slate-400'}`}>
                                             <p className="text-[10px] uppercase font-semibold tracking-normal">Current Rate</p>
-                                            <p className={`text - 2xl font - semibold ${isDarkMode ? 'text-blue-400' : 'text-blue-600'} `}>{commission}%</p>
+                                            <p className={`text-2xl font-semibold ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>{commission}%</p>
                                         </div>
                                     </div>
 
-                                    <div className={`p - 8 rounded - [2rem] border flex flex - col lg: flex - row lg: items - center justify - between gap - 8 ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-50 border-slate-100 shadow-inner'} `}>
+                                    <div className={`p-8 rounded-[2rem] border flex flex-col lg:flex-row lg:items-center justify-between gap-8 ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-50 border-slate-100 shadow-inner'}`}>
                                         <div className="max-w-md">
-                                            <h4 className={`text - xs font - semibold uppercase tracking - normal mb - 2 ${isDarkMode ? 'text-slate-300' : 'text-slate-900'} `}>How it works</h4>
+                                            <h4 className={`text-xs font-semibold uppercase tracking-normal mb-2 ${isDarkMode ? 'text-slate-300' : 'text-slate-900'}`}>How it works</h4>
                                             <p className="text-[11px] text-slate-500 font-medium leading-relaxed">This rate applies to all vendors by default. Changing it takes effect immediately for new orders. Category overrides below will take priority over this rate.</p>
                                         </div>
                                         <button
@@ -279,7 +279,7 @@ const CommissionSettings = () => {
                             </div>
 
                             <div className="space-y-6">
-                                <div className={`p - 8 rounded - [2.5rem] relative overflow - hidden transition - all duration - 300 shadow - xl shadow - blue - 600 / 20 aspect - square flex flex - col justify - between ${isDarkMode ? 'bg-blue-600/90' : 'bg-blue-600'} `}>
+                                <div className={`p-8 rounded-[2.5rem] relative overflow-hidden transition-all duration-300 shadow-xl shadow-blue-600/20 aspect-square flex flex-col justify-between ${isDarkMode ? 'bg-blue-600/90' : 'bg-blue-600'}`}>
                                     <div className="absolute top-0 right-0 p-8 opacity-10">
                                         <ShieldCheck className="w-32 h-32" />
                                     </div>
@@ -293,34 +293,34 @@ const CommissionSettings = () => {
                                     </div>
                                 </div>
 
-                                <div className={`p - 6 rounded - [2rem] border transition - all duration - 300 ${isDarkMode ? 'bg-[#1e293b]/50 border-slate-800' : 'bg-white border-slate-100'} `}>
+                                <div className={`p-6 rounded-[2rem] border transition-all duration-300 ${isDarkMode ? 'bg-[#1e293b]/50 border-slate-800' : 'bg-white border-slate-100'}`}>
                                     <div className="flex items-center gap-3 mb-4">
-                                        <div className={`p - 2 rounded - lg ${isDarkMode ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-50 text-emerald-600'} `}>
+                                        <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-50 text-emerald-600'}`}>
                                             <TrendingUp className="w-4 h-4" />
                                         </div>
                                         <p className="text-[9px] font-semibold text-slate-500 uppercase tracking-normal">Revenue Growth</p>
                                     </div>
-                                    <div className={`text - 2xl font - semibold ${isDarkMode ? 'text-white' : 'text-slate-900'} `}>+4.2%</div>
+                                    <div className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>+4.2%</div>
                                     <p className="text-[10px] text-slate-500 font-bold uppercase tracking-normal mt-1 opacity-60">Revenue Spike Projected</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Overrides Table */}
-                        <div className={`rounded - [2.5rem] border overflow - hidden transition - all duration - 300 ${isDarkMode ? 'bg-[#1e293b]/50 border-slate-800' : 'bg-white border-slate-100 shadow-sm'} `}>
+                        <div className={`rounded-[2.5rem] border overflow-hidden transition-all duration-300 ${isDarkMode ? 'bg-[#1e293b]/50 border-slate-800' : 'bg-white border-slate-100 shadow-sm'}`}>
                             <div className="p-10 flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-800/20">
                                 <div>
-                                    <h3 className={`text - sm sm: text - base lg: text - lg font - semibold flex items - center gap - 2 uppercase tracking - wide ${isDarkMode ? 'text-white' : 'text-slate-900'} `}>
+                                    <h3 className={`text-sm sm:text-base lg:text-lg font-semibold flex items-center gap-2 uppercase tracking-wide ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
                                         <Layers className="w-5 h-5 text-blue-500" /> Category Overrides
                                     </h3>
                                     <p className="text-[11px] text-slate-500 font-medium mt-1">Set a different commission rate for specific product categories.</p>
                                 </div>
                                 <button
                                     onClick={() => setShowAddForm(!showAddForm)}
-                                    className={`px - 6 py - 3 rounded - 2xl text - [10px] font - semibold uppercase tracking - normal transition - all transition - all ${showAddForm
-                                            ? (isDarkMode ? 'bg-rose-500/10 text-rose-400' : 'bg-rose-50 text-rose-600')
-                                            : (isDarkMode ? 'bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white' : 'bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white')
-                                        } `}
+                                    className={`px-6 py-3 rounded-2xl text-[10px] font-semibold uppercase tracking-normal transition-all ${showAddForm
+                                        ? (isDarkMode ? 'bg-rose-500/10 text-rose-400' : 'bg-rose-50 text-rose-600')
+                                        : (isDarkMode ? 'bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white' : 'bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white')
+                                    }`}
                                 >
                                     {showAddForm ? 'Cancel' : '+ Add Override'}
                                 </button>
@@ -333,7 +333,7 @@ const CommissionSettings = () => {
                                             initial={{ opacity: 0, y: -20 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: -20 }}
-                                            className={`p - 8 rounded - [2rem] border mb - 8 ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-50 border-blue-100 shadow-inner'} `}
+                                            className={`p-8 rounded-[2rem] border mb-8 ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-50 border-blue-100 shadow-inner'}`}
                                         >
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-end">
                                                 <div className="space-y-3">
@@ -341,10 +341,10 @@ const CommissionSettings = () => {
                                                     <select
                                                         value={newOverride.category}
                                                         onChange={(e) => setNewOverride({ ...newOverride, category: e.target.value })}
-                                                        className={`w - full px - 5 py - 4 rounded - xl outline - none text - [11px] font - semibold uppercase tracking - normal transition - all appearance - none ${isDarkMode
-                                                                ? 'bg-slate-800 border border-slate-700 text-white focus:border-blue-500'
-                                                                : 'bg-white border border-slate-200 text-slate-700 focus:border-blue-600'
-                                                            } `}
+                                                        className={`w-full px-5 py-4 rounded-xl outline-none text-[11px] font-semibold uppercase tracking-normal transition-all appearance-none ${isDarkMode
+                                                            ? 'bg-slate-800 border border-slate-700 text-white focus:border-blue-500'
+                                                            : 'bg-white border border-slate-200 text-slate-700 focus:border-blue-600'
+                                                        }`}
                                                     >
                                                         <option value="">Select Category...</option>
                                                         {CATEGORIES
@@ -362,10 +362,10 @@ const CommissionSettings = () => {
                                                             type="number"
                                                             value={newOverride.percentage}
                                                             onChange={(e) => setNewOverride({ ...newOverride, percentage: e.target.value })}
-                                                            className={`w - full pl - 6 pr - 10 py - 4 rounded - xl outline - none text - sm font - semibold transition - all ${isDarkMode
-                                                                    ? 'bg-slate-800 border border-slate-700 text-white focus:border-blue-500'
-                                                                    : 'bg-white border border-slate-200 text-slate-900 focus:border-blue-600'
-                                                                } `}
+                                                            className={`w-full pl-6 pr-10 py-4 rounded-xl outline-none text-sm font-semibold transition-all ${isDarkMode
+                                                                ? 'bg-slate-800 border border-slate-700 text-white focus:border-blue-500'
+                                                                : 'bg-white border border-slate-200 text-slate-900 focus:border-blue-600'
+                                                            }`}
                                                         />
                                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-semibold text-xs">%</div>
                                                     </div>
@@ -373,7 +373,7 @@ const CommissionSettings = () => {
                                                 <button
                                                     onClick={handleAddCategoryOverride}
                                                     disabled={isCategoryLoading}
-                                                    className="w-full py-5 bg-slate-900 text-white rounded-xl text-[10px] font-semibold font-semibold uppercase tracking-normal hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 disabled:opacity-50"
+                                                    className="w-full py-5 bg-slate-900 text-white rounded-xl text-[10px] font-semibold uppercase tracking-normal hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 disabled:opacity-50"
                                                 >
                                                     {isCategoryLoading ? 'Saving...' : 'Add Override'}
                                                 </button>
@@ -384,31 +384,31 @@ const CommissionSettings = () => {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {categoryCommissions.length === 0 ? (
-                                        <div className={`col - span - full py - 20 text - center rounded - [2.5rem] border - 2 border - dashed transition - all ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-50 border-slate-200'} `}>
-                                            <Layers className={`w - 12 h - 12 mx - auto mb - 6 opacity - 20 ${isDarkMode ? 'text-white' : 'text-slate-900'} `} />
-                                            <p className={`text - sm font - semibold uppercase tracking - normal ${isDarkMode ? 'text-slate-500' : 'text-slate-400'} `}>No category overrides added yet</p>
+                                        <div className={`col-span-full py-20 text-center rounded-[2.5rem] border-2 border-dashed transition-all ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                                            <Layers className={`w-12 h-12 mx-auto mb-6 opacity-20 ${isDarkMode ? 'text-white' : 'text-slate-900'}`} />
+                                            <p className={`text-sm font-semibold uppercase tracking-normal ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>No category overrides added yet</p>
                                         </div>
                                     ) : (
                                         categoryCommissions.map((item) => (
-                                            <div key={item.id} className={`p - 6 rounded - 3xl border flex items - center justify - between transition - all group ${isDarkMode ? 'bg-slate-900/50 border-slate-800 hover:border-blue-500/50' : 'bg-slate-50 border-slate-200 hover:border-blue-400 shadow-sm hover:shadow-lg'} `}>
+                                            <div key={item.id} className={`p-6 rounded-3xl border flex items-center justify-between transition-all group ${isDarkMode ? 'bg-slate-900/50 border-slate-800 hover:border-blue-500/50' : 'bg-slate-50 border-slate-200 hover:border-blue-400 shadow-sm hover:shadow-lg'}`}>
                                                 <div className="flex items-center gap-4">
-                                                    <div className={`w - 12 h - 12 rounded - 2xl flex items - center justify - center transition - all ${isDarkMode ? 'bg-slate-800 text-blue-400' : 'bg-white text-blue-600 shadow-sm'} `}>
+                                                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${isDarkMode ? 'bg-slate-800 text-blue-400' : 'bg-white text-blue-600 shadow-sm'}`}>
                                                         <Percent className="w-5 h-5" />
                                                     </div>
                                                     <div>
-                                                        <h4 className={`text - xs font - semibold uppercase tracking - normal ${isDarkMode ? 'text-white' : 'text-slate-900'} `}>{item.category_display || item.category}</h4>
-                                                        <div className={`inline - flex items - center gap - 1.5 px - 2 py - 0.5 rounded - md text - [8px] font - semibold uppercase tracking - normal mt - 1 ${isDarkMode ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-100 text-blue-600'} `}>Custom Rule</div>
+                                                        <h4 className={`text-xs font-semibold uppercase tracking-normal ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{item.category_display || item.category}</h4>
+                                                        <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[8px] font-semibold uppercase tracking-normal mt-1 ${isDarkMode ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-100 text-blue-600'}`}>Custom Rule</div>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-6">
                                                     <div className="text-right">
-                                                        <div className={`text - 2xl font - semibold ${isDarkMode ? 'text-white' : 'text-slate-900'} `}>{item.percentage}%</div>
+                                                        <div className={`text-2xl font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{item.percentage}%</div>
                                                         <p className="text-[9px] font-semibold text-slate-500 uppercase tracking-normal">Override Rate</p>
                                                     </div>
                                                     <button
                                                         onClick={() => handleDeleteCategoryOverride(item.id)}
                                                         disabled={isCategoryLoading}
-                                                        className={`p - 3 rounded - xl transition - all opacity - 0 group - hover: opacity - 100 ${isDarkMode ? 'bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white' : 'bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white shadow-sm'} `}
+                                                        className={`p-3 rounded-xl transition-all opacity-0 group-hover:opacity-100 ${isDarkMode ? 'bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white' : 'bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white shadow-sm'}`}
                                                     >
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
@@ -421,8 +421,8 @@ const CommissionSettings = () => {
                         </div>
 
                         {/* Protocol Docs */}
-                        <div className={`p - 10 rounded - [2.5rem] border transition - all duration - 300 ${isDarkMode ? 'bg-[#1e293b]/50 border-slate-800' : 'bg-white border-slate-100 shadow-sm'} `}>
-                            <h3 className={`text - xs font - semibold mb - 8 flex items - center gap - 2 uppercase tracking - normal ${isDarkMode ? 'text-slate-400' : 'text-slate-500'} `}>
+                        <div className={`p-10 rounded-[2.5rem] border transition-all duration-300 ${isDarkMode ? 'bg-[#1e293b]/50 border-slate-800' : 'bg-white border-slate-100 shadow-sm'}`}>
+                            <h3 className={`text-xs font-semibold mb-8 flex items-center gap-2 uppercase tracking-normal ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                                 <Info className="w-4 h-4 text-blue-500" /> How Commission Works
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -431,9 +431,9 @@ const CommissionSettings = () => {
                                     { title: 'Saved at Order Time', desc: 'Commission rates are locked in when an order is placed. Changing the rate will not affect past orders.', id: 2 }
                                 ].map((rule) => (
                                     <div key={rule.id} className="flex gap-6">
-                                        <div className={`w - 10 h - 10 rounded - 2xl flex items - center justify - center text - xs font - semibold shrink - 0 ${isDarkMode ? 'bg-slate-900 text-slate-500 border border-slate-800' : 'bg-slate-50 text-slate-400 border border-slate-100'} `}>{rule.id}</div>
+                                        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-xs font-semibold shrink-0 ${isDarkMode ? 'bg-slate-900 text-slate-500 border border-slate-800' : 'bg-slate-50 text-slate-400 border border-slate-100'}`}>{rule.id}</div>
                                         <div>
-                                            <h4 className={`text - sm font - semibold uppercase tracking - normal mb - 2 ${isDarkMode ? 'text-slate-200' : 'text-slate-900'} `}>{rule.title}</h4>
+                                            <h4 className={`text-sm font-semibold uppercase tracking-normal mb-2 ${isDarkMode ? 'text-slate-200' : 'text-slate-900'}`}>{rule.title}</h4>
                                             <p className="text-[11px] text-slate-500 font-medium leading-relaxed">{rule.desc}</p>
                                         </div>
                                     </div>

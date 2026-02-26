@@ -1,0 +1,99 @@
+﻿[36mvite v7.3.1 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32mΓ£ô[39m 29 modules transformed.
+node.exe : [31mΓ£ù[39m 
+Build failed in 967ms
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" "C:\Use
+rs\sdash\AppData\Roaming\ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
+    + CategoryInfo          : 
+    NotSpecified: ([31mΓ£ù  
+  [39m Build failed in 967m   
+ s:String) [], RemoteExcep    
+tion
+    + FullyQualifiedErrorId : 
+    NativeCommandError
+ 
+[31merror during build:
+[31m[vite:esbuild] Transform 
+failed with 2 errors:
+C:/Users/sdash/OneDrive/Deskto
+p/Ecommerce/project-ecommerce/
+user-frontend/src/Components/c
+ommon/Footer.jsx:188:10: 
+ERROR: Unexpected closing 
+"footer" tag does not match 
+opening "div" tag
+C:/Users/sdash/OneDrive/Deskto
+p/Ecommerce/project-ecommerce/
+user-frontend/src/Components/c
+ommon/Footer.jsx:193:0: 
+ERROR: Unexpected end of file 
+before a closing "div" 
+tag[31m
+file: [36mC:/Users/sdash/OneD
+rive/Desktop/Ecommerce/project
+-ecommerce/user-frontend/src/C
+omponents/common/Footer.jsx:18
+8:10[31m
+[33m
+[33mUnexpected closing 
+"footer" tag does not match 
+opening "div" tag[33m
+186 |                  </div>
+187 |              </div>
+188 |          </footer >
+    |            ^
+189 |      );
+190 |  };
+
+[33mUnexpected end of file 
+before a closing "div" 
+tag[33m
+191 |  
+192 |  export default Footer;
+193 |  
+    |  ^
+[31m
+    at failureErrorWithLog (C:
+\Users\sdash\OneDrive\Desktop\
+Ecommerce\project-ecommerce\us
+er-frontend\node_modules\esbui
+ld\lib\main.js:1467:15)
+    at C:\Users\sdash\OneDrive
+\Desktop\Ecommerce\project-eco
+mmerce\user-frontend\node_modu
+les\esbuild\lib\main.js:736:50
+    at 
+responseCallbacks.<computed> (
+C:\Users\sdash\OneDrive\Deskto
+p\Ecommerce\project-ecommerce\
+user-frontend\node_modules\esb
+uild\lib\main.js:603:9)
+    at handleIncomingPacket (C
+:\Users\sdash\OneDrive\Desktop
+\Ecommerce\project-ecommerce\u
+ser-frontend\node_modules\esbu
+ild\lib\main.js:658:12)
+    at Socket.readFromStdout (
+C:\Users\sdash\OneDrive\Deskto
+p\Ecommerce\project-ecommerce\
+user-frontend\node_modules\esb
+uild\lib\main.js:581:7)
+    at Socket.emit 
+(node:events:508:28)
+    at addChunk (node:internal
+/streams/readable:559:12)
+    at 
+readableAddChunkPushByteMode (
+node:internal/streams/readable
+:510:3)
+    at Readable.push (node:int
+ernal/streams/readable:390:5)
+    at Pipe.onStreamRead (node
+:internal/stream_base_commons:
+189:23)[39m
