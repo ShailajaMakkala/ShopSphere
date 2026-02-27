@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const base_url = import.meta.env.VITE_API_BASE_URL || "https://final-shopsphere-8v1c.onrender.com";
+const base_url = import.meta.env.VITE_API_BASE_URL || "https://shopsphere-bkiy.onrender.com";
 
 // ── Token helper ─────────────────────────────────────────────────────────────
 const getAdminToken = () => {
