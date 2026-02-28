@@ -43,7 +43,8 @@ const VendorApproval = () => {
         setIsLoading(true);
         try {
             const data = await fetchAllVendors();
-            setVendors(Array.isArray(data) ? data : []);
+            const results = data.results || (Array.isArray(data) ? data : []);
+            setVendors(results);
         } catch (error) {
             console.error("Failed to load vendors:", error);
             toast.error("Cloud synchronization failed");

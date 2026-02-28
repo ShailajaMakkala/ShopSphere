@@ -68,7 +68,7 @@ function Layout() {
         }}
       />
       {!hideNavbarFooter && <Navbar />}
-      <main className={`flex-grow ${!hideNavbarFooter ? (location.pathname === '/home' ? "pt-0" : "pt-19") : ""}`}>
+      <main className="flex-grow">
         <AppRoutes />
       </main>
       {!hideNavbarFooter && <Footer />}
@@ -87,3 +87,4 @@ function App() {
 }
 
 export default App;
+

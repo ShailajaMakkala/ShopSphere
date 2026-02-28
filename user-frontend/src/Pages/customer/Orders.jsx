@@ -294,16 +294,18 @@ function Orders() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-16">
-      <div className="flex items-center justify-between mb-12">
-        <div>
-          <h1 className="text-4xl font-black text-gray-900 tracking-tighter flex items-center gap-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-purple-500 text-white rounded-2xl flex items-center justify-center shadow-xl shadow-orange-400/20">
-              <Receipt size={28} />
-            </div>
-            Order History
-          </h1>
-          <p className="text-gray-400 font-bold mt-2 ml-1">Managing {orders.length} orders across your history.</p>
+    <div className="max-w-4xl mx-auto px-3 sm:px-4 py-8 sm:py-16">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10 sm:mb-12">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-orange-400 to-purple-500 text-white rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl shadow-orange-400/20 shrink-0">
+            <Receipt size={24} className="sm:w-[28px] sm:h-[28px]" />
+          </div>
+          <div>
+            <h1 className="text-2xl sm:text-4xl font-black text-gray-900 tracking-tighter">
+              Order History
+            </h1>
+            <p className="text-gray-400 font-bold mt-1 text-[11px] sm:text-sm">Managing {orders.length} orders across your history.</p>
+          </div>
         </div>
       </div>
 
@@ -316,24 +318,24 @@ function Orders() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
               key={order.id || index}
-              className="group bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden transition-all hover:shadow-2xl hover:shadow-gray-200/40 hover:border-orange-100"
+              className="group bg-white rounded-2xl sm:rounded-[32px] border border-gray-100 shadow-sm overflow-hidden transition-all hover:shadow-2xl hover:shadow-gray-200/40 hover:border-orange-100"
             >
               {/* Order Header */}
               <div
                 onClick={() => toggleExpand(order.id)}
-                className="p-6 cursor-pointer hover:bg-gray-50/50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                className="p-4 sm:p-6 cursor-pointer hover:bg-gray-50/50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
               >
-                <div className="flex items-center gap-5">
-                  <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center text-orange-400 shadow-inner group-hover:bg-orange-50 transition-colors">
-                    <Package size={28} />
+                <div className="flex items-start sm:items-center gap-3 sm:gap-5">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-50 rounded-xl sm:rounded-2xl flex items-center justify-center text-orange-400 shadow-inner group-hover:bg-orange-50 transition-colors shrink-0">
+                    <Package size={22} className="sm:w-[28px] sm:h-[28px]" />
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <p className="font-black text-gray-900 text-lg uppercase tracking-tight">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <p className="font-black text-gray-900 text-base sm:text-lg uppercase tracking-tight break-all sm:break-normal">
                         {order.transaction_id || `ORD-${order.id}`}
                       </p>
-                      <span className={`text-[9px] font-black uppercase tracking-[2px] px-3 py-1 rounded-full border flex items-center gap-1.5 ${status.bgColor} ${status.textColor} ${status.borderColor}`}>
-                        <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${status.dotColor}`}></div>
+                      <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-[1px] sm:tracking-[2px] px-2 sm:px-3 py-1 rounded-full border flex items-center gap-1.5 ${status.bgColor} ${status.textColor} ${status.borderColor}`}>
+                        <div className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full animate-pulse ${status.dotColor}`}></div>
                         {status.label}
                       </span>
                     </div>
@@ -350,15 +352,15 @@ function Orders() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between sm:justify-end gap-10 border-t sm:border-t-0 pt-4 sm:pt-0">
+                <div className="flex items-center justify-between sm:justify-end gap-6 sm:gap-10 border-t sm:border-t-0 pt-4 sm:pt-0">
                   <div className="text-left sm:text-right">
-                    <p className="text-[10px] font-black text-gray-300 uppercase tracking-[2px] mb-0.5">Grand Total</p>
-                    <p className="text-2xl font-black text-orange-400 tracking-tighter">
+                    <p className="text-[9px] sm:text-[10px] font-black text-gray-300 uppercase tracking-[2px] mb-0.5">Grand Total</p>
+                    <p className="text-xl sm:text-2xl font-black text-orange-400 tracking-tighter">
                       ₹{Number(order.total_amount).toFixed(2)}
                     </p>
                   </div>
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${expandedOrder === order.id ? "bg-gray-900 text-white rotate-180" : "bg-gray-50 text-gray-400"}`}>
-                    <ChevronDown size={22} />
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all shrink-0 ${expandedOrder === order.id ? "bg-gray-900 text-white rotate-180" : "bg-gray-50 text-gray-400"}`}>
+                    <ChevronDown size={20} className="sm:w-[22px] sm:h-[22px]" />
                   </div>
                 </div>
               </div>
@@ -380,68 +382,72 @@ function Orders() {
 
                       <div className="space-y-4">
                         {order.items?.map((item, idx) => (
-                          <div key={idx} className="flex justify-between items-center bg-white rounded-3xl p-5 border border-gray-100 shadow-sm hover:border-blue-100 group/item transition-all">
-                            <div className="flex items-center gap-5">
-                              <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-xs font-black text-gray-500 border border-gray-100 group-hover/item:bg-gradient-to-r from-orange-400 to-purple-500 group-hover/item:text-white transition-all">
+                          <div key={idx} className="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-white rounded-3xl p-4 sm:p-5 border border-gray-100 shadow-sm hover:border-blue-100 group/item transition-all gap-4">
+                            <div className="flex items-start sm:items-center gap-4 sm:gap-5">
+                              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-50 rounded-xl sm:rounded-2xl flex items-center justify-center text-xs font-black text-gray-500 border border-gray-100 group-hover/item:bg-gradient-to-r from-orange-400 to-purple-500 group-hover/item:text-white transition-all shrink-0">
                                 {item.quantity}×
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h4 className="text-sm font-black text-gray-900 line-clamp-1 mb-1 group-hover:text-orange-400 transition-colors">
+                                <h4 className="text-sm font-black text-gray-900 line-clamp-2 sm:line-clamp-1 mb-1 group-hover:text-orange-400 transition-colors">
                                   {item.product_name}
                                 </h4>
                                 {item.user_review && (
-                                  <div className="flex flex-col gap-1 mb-2 bg-orange-50/50 p-3 rounded-xl border border-orange-100/50 w-fit max-w-md">
+                                  <div className="flex flex-col gap-1 mb-2 bg-orange-50/50 p-2 sm:p-3 rounded-xl border border-orange-100/50 w-fit max-w-full sm:max-w-md">
                                     <div className="flex gap-0.5">
                                       {[...Array(5)].map((_, i) => (
-                                        <FaStar key={i} className={`text-[10px] ${i < item.user_review.rating ? "text-yellow-400" : "text-gray-200"}`} />
+                                        <FaStar key={i} className={`text-[9px] sm:text-[10px] ${i < item.user_review.rating ? "text-yellow-400" : "text-gray-200"}`} />
                                       ))}
                                     </div>
-                                    <p className="text-[11px] text-gray-600 font-medium italic line-clamp-2">"{item.user_review.comment}"</p>
+                                    <p className="text-[10px] sm:text-[11px] text-gray-600 font-medium italic line-clamp-2">"{item.user_review.comment}"</p>
                                   </div>
                                 )}
-                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Unit Price: ₹{Number(item.product_price).toFixed(2)}</span>
+                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Unit: ₹{Number(item.product_price).toFixed(2)}</span>
                               </div>
                             </div>
 
-                            <div className="flex items-center gap-4">
+                            <div className="flex flex-wrap items-center justify-between sm:justify-end gap-3 sm:gap-4 border-t sm:border-t-0 pt-3 sm:pt-0">
                               {status.label === 'Delivered' && (
                                 item.user_review ? (
                                   item.user_review.can_edit_review ? (
-                                    <button onClick={() => openReviewModal(item)} className="px-4 py-2 bg-orange-50 text-orange-400 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-gradient-to-r from-orange-400 to-purple-500 hover:text-white transition-all border border-orange-100 shadow-sm">
-                                      Alter the Review
+                                    <button onClick={() => openReviewModal(item)} className="px-3 py-2 bg-orange-50 text-orange-400 text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-lg sm:rounded-xl hover:bg-gradient-to-r from-orange-400 to-purple-500 hover:text-white transition-all border border-orange-100 shadow-sm">
+                                      Alter Review
                                     </button>
                                   ) : (
-                                    <span className="text-[9px] font-black text-gray-400 uppercase bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100 tracking-wider">Review Closed</span>
+                                    <span className="text-[8px] sm:text-[9px] font-black text-gray-400 uppercase bg-gray-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-gray-100 tracking-wider">Review Closed</span>
                                   )
                                 ) : (
-                                  <button onClick={() => openReviewModal(item)} className="px-4 py-2 bg-orange-50 text-orange-400 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-gradient-to-r from-orange-400 to-purple-500 hover:text-white transition-all border border-orange-100 shadow-sm">
-                                    Write a Review
+                                  <button onClick={() => openReviewModal(item)} className="px-3 py-2 bg-orange-50 text-orange-400 text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-lg sm:rounded-xl hover:bg-gradient-to-r from-orange-400 to-purple-500 hover:text-white transition-all border border-orange-100 shadow-sm">
+                                    Review
                                   </button>
                                 )
                               )}
-                              <span className="font-black text-gray-900">₹{(Number(item.product_price) * item.quantity).toFixed(2)}</span>
+                              <span className="font-black text-gray-900 text-sm sm:text-base">₹{(Number(item.product_price) * item.quantity).toFixed(2)}</span>
                             </div>
                           </div>
                         ))}
                       </div>
 
-                      <div className="mt-10 pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                        <div className="flex items-start gap-4">
-                          <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center shrink-0">
-                            <AlertCircle size={18} className="text-orange-400" />
-                          </div>
-                          <div>
-                            <p className="text-[11px] font-black text-gray-900 uppercase tracking-widest mb-1">Payment Info</p>
-                            <p className="text-xs text-gray-400 font-medium capitalize">Method: {order.payment_method?.replace('_', ' ')}</p>
-                            <p className="text-xs text-gray-400 font-medium truncate max-w-[200px]">ID: {order.transaction_id || 'N/A'}</p>
+                      <div className="mt-10 pt-8 border-t border-gray-100 flex flex-col gap-8">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+                          <div className="flex items-start gap-4">
+                            <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center shrink-0">
+                              <AlertCircle size={18} className="text-orange-400" />
+                            </div>
+                            <div>
+                              <p className="text-[11px] font-black text-gray-900 uppercase tracking-widest mb-1">Payment Info</p>
+                              <p className="text-xs text-gray-400 font-medium capitalize">Method: {order.payment_method?.replace('_', ' ')}</p>
+                              <p className="text-xs text-gray-400 font-medium truncate max-w-[200px]">ID: {order.transaction_id || 'N/A'}</p>
+                            </div>
                           </div>
                         </div>
 
-                        <div className="flex gap-3 w-full md:w-auto">
-                          <button className="flex-1 md:flex-none px-6 py-3 bg-white text-gray-900 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-gray-50 transition-all border border-gray-200 shadow-sm">
+                        <div className="flex flex-wrap gap-2 sm:gap-3">
+                          <button onClick={() => window.Tawk_API?.maximize()}
+                            className="flex-1 md:flex-none px-6 py-3 bg-white text-gray-900 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-gray-50 transition-all border border-gray-200 shadow-sm"
+                          >
                             Need Help?
                           </button>
-                          <button onClick={() => navigate(`/track-order/${order.id}`)} className="flex-1 md:flex-none px-8 py-3 bg-gradient-to-r from-orange-400 to-purple-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:from-orange-600 hover:to-purple-600 transition-all shadow-xl shadow-orange-200">
+                          <button onClick={() => navigate(`/track-order/${order.id}`)} className="flex-1 sm:flex-none px-4 sm:px-8 py-3 bg-gradient-to-r from-orange-400 to-purple-500 text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-xl hover:shadow-orange-200 shadow-xl transition-all min-w-[120px]">
                             Track Order
                           </button>
                           <button
@@ -467,17 +473,17 @@ function Orders() {
                                 toast.error("Failed to download invoice");
                               }
                             }}
-                            className="flex-1 md:flex-none px-8 py-3 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-gray-800 transition-all shadow-xl shadow-gray-200"
+                            className="flex-1 sm:flex-none px-4 sm:px-8 py-3 bg-gray-900 text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-gray-800 transition-all shadow-xl shadow-gray-200 min-w-[120px]"
                           >
                             Invoice
                           </button>
                           {order.can_be_returned && !order.return_data && (
-                            <button onClick={() => openReturnModal(order.id)} className="flex-1 md:flex-none px-8 py-3 bg-red-50 text-red-500 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-red-500 hover:text-white transition-all border border-red-100 shadow-sm">
-                              Return Order
+                            <button onClick={() => openReturnModal(order.id)} className="flex-1 sm:flex-none px-4 sm:px-8 py-3 bg-red-50 text-red-500 text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-red-500 hover:text-white transition-all border border-red-100 shadow-sm min-w-[120px]">
+                              Return
                             </button>
                           )}
                           {order.return_data && (
-                            <div className="flex flex-col items-center justify-center px-4 py-2 bg-orange-50 border border-orange-100 rounded-xl">
+                            <div className="flex flex-col items-center justify-center px-4 py-2 bg-orange-50 border border-orange-100 rounded-xl flex-1 sm:flex-none">
                               <span className="text-[9px] font-black text-orange-400 uppercase tracking-widest">Return {order.return_data.status}</span>
                             </div>
                           )}
@@ -497,8 +503,8 @@ function Orders() {
         {isReviewModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsReviewModalOpen(false)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative w-full max-w-lg bg-white rounded-[40px] shadow-2xl p-8 md:p-12 overflow-hidden">
-              <button onClick={() => setIsReviewModalOpen(false)} className="absolute top-8 right-8 text-gray-400 hover:text-gray-600 transition-colors"><FaTimes size={24} /></button>
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative w-full max-w-lg bg-white rounded-[32px] sm:rounded-[40px] shadow-2xl p-6 sm:p-8 md:p-12 overflow-hidden max-h-[90vh] overflow-y-auto">
+              <button onClick={() => setIsReviewModalOpen(false)} className="absolute top-6 right-6 sm:top-8 sm:right-8 text-gray-400 hover:text-gray-600 transition-colors"><FaTimes size={20} /></button>
               <div className="flex items-center justify-between pr-10">
                 <h2 className="text-3xl font-black text-gray-900 mb-1">{newReview.isAltering ? "Alter the Review" : "Write a Review"}</h2>
                 {newReview.isAltering && (
@@ -549,8 +555,8 @@ function Orders() {
         {isReturnModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsReturnModalOpen(false)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative w-full max-w-lg bg-white rounded-[40px] shadow-2xl p-8 md:p-12 overflow-hidden">
-              <button onClick={() => setIsReturnModalOpen(false)} className="absolute top-8 right-8 text-gray-400 hover:text-gray-600 transition-colors"><FaTimes size={24} /></button>
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 0 }} className="relative w-full max-w-lg bg-white rounded-[32px] sm:rounded-[40px] shadow-2xl p-6 sm:p-8 md:p-12 overflow-hidden max-h-[90vh] overflow-y-auto">
+              <button onClick={() => setIsReturnModalOpen(false)} className="absolute top-6 right-6 sm:top-8 sm:right-8 text-gray-400 hover:text-gray-600 transition-colors"><FaTimes size={20} /></button>
               <h2 className="text-3xl font-black text-gray-900 mb-2">Request Return</h2>
               <form onSubmit={handleReturnSubmit} className="space-y-6">
                 <div className="space-y-2">

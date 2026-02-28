@@ -34,7 +34,8 @@ const DeliveryList = () => {
         setIsLoading(true);
         try {
             const data = await fetchAllDeliveryAgents();
-            setAgents(Array.isArray(data) ? data : []);
+            const results = data.results || (Array.isArray(data) ? data : []);
+            setAgents(results);
         } catch (error) {
             console.error("Failed to fetch delivery agents", error);
         } finally {

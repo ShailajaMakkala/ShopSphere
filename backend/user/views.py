@@ -256,11 +256,20 @@ def home_api(request):
 
     from django.db.models import Avg
     # Base query with annotation to avoid N+1 queries for ratings
-    from django.db.models import Avg, Count
+    from django.db.models import Avg, Count, Prefetch
+    from vendor.models import ProductImage
+
+    # Optimized image prefetch that avoids loading large binary blobs for list views
+    images_prefetch = Prefetch(
+        'images',
+        queryset=ProductImage.objects.defer('image_data')
+    )
+
+    # Base query with annotation to avoid N+1 queries for ratings
     products_qs = Product.objects.filter(
         status__in=['active', 'approved'],
         is_blocked=False
-    ).select_related('vendor').prefetch_related('images').annotate(
+    ).select_related('vendor').prefetch_related(images_prefetch).annotate(
         avg_rating=Avg('reviews__rating'),
         count_reviews=Count('reviews')
     ).order_by('-id')
@@ -386,7 +395,25 @@ def add_to_cart(request, product_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def cart_view(request):
-    cart, created = Cart.objects.get_or_create(user=request.user)
+    from django.db.models import Prefetch, Avg, Count
+    from vendor.models import ProductImage
+    
+    # Define images prefetch with defer to avoid binary data transfer
+    images_prefetch = Prefetch(
+        'product__images',
+        queryset=ProductImage.objects.defer('image_data')
+    )
+
+    # Pre-fetch cart items with products and images in one go
+    cart, _ = Cart.objects.prefetch_related(
+        Prefetch(
+            'items',
+            queryset=CartItem.objects.select_related('product', 'product__vendor').prefetch_related(images_prefetch).annotate(
+                avg_rating=Avg('product__reviews__rating')
+            )
+        )
+    ).get_or_create(user=request.user)
+    
     cart_items = cart.items.all()
     
     if request.accepted_renderer.format == 'json':
@@ -659,7 +686,25 @@ def process_payment(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def my_orders(request):
-    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    from django.db.models import Prefetch
+    from vendor.models import ProductImage
+    
+    # Optimized prefetch for OrderItem -> Product -> Images
+    images_prefetch = Prefetch(
+        'items__product__images',
+        queryset=ProductImage.objects.defer('image_data')
+    )
+    
+    # Fetch orders with items, products and images efficiently 
+    orders = Order.objects.filter(user=request.user).select_related(
+        'delivery_address', 'billing_address'
+    ).prefetch_related(
+        'items', 
+        'items__product', 
+        'items__product__vendor',
+        images_prefetch,
+        'tracking_history'
+    ).order_by('-created_at')
     
     if request.accepted_renderer.format == 'json':
         serializer = OrderSerializer(orders, many=True, context={'request': request})
@@ -723,9 +768,24 @@ def cancel_order(request, order_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def order_tracking(request, order_number):
+    from django.db.models import Prefetch
+    from vendor.models import ProductImage
+
+    # Prefetch images for product items
+    images_prefetch = Prefetch(
+        'items__product__images',
+        queryset=ProductImage.objects.defer('image_data')
+    )
+
     try:
-        order = Order.objects.prefetch_related('items', 'tracking_history').select_related(
+        order = Order.objects.select_related(
             'delivery_address'
+        ).prefetch_related(
+            'items', 
+            'items__product', 
+            'items__product__vendor',
+            images_prefetch, 
+            'tracking_history'
         ).get(order_number=order_number, user=request.user)
     except Order.DoesNotExist:
         return Response({"error": "Order not found"}, status=404)
@@ -892,7 +952,24 @@ def logout_api(request):
 @authentication_classes([])
 @permission_classes([AllowAny])
 def product_detail(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
+    from django.db.models import Prefetch, Avg, Count
+    from vendor.models import ProductImage
+
+    # Optimized image prefetch that avoids loading large binary blobs
+    images_prefetch = Prefetch(
+        'images',
+        queryset=ProductImage.objects.defer('image_data')
+    )
+
+    # Use prefetch_related and select_related for the single product to avoid N+1
+    product = get_object_or_404(
+        Product.objects.select_related('vendor').prefetch_related(images_prefetch).annotate(
+            avg_rating=Avg('reviews__rating'),
+            count_reviews=Count('reviews')
+        ), 
+        id=product_id
+    )
+    
     user_review = None
     can_edit_review = False
     days_left = 0
@@ -1041,12 +1118,20 @@ def reverse_geocode(request):
 @authentication_classes([])
 @permission_classes([AllowAny])
 def get_trending_products(request):
-    # Trending considers search count and ratings
+    from vendor.models import ProductImage
+    from django.db.models import Prefetch
+    
+    # Optimized prefetch
+    images_prefetch = Prefetch(
+        'images',
+        queryset=ProductImage.objects.defer('image_data')
+    )
+    
+    # Removed average_rating__gt=3 as new data starts with 0
     trending = Product.objects.filter(
         status__in=['active', 'approved'],
-        is_blocked=False,
-        average_rating__gt=3
-    ).select_related('vendor').prefetch_related('images').order_by('-search_count', '-total_reviews', '-average_rating')[:12]
+        is_blocked=False
+    ).select_related('vendor').prefetch_related(images_prefetch).order_by('-search_count', '-total_reviews', '-average_rating', '-id')[:12]
     
     serializer = ProductSerializer(trending, many=True, context={'request': request})
     data = serializer.data

@@ -14,13 +14,18 @@
 }
 
 /* Smooth scroll behavior & prevent horizontal overflow */
-html {
+html,
+body {
+    margin: 0;
+    padding: 0;
     scroll-behavior: smooth;
     overflow-x: hidden;
+    width: 100%;
+    background-color: #0f172a;
+    /* Default to dark theme background to prevent white flashes */
 }
 
 body {
-    overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;

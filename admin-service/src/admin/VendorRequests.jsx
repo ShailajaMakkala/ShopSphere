@@ -35,7 +35,8 @@ const VendorRequests = () => {
         setIsLoading(true);
         try {
             const data = await fetchVendorRequests();
-            setVendors(Array.isArray(data) ? data : []);
+            const results = data.results || (Array.isArray(data) ? data : []);
+            setVendors(results);
         } catch (error) {
             console.error("Failed to fetch vendor requests", error);
             toast.error("Failed to load requests");

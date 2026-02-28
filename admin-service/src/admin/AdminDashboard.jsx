@@ -69,8 +69,8 @@ const AdminDashboard = () => {
             route: '/vendors'
         },
         {
-            title: 'Total Customers',
-            value: dashData?.customers?.total || 0,
+            title: 'Total Users',
+            value: dashData?.users?.total || 0,
             subtitle: 'Registered users',
             icon: Users,
             color: 'sky',

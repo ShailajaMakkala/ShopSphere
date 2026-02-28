@@ -16,12 +16,12 @@ import {
 import { fetchProducts, AddToCart, AddToWishlist, RemoveFromWishlist } from "../../Store";
 import { getProducts } from "../../api/axios";
 import toast from "react-hot-toast";
+import { useTheme } from "../../context/ThemeContext";
 import ProductCard from "../../Components/ProductCard";
 import TrendingProducts from "../../Components/TrendingProducts";
 import BestValueDeals from "../../Components/BestValueDeals";
 import MostSearched from "../../Components/MostSearched";
 import DiscoverySection from "../../Components/DiscoverySection";
-import Newsletter from "../../Components/Newsletter";
 
 const CATEGORIES = [
   { id: "all", label: "All Products" },
@@ -131,6 +131,7 @@ const Home = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const { isDarkMode } = useTheme();
   const searchParams = new URLSearchParams(location.search);
   const urlSearchQuery = searchParams.get("search") || "";
 
@@ -289,7 +290,7 @@ const Home = () => {
   const banner = BANNERS[currentBanner];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#fff5f5] via-[#fef3f2] to-[#f3e8ff]">
+    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#020617]' : 'bg-gradient-to-br from-[#fff5f5] via-[#fef3f2] to-[#f3e8ff]'}`}>
 
       {searchQuery === "" && (
         <>
@@ -515,9 +516,8 @@ const Home = () => {
 
       {searchQuery === "" && (
         <>
-          {/* ── DISCOVERY & NEWSLETTER ────────────────────────────────────────────── */}
+          {/* ── DISCOVERY ────────────────────────────────────────────── */}
           <DiscoverySection />
-          <Newsletter />
         </>
       )}
 

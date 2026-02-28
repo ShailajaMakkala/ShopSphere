@@ -15,7 +15,9 @@ import {
     FaBox,
     FaHome,
     FaMicrophone,
+    FaQuestion,
 } from "react-icons/fa";
+import TawkToWidget from "./TawkWidget";
 import toast from "react-hot-toast";
 
 const CATEGORIES = [
@@ -73,6 +75,13 @@ function Navbar() {
         dispatch(resetWishlist());// ✅ Soft clear (Redux only)
         dispatch(clearOrders());
         apiLogout();
+
+        // Ensure Tawk.to chat is hidden and minimized on logout
+        if (window.Tawk_API) {
+            if (typeof window.Tawk_API.hideWidget === 'function') window.Tawk_API.hideWidget();
+            if (typeof window.Tawk_API.minimize === 'function') window.Tawk_API.minimize();
+        }
+
         localStorage.removeItem("user");
         localStorage.removeItem("selectedAddress");
         localStorage.removeItem("accessToken");
@@ -189,10 +198,14 @@ function Navbar() {
         return null;
     }
 
+    const isHome = location.pathname === "/" || location.pathname === "/home";
+    const navPosClass = isHome ? "fixed" : "sticky";
+
     return (
         <>
-            <nav className="fixed top-0 left-0 right-0 z-50 py-2 md:py-3 transition-all duration-500 ease-out">
-                <div className={`absolute inset-0 transition-all duration-500 ease-out bg-gradient-to-r from-[#fb923c] via-[#c084fc] to-[#a78bfa] ${scrolled ? "backdrop-blur-xl shadow-lg shadow-purple-900/20 bg-opacity-95" : ""}`} />
+            <TawkToWidget />
+            <nav className={`${navPosClass} top-0 left-0 right-0 z-50 py-2 md:py-3 transition-all duration-500 ease-out`}>
+                <div className={`absolute inset-0 transition-all duration-500 ease-out bg-gradient-to-r from-[#fb923c] via-[#c084fc] to-[#a78bfa] ${scrolled ? "backdrop-blur-xl shadow-lg shadow-purple-900/20 bg-opacity-95" : "bg-opacity-100"}`} />
                 <div className="absolute inset-0 border-b border-white/5 pointer-events-none" />
 
                 <div className="relative w-full px-3 sm:px-4 md:px-6 lg:px-12">
@@ -291,6 +304,15 @@ function Navbar() {
                                 <FaShoppingCart size={18} className="transition-transform group-hover:scale-110" />
                                 {cartCount > 0 && <span className="absolute -top-0.5 -right-0.5 min-w-[20px] h-[20px] bg-orange-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{cartCount}</span>}
                             </Link>
+
+                            <button
+                                onClick={() => window.Tawk_API?.toggle()}
+                                className="p-2.5 text-violet-200 hover:text-white hover:bg-white/10 rounded-xl transition"
+                                aria-label="Help"
+                                title="Help"
+                            >
+                                <FaQuestion size={18} />
+                            </button>
 
                             {user ? (
                                 <div className="relative hidden sm:block" ref={dropdownRef}>

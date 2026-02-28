@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import emailjs from "@emailjs/browser";
 import StepProgress from "../../Components/StepProgress";
+import { FaArrowLeft } from "react-icons/fa";
 
 export default function VerifyAccount() {
   const navigate = useNavigate();
@@ -47,10 +48,18 @@ export default function VerifyAccount() {
   return (
     <div className="min-h-screen" style={{ background: "linear-gradient(135deg, #fff5f5 0%, #fef3f2 50%, #f3e8ff 100%)" }}>
       {/* HEADER */}
-      <header className="px-8 py-5 shadow-sm" style={{ background: "linear-gradient(to right, #fb923c, #a855f7)" }}>
-        <h1 className="text-sm font-bold text-white tracking-wide">
-          ShopSphere Seller Central
-        </h1>
+      <header className="px-6 py-5 flex items-center justify-between shadow-sm" style={{ background: "linear-gradient(to right, #fb923c, #a855f7)" }}>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="p-2.5 rounded-xl bg-white/20 hover:bg-white/30 text-white transition-all active:scale-95"
+          >
+            <FaArrowLeft size={16} />
+          </button>
+          <h1 className="text-sm font-bold text-white tracking-wide">
+            ShopSphere Seller Central
+          </h1>
+        </div>
       </header>
 
       <main className="px-6 py-14">

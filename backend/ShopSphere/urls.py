@@ -7,9 +7,14 @@ from django.http import JsonResponse
 import os
 
 def debug_view(request):
+    from vendor.models import Product
+    import os
     return JsonResponse({
         "status": "alive",
         "host_header": request.get_host(),
+        "database_url_set": bool(os.environ.get('DATABASE_URL')),
+        "database_url_preview": os.environ.get('DATABASE_URL')[-20:] if os.environ.get('DATABASE_URL') else "MISSING",
+        "product_count": Product.objects.count(),
         "allowed_hosts": os.environ.get('ALLOWED_HOSTS', 'NOT_SET'),
         "debug": os.environ.get('DEBUG', 'NOT_SET'),
     })

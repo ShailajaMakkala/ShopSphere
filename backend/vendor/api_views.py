@@ -207,11 +207,21 @@ class ProductViewSet(viewsets.ModelViewSet):
     pagination_class = None
     
     def get_queryset(self):
+        from django.db.models import Prefetch
+        from .models import ProductImage
+        
         try:
             vendor = VendorProfile.objects.get(user=self.request.user)
             if vendor.approval_status != 'approved' or vendor.is_blocked:
                 return Product.objects.none()
-            return Product.objects.filter(vendor=vendor)
+            
+            # Optimized image prefetch that avoids loading large binary blobs for list views
+            images_prefetch = Prefetch(
+                'images',
+                queryset=ProductImage.objects.defer('image_data')
+            )
+            
+            return Product.objects.filter(vendor=vendor).select_related('vendor').prefetch_related(images_prefetch)
         except VendorProfile.DoesNotExist:
             return Product.objects.none()
     

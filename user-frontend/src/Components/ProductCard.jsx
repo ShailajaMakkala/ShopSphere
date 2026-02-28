@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaHeart, FaShoppingBag, FaStar, FaBolt } from "react-icons/fa";
+import { FaHeart, FaShoppingBag, FaStar } from "react-icons/fa";
 
 export default function ProductCard({
     item,
@@ -122,17 +122,6 @@ export default function ProductCard({
                                 className="bg-gradient-to-r from-orange-400 to-purple-500 text-white p-3 rounded-xl hover:from-orange-600 hover:to-purple-700 transition-all shadow-lg active:scale-95 flex items-center justify-center min-w-[44px]"
                             >
                                 <FaShoppingBag />
-                            </button>
-                        )}
-                        {handleBuyNow && (
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleBuyNow(item);
-                                }}
-                                className="bg-orange-500 text-white px-4 py-2 rounded-xl hover:bg-orange-600 transition-all shadow-md active:scale-95 flex items-center gap-2 text-xs font-bold"
-                            >
-                                <FaBolt size={12} /> Buy Now
                             </button>
                         )}
                     </div>

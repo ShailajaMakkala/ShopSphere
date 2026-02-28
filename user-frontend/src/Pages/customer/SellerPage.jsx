@@ -317,13 +317,11 @@ const SellerPage = () => {
                     setStatus('NOT_REGISTERED');
                 }
             } catch (error) {
-                console.error('Error fetching vendor status:', error);
-
-                // If 404 or vendor not found, show default landing
+                // If 404 or vendor not found, show default landing without logging error to console
                 if (error.response && error.response.status === 404) {
                     setStatus('NOT_REGISTERED');
                 } else {
-                    // For other errors, show default landing
+                    console.error('Error fetching vendor status:', error);
                     setStatus('NOT_REGISTERED');
                     toast.error('Unable to fetch vendor status');
                 }

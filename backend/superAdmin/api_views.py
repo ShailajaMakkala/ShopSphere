@@ -172,7 +172,10 @@ class VendorManagementViewSet(AdminLoginRequiredMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsStaffOrSuperuser]
     
     def list(self, request, *args, **kwargs):
-        queryset = VendorProfile.objects.all()
+        from django.core.paginator import Paginator
+        PAGE_SIZE = 50
+
+        queryset = VendorProfile.objects.select_related('user').all()
         
         status_filter = request.query_params.get('status', None)
         if status_filter:
@@ -192,8 +195,20 @@ class VendorManagementViewSet(AdminLoginRequiredMixin, viewsets.ModelViewSet):
         elif blocked_filter == 'false':
             queryset = queryset.filter(is_blocked=False)
         
-        serializer = AdminVendorListSerializer(queryset, many=True, context={'request': request})
-        return Response(serializer.data)
+        queryset = queryset.order_by('-created_at')
+
+        # Server-side pagination
+        page_number = int(request.query_params.get('page', 1))
+        paginator = Paginator(queryset, PAGE_SIZE)
+        page_obj = paginator.get_page(page_number)
+
+        serializer = AdminVendorListSerializer(page_obj.object_list, many=True, context={'request': request})
+        return Response({
+            'count': paginator.count,
+            'num_pages': paginator.num_pages,
+            'current_page': page_obj.number,
+            'results': serializer.data,
+        })
     
     def retrieve(self, request, *args, **kwargs):
         vendor = self.get_object()
@@ -287,16 +302,34 @@ class VendorManagementViewSet(AdminLoginRequiredMixin, viewsets.ModelViewSet):
         })
 
 class ProductManagementViewSet(AdminLoginRequiredMixin, viewsets.ModelViewSet):
-    queryset = Product.objects.select_related('vendor').prefetch_related('images').all()
+    from django.db.models import Prefetch
+    from vendor.models import ProductImage
+    
+    # Optimized image prefetch that avoids loading large binary blobs for list views
+    images_prefetch = Prefetch(
+        'images',
+        queryset=ProductImage.objects.defer('image_data')
+    )
+    
+    queryset = Product.objects.select_related('vendor').prefetch_related(images_prefetch).all()
     serializer_class = AdminProductListSerializer
     permission_classes = [IsAuthenticated, IsStaffOrSuperuser]
     pagination_class = None  # We handle pagination manually below
 
     def list(self, request, *args, **kwargs):
         from django.core.paginator import Paginator
+        from vendor.models import ProductImage
+        from django.db.models import Prefetch
+        
         PAGE_SIZE = 50
 
-        queryset = Product.objects.select_related('vendor').prefetch_related('images').all()
+        # Optimized image prefetch that avoids loading large binary blobs for list views
+        images_prefetch = Prefetch(
+            'images',
+            queryset=ProductImage.objects.defer('image_data')
+        )
+
+        queryset = Product.objects.select_related('vendor').prefetch_related(images_prefetch).all()
 
         # Status filter
         status_filter = request.query_params.get('status', None)
@@ -517,7 +550,10 @@ class DeliveryAgentManagementViewSet(AdminLoginRequiredMixin, viewsets.ModelView
     permission_classes = [IsAuthenticated, IsStaffOrSuperuser]
     
     def list(self, request, *args, **kwargs):
-        queryset = DeliveryAgentProfile.objects.all()
+        from django.core.paginator import Paginator
+        PAGE_SIZE = 50
+
+        queryset = DeliveryAgentProfile.objects.select_related('user').all()
         
         status_filter = request.query_params.get('status', None)
         if status_filter:
@@ -534,8 +570,20 @@ class DeliveryAgentManagementViewSet(AdminLoginRequiredMixin, viewsets.ModelView
                 Q(phone_number__icontains=search)
             )
         
-        serializer = AdminDeliveryAgentListSerializer(queryset, many=True, context={'request': request})
-        return Response(serializer.data)
+        queryset = queryset.order_by('-created_at')
+
+        # Server-side pagination
+        page_number = int(request.query_params.get('page', 1))
+        paginator = Paginator(queryset, PAGE_SIZE)
+        page_obj = paginator.get_page(page_number)
+
+        serializer = AdminDeliveryAgentListSerializer(page_obj.object_list, many=True, context={'request': request})
+        return Response({
+            'count': paginator.count,
+            'num_pages': paginator.num_pages,
+            'current_page': page_obj.number,
+            'results': serializer.data,
+        })
     
     def retrieve(self, request, *args, **kwargs):
         agent = self.get_object()
@@ -644,11 +692,11 @@ class DashboardView(AdminLoginRequiredMixin, generics.GenericAPIView):
         delivered_orders = Order.objects.filter(status='delivered').count()
         cancelled_orders = Order.objects.filter(status='cancelled').count()
         
-        # User/Customer stats
+        # User stats (all non-staff/superuser)
         User = get_user_model()
-        total_customers = User.objects.filter(role='customer').count()
-        active_customers = User.objects.filter(role='customer', is_blocked=False).count()
-        blocked_customers = User.objects.filter(role='customer', is_blocked=True).count()
+        total_users = User.objects.filter(is_superuser=False, is_staff=False).count()
+        active_users = User.objects.filter(is_superuser=False, is_staff=False, is_blocked=False).count()
+        blocked_users = User.objects.filter(is_superuser=False, is_staff=False, is_blocked=True).count()
 
         # Deletion requests count
         deletion_requests = VendorProfile.objects.filter(is_deletion_requested=True).count() + \
@@ -678,10 +726,10 @@ class DashboardView(AdminLoginRequiredMixin, generics.GenericAPIView):
                 'approved': approved_agents,
                 'blocked': blocked_agents
             },
-            'customers': {
-                'total': total_customers,
-                'active': active_customers,
-                'blocked': blocked_customers
+            'users': {
+                'total': total_users,
+                'active': active_users,
+                'blocked': blocked_users
             },
             'orders': {
                 'total': total_orders,
@@ -885,12 +933,16 @@ class UserManagementView(APIView):
 
     def get(self, request):
         from django.db.models import Count, Q
+        from django.core.paginator import Paginator
         from user.models import Order, OrderReturn
+        from django.contrib.auth import get_user_model
+        from rest_framework.response import Response
         User = get_user_model()
+        PAGE_SIZE = 50
 
-        # Customers only
+        # Non-staff, non-superuser accounts of any role (customer, vendor, delivery)
         qs = User.objects.filter(
-            is_superuser=False, is_staff=False, role='customer'
+            is_superuser=False, is_staff=False
         ).order_by('-date_joined')
 
         # Optional search
@@ -907,31 +959,38 @@ class UserManagementView(APIView):
         elif status_filter == 'ACTIVE':
             qs = qs.filter(is_blocked=False)
 
-        # Aggregate stats bases on full customer set (before search/status filters)
-        base_customers = User.objects.filter(
-            is_superuser=False, is_staff=False, role='customer'
+        # Aggregate stats bases on full user set (before search/status filters)
+        base_users = User.objects.filter(
+            is_superuser=False, is_staff=False
         )
-        total = base_customers.count()
-        active_count = base_customers.filter(is_blocked=False).count()
-        blocked_count = base_customers.filter(is_blocked=True).count()
+        total_count = base_users.count()
+        active_count = base_users.filter(is_blocked=False).count()
+        blocked_count = base_users.filter(is_blocked=True).count()
 
-        # Pre-fetch order stats per user for efficient risk scoring
+        # Pagination
+        page_number = int(request.query_params.get('page', 1))
+        paginator = Paginator(qs, PAGE_SIZE)
+        page_obj = paginator.get_page(page_number)
+        current_batch = page_obj.object_list
+        batch_user_ids = [u.id for u in current_batch]
+
+        # Pre-fetch order stats per user for the CURRENT BATCH ONLY
         order_stats = {
             row['user_id']: row
-            for row in Order.objects.values('user_id').annotate(
+            for row in Order.objects.filter(user_id__in=batch_user_ids).values('user_id').annotate(
                 total=Count('id'),
                 cancelled=Count('id', filter=Q(status='cancelled')),
                 failed_payments=Count('id', filter=Q(payment_status='failed')),
             )
         }
-        # Pre-fetch return counts per user
+        # Pre-fetch return counts per user for the CURRENT BATCH ONLY
         return_counts = {
             row['user_id']: row['returns']
-            for row in OrderReturn.objects.values('user_id').annotate(returns=Count('id'))
+            for row in OrderReturn.objects.filter(user_id__in=batch_user_ids).values('user_id').annotate(returns=Count('id'))
         }
 
-        users = []
-        for u in qs:
+        user_list = []
+        for u in current_batch:
             stats = order_stats.get(u.id, {})
             total_orders = stats.get('total', 0)
             cancelled = stats.get('cancelled', 0)
@@ -939,21 +998,14 @@ class UserManagementView(APIView):
             returns = return_counts.get(u.id, 0)
 
             # ── Risk score ────────────────────────────────────────────────
-            # 1. Cancellation rate → 0-40 pts
             cancel_rate = (cancelled / total_orders) if total_orders else 0
             cancel_score = round(cancel_rate * 40)
-
-            # 2. Return rate → 0-30 pts
             return_rate = (returns / total_orders) if total_orders else 0
             return_score = round(return_rate * 30)
-
-            # 3. Failed payments → 0-30 pts (10 pts each, capped at 30)
             payment_score = min(failed_pay * 10, 30)
-
             risk_score = min(cancel_score + return_score + payment_score, 100)
-            # ─────────────────────────────────────────────────────────────
 
-            users.append({
+            user_list.append({
                 'id': u.id,
                 'name': u.username or u.email.split('@')[0],
                 'email': u.email,
@@ -962,20 +1014,20 @@ class UserManagementView(APIView):
                 'blocked_reason': u.blocked_reason or '',
                 'joinDate': u.date_joined.strftime('%Y-%m-%d'),
                 'is_active': u.is_active,
-                # Order activity
                 'total_orders': total_orders,
                 'cancelled_orders': cancelled,
                 'return_requests': returns,
                 'failed_payments': failed_pay,
-                # Risk
                 'riskScore': risk_score,
             })
 
         return Response({
-            'users': users,
-            'total': total,
+            'users': user_list,
+            'total': total_count,
             'active': active_count,
             'blocked': blocked_count,
+            'num_pages': paginator.num_pages,
+            'current_page': page_obj.number,
         })
 
 
@@ -987,6 +1039,9 @@ class UserBlockToggleView(APIView):
     permission_classes = [IsAuthenticated, IsStaffOrSuperuser]
 
     def post(self, request, pk):
+        from django.contrib.auth import get_user_model
+        from rest_framework.response import Response
+        from rest_framework import status
         User = get_user_model()
         try:
             user = User.objects.get(pk=pk)
@@ -1022,6 +1077,8 @@ class UserBlockToggleView(APIView):
 # ===============================================
 #     ADMIN: Trigger Auto-Assignment for an Order
 # ===============================================
+
+# Handled by top-level imports
 
 class TriggerAssignmentView(APIView):
     """
@@ -1144,7 +1201,8 @@ class AdminOrderTrackingViewSet(viewsets.ReadOnlyModelViewSet):
             return DeliveryAssignmentListSerializer
         return self.serializer_class
 
-        return queryset
+    def get_queryset(self):
+        return super().get_queryset()
 
 class DeletionRequestViewSet(AdminLoginRequiredMixin, viewsets.ViewSet):
     """Manage account deletion requests from vendors and delivery agents"""
@@ -1156,10 +1214,10 @@ class DeletionRequestViewSet(AdminLoginRequiredMixin, viewsets.ViewSet):
         from vendor.models import VendorProfile
         from deliveryAgent.models import DeliveryAgentProfile
         
+        data = []
         vendor_requests = VendorProfile.objects.filter(is_deletion_requested=True)
         agent_requests = DeliveryAgentProfile.objects.filter(is_deletion_requested=True)
         
-        data = []
         for v in vendor_requests:
             data.append({
                 'type': 'vendor',
@@ -1423,6 +1481,7 @@ class ReturnManagementViewSet(AdminLoginRequiredMixin, viewsets.ModelViewSet):
     queryset = OrderReturn.objects.all().select_related('order', 'order_item', 'user', 'pickup_agent')
     serializer_class = AdminOrderReturnSerializer
     permission_classes = [IsAuthenticated, IsStaffOrSuperuser]
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
         queryset = super().get_queryset()

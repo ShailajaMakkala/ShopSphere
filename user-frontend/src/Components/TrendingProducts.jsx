@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaHeart, FaShoppingBag, FaFire, FaStar, FaChevronLeft, FaChevronRight, FaBolt } from "react-icons/fa";
+import { FaHeart, FaShoppingBag, FaFire, FaStar, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { getTrendingProducts } from "../api/axios";
 
 const RANK_COLORS = [
@@ -184,8 +184,7 @@ export default function TrendingProducts({
                 {/* Carousel */}
                 <div
                     ref={scrollRef}
-                    className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth"
-                    style={{ scrollSnapType: "x mandatory" }}
+                    className="flex gap-3 sm:gap-4 overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth"
                 >
                     {isLoading
                         ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
@@ -196,13 +195,12 @@ export default function TrendingProducts({
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.4, delay: index * 0.08 }}
-                                className="flex-shrink-0 w-[160px] sm:w-[200px] md:w-[220px] group"
-                                style={{ scrollSnapAlign: "start" }}
+                                className="flex-shrink-0 w-[85%] basis-[180px] sm:basis-[220px] md:basis-[240px] lg:basis-[1/6] group snap-start antialiased"
                                 onMouseEnter={() => setHoveredId(item.id)}
                                 onMouseLeave={() => setHoveredId(null)}
                             >
                                 <div
-                                    className="relative h-[260px] sm:h-[300px] rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 hover:scale-[1.04]"
+                                    className="relative h-[320px] sm:h-[350px] rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 hover:scale-[1.04] bg-white/[0.03] backdrop-blur-md border border-white/10"
                                     onClick={() => navigate(`/product/${item.id}`)}
                                 >
                                     {/* Card bg */}
@@ -228,7 +226,7 @@ export default function TrendingProducts({
                                     </div>
 
                                     {/* Product Image */}
-                                    <div className="relative z-10 h-[50%] flex items-center justify-center p-4 overflow-hidden">
+                                    <div className="relative z-10 h-[45%] flex items-center justify-center p-4 overflow-hidden">
                                         <motion.img
                                             src={getImageUrl(item)}
                                             alt={item.name}
@@ -240,7 +238,7 @@ export default function TrendingProducts({
                                     </div>
 
                                     {/* Product Info */}
-                                    <div className="relative z-10 px-3.5 pb-3.5 pt-1 flex flex-col flex-1">
+                                    <div className="relative z-10 px-3.5 pb-4 pt-1 flex flex-col flex-1">
                                         <span className="text-orange-400 text-[8px] font-black tracking-[0.2em] uppercase mb-1">
                                             {item.category || "Product"}
                                         </span>
@@ -272,52 +270,43 @@ export default function TrendingProducts({
                                         </p>
 
                                         {/* Price & Actions */}
-                                        <div className="flex items-center justify-between mt-auto">
-                                            <div className="flex flex-col">
-                                                <span className="text-gray-500 text-[8px] font-bold uppercase tracking-wider">Price</span>
-                                                <span className="text-white font-black text-base">
-                                                    ₹{parseFloat(item.price).toLocaleString("en-IN", { minimumFractionDigits: 0 })}
-                                                </span>
-                                            </div>
+                                        <div className="mt-auto pt-3 border-t border-white/5">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex flex-col">
+                                                    <span className="text-white/30 text-[9px] font-black uppercase tracking-[0.2em] mb-1">Price Tag</span>
+                                                    <span className="text-white font-black text-lg leading-tight">
+                                                        ₹{parseFloat(item.price).toLocaleString("en-IN", { minimumFractionDigits: 0 })}
+                                                    </span>
+                                                </div>
 
-                                            <div className="flex items-center gap-1.5">
-                                                {handleBuyNow && (
+                                                <div className="flex items-center gap-1.5">
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            handleBuyNow(item);
+                                                            handleWishlistClick(item);
                                                         }}
-                                                        className="px-2.5 py-2 rounded-xl bg-orange-500 text-white hover:bg-orange-600 transition-all duration-300 shadow-md flex items-center gap-1 text-[9px] font-black"
+                                                        className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-rose-500/50 transition-all duration-300 group/wish min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] flex items-center justify-center transform active:scale-90"
                                                     >
-                                                        <FaBolt size={8} /> BUY
+                                                        <FaHeart
+                                                            size={11}
+                                                            className={
+                                                                isInWishlist(item.name)
+                                                                    ? "text-rose-500"
+                                                                    : "text-white/40 group-hover/wish:text-rose-400"
+                                                            }
+                                                        />
                                                     </button>
-                                                )}
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleWishlistClick(item);
-                                                    }}
-                                                    className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-rose-500/50 transition-all duration-300 group/wish min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] flex items-center justify-center"
-                                                >
-                                                    <FaHeart
-                                                        size={11}
-                                                        className={
-                                                            isInWishlist(item.name)
-                                                                ? "text-rose-500"
-                                                                : "text-gray-500 group-hover/wish:text-rose-400"
-                                                        }
-                                                    />
-                                                </button>
 
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleAddToCartClick(item);
-                                                    }}
-                                                    className="p-2.5 rounded-xl bg-gradient-to-r from-orange-400 to-purple-500 text-white hover:from-orange-500 hover:to-purple-500 transition-all duration-300 shadow-md shadow-orange-400/25 active:scale-95 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] flex items-center justify-center"
-                                                >
-                                                    <FaShoppingBag size={11} />
-                                                </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleAddToCartClick(item);
+                                                        }}
+                                                        className="p-2.5 rounded-xl bg-gradient-to-r from-orange-400 to-purple-500 text-white hover:shadow-[0_0_15px_rgba(251,146,60,0.3)] transition-all duration-300 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] flex items-center justify-center transform active:scale-95"
+                                                    >
+                                                        <FaShoppingBag size={11} />
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

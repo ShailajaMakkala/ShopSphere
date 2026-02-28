@@ -33,6 +33,7 @@ const UserManagement = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 1024);
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState('ALL');
+    const [roleFilter, setRoleFilter] = useState('ALL');
     const [isActionModalOpen, setIsActionModalOpen] = useState(false);
     const [pendingAction, setPendingAction] = useState(null);
     const [isActioning, setIsActioning] = useState(false);
@@ -58,9 +59,10 @@ const UserManagement = () => {
             const matchesSearch = (user.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                 (user.email || '').toLowerCase().includes(searchTerm.toLowerCase());
             const matchesTab = activeTab === 'ALL' || user.status === activeTab;
-            return matchesSearch && matchesTab;
+            const matchesRole = roleFilter === 'ALL' || user.role === roleFilter;
+            return matchesSearch && matchesTab && matchesRole;
         });
-    }, [users, searchTerm, activeTab]);
+    }, [users, searchTerm, activeTab, roleFilter]);
 
     const handleActionClick = (user, action) => {
         setPendingAction({ user, action });
@@ -101,6 +103,14 @@ const UserManagement = () => {
         return { bar: isDarkMode ? 'bg-emerald-500' : 'bg-emerald-400', text: isDarkMode ? 'text-emerald-400 font-medium' : 'text-emerald-600 font-medium' };
     };
 
+    const getRoleStyles = (role) => {
+        switch (role) {
+            case 'vendor': return isDarkMode ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-blue-50 text-blue-600 border-blue-100';
+            case 'delivery': return isDarkMode ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' : 'bg-purple-50 text-purple-600 border-purple-100';
+            default: return isDarkMode ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-slate-50 text-slate-500 border-slate-100';
+        }
+    };
+
     // Mobile card view for user
     const UserCard = ({ user }) => (
         <div className={`p-4 rounded-2xl border transition-all ${isDarkMode ? 'bg-[#1e293b]/50 border-slate-800' : 'bg-white border-slate-100 shadow-sm'}`}>
@@ -110,7 +120,12 @@ const UserManagement = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                     <div className={`text-sm font-bold truncate ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{user.name || '—'}</div>
-                    <div className="text-[10px] text-slate-500 font-bold uppercase">UID #{user.id}</div>
+                    <div className="flex items-center gap-2">
+                        <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border ${getRoleStyles(user.role)}`}>
+                            {user.role === 'customer' ? 'User' : user.role === 'vendor' ? 'Merchant' : 'Agent'}
+                        </span>
+                        <div className="text-[10px] text-slate-500 font-bold uppercase">UID #{user.id}</div>
+                    </div>
                 </div>
                 <span className={`px-2 py-1 rounded-full text-[9px] font-semibold uppercase border shrink-0 ${getStatusStyles(user.status)}`}>
                     {user.status}
@@ -237,8 +252,18 @@ const UserManagement = () => {
                             ))}
                         </div>
 
-                        {/* Search */}
-                        <div className="flex items-center gap-4 w-full lg:w-auto">
+                        {/* Search & Role Filter */}
+                        <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full lg:w-auto">
+                            <select
+                                value={roleFilter}
+                                onChange={(e) => setRoleFilter(e.target.value)}
+                                className={`w-full sm:w-40 px-4 py-3 border rounded-xl sm:rounded-2xl text-xs font-semibold uppercase tracking-normal focus:outline-none focus:ring-4 transition-all ${isDarkMode ? 'bg-slate-900 border-slate-800 text-white focus:ring-blue-500/10 focus:border-blue-500' : 'bg-white border-slate-200 text-slate-900 focus:ring-blue-500/5 focus:border-blue-500'}`}
+                            >
+                                <option value="ALL">All Roles</option>
+                                <option value="customer">Customers</option>
+                                <option value="vendor">Merchants</option>
+                                <option value="delivery">Delivery Agents</option>
+                            </select>
                             <div className="relative flex-1 lg:w-80">
                                 <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`} />
                                 <input
@@ -280,7 +305,7 @@ const UserManagement = () => {
                             <table className="w-full text-left border-collapse">
                                 <thead className={`border-b transition-colors duration-300 ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-50/50 border-slate-100'}`}>
                                     <tr>
-                                        {['User Details', 'Contact', 'Risk Potential', 'Account Status', 'Joined Date', 'Governance'].map(h => (
+                                        {['User Details', 'Role', 'Contact', 'Risk Potential', 'Account Status', 'Joined Date', 'Governance'].map(h => (
                                             <th key={h} className="px-8 py-5 text-[10px] font-semibold text-slate-500 uppercase tracking-normal">{h}</th>
                                         ))}
                                     </tr>
@@ -305,6 +330,11 @@ const UserManagement = () => {
                                                             <div className="text-[10px] text-slate-500 font-bold uppercase tracking-normal">UID #{user.id}</div>
                                                         </div>
                                                     </div>
+                                                </td>
+                                                <td className="px-8 py-6">
+                                                    <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase border whitespace-nowrap ${getRoleStyles(user.role)}`}>
+                                                        {user.role === 'customer' ? 'Customer' : user.role === 'vendor' ? 'Merchant' : 'Agent'}
+                                                    </span>
                                                 </td>
                                                 <td className="px-8 py-6">
                                                     <div className={`flex items-center gap-2 text-xs font-bold ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
@@ -401,11 +431,11 @@ const UserManagement = () => {
                             </div>
                         </div>
                     </div>
-                </main>
-            </div>
+                </main >
+            </div >
 
             {/* Confirmation Modal */}
-            <AnimatePresence>
+            < AnimatePresence >
                 {isActionModalOpen && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
                         <motion.div
@@ -458,8 +488,8 @@ const UserManagement = () => {
                         </motion.div>
                     </div>
                 )}
-            </AnimatePresence>
-        </div>
+            </AnimatePresence >
+        </div >
     );
 };
 

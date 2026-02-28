@@ -160,10 +160,6 @@ export const ProfileInfoTab = () => {
                             <p className="text-lg font-bold text-gray-900">{user?.username}</p>
                         </div>
                         <div>
-                            <label className="text-[11px] font-black text-gray-400 uppercase tracking-[2px] mb-2 block">Email Address</label>
-                            <p className="text-lg font-bold text-gray-900">{user?.email}</p>
-                        </div>
-                        <div>
                             <label className="text-[11px] font-black text-gray-400 uppercase tracking-[2px] mb-2 block">Phone Number</label>
                             <p className="text-lg font-bold text-gray-900">{user?.phone || user?.mobile || 'Not provided'}</p>
                         </div>

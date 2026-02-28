@@ -67,7 +67,7 @@ const productsSlice = createSlice({
     automotive: [],
     services: [],
     other: [],
-    all: loadFromStorage('products_all'), // ✅ Load cached products
+    all: [], // Products are fetched fresh from API
     isLoading: false,
     error: null,
   },
@@ -305,9 +305,8 @@ store.subscribe(() => {
   const state = store.getState();
   saveToStorage('cart', state.cart);
   saveToStorage('wishlist', state.wishlist);
-  if (state.products.all.length > 0) {
-    saveToStorage('products_all', state.products.all);
-  }
+  // Disabled saving all products to localStorage as it's slow and blocks the UI thread 
+  // on every action. Products should be fetched from the API for fresh data.
 });
 
 export default store;
