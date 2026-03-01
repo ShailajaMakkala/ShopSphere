@@ -1,28 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, NavLink, Outlet, useOutletContext } from "react-router-dom";
+import { getWallet, logout, updateProfile } from "../../api/axios";
 import { useDispatch } from "react-redux";
 import { clearCart, clearWishlist, clearOrders } from "../../Store";
 import Orders from "./Orders";
+import Wishlist from "./Wishlist";
+import AddressPage from "./AddressPage";
 import {
     FaUser,
     FaShoppingBag,
-    FaMapMarkerAlt,
     FaHeart,
+    FaMapMarkerAlt,
     FaSignOutAlt,
     FaEdit,
-    FaPlus,
-    FaCheckCircle,
     FaWallet,
+    FaCheckCircle,
     FaCalendarAlt,
-    FaChevronRight,
-    FaRegAddressCard,
-    FaStore,
+    FaStore
 } from "react-icons/fa";
-
-import { logout, updateProfile } from "../../api/axios";
-import toast from "react-hot-toast";
-import AddressPage from "./AddressPage";
-import Wishlist from "./Wishlist";
+import { toast } from "react-hot-toast";
 
 export const ProfileInfoTab = () => {
     const user = useOutletContext();
@@ -33,6 +29,23 @@ export const ProfileInfoTab = () => {
         gender: user?.gender || ""
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [walletBalance, setWalletBalance] = useState(null);
+    const [walletLoading, setWalletLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchWallet = async () => {
+            try {
+                const data = await getWallet();
+                setWalletBalance(data.balance);
+            } catch (error) {
+                console.error("Failed to fetch wallet:", error);
+                setWalletBalance(0);
+            } finally {
+                setWalletLoading(false);
+            }
+        };
+        fetchWallet();
+    }, []);
 
     const handleUpdate = async (e) => {
         e.preventDefault();
@@ -193,8 +206,14 @@ export const ProfileInfoTab = () => {
                                 <FaWallet size={20} />
                             </div>
                             <div>
-                                <p className="text-[10px] text-purple-600 font-black uppercase tracking-[2px] mb-0.5">Wallet</p>
-                                <p className="text-base font-bold text-purple-900">$450.00</p>
+                                <p className="text-[10px] text-purple-600 font-black uppercase tracking-[2px] mb-0.5">Wallet Balance</p>
+                                {walletLoading ? (
+                                    <div className="h-5 w-20 bg-purple-100 animate-pulse rounded" />
+                                ) : (
+                                    <p className="text-base font-bold text-purple-900">
+                                        ₹{(walletBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </p>
+                                )}
                             </div>
                         </div>
                     </div>

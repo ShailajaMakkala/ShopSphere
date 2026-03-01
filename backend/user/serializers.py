@@ -3,6 +3,7 @@ from .models import (AuthUser, Cart, CartItem, Order, OrderItem, Address,
                      UserWallet, WalletTransaction, OrderReturn, Refund, 
                      TwoFactorAuth, Notification, Dispute, Coupon, CouponUsage, Review)
 from vendor.models import Product, ProductImage
+from django.urls import reverse
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -39,8 +40,6 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Name must be at least 3 characters long.")
         return value
 
-
-from django.urls import reverse
 
 class ProductImageSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
@@ -89,23 +88,34 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_image(self, obj):
         request = self.context.get('request')
-        first_image = obj.images.first()
-        if first_image:
-            path = reverse('serve_product_image', kwargs={'image_id': first_image.id})
-            if request:
-                return request.build_absolute_uri(path)
-            return path
+        # Use prefetched images if available to avoid DB hit
+        try:
+            # Check if 'images' has been prefetched
+            images = obj.images.all()
+            if images:
+                first_image = images[0]
+                path = reverse('serve_product_image', kwargs={'image_id': first_image.id})
+                if request:
+                    return request.build_absolute_uri(path)
+                return path
+        except (AttributeError, IndexError):
+            pass
         return None
 
     def get_image_urls(self, obj):
         request = self.context.get('request')
         urls = []
-        for img in obj.images.all():
-            path = reverse('serve_product_image', kwargs={'image_id': img.id})
-            if request:
-                urls.append(request.build_absolute_uri(path))
-            else:
-                urls.append(path)
+        # Use prefetched images if available
+        try:
+            images = obj.images.all()
+            for img in images:
+                path = reverse('serve_product_image', kwargs={'image_id': img.id})
+                if request:
+                    urls.append(request.build_absolute_uri(path))
+                else:
+                    urls.append(path)
+        except AttributeError:
+            pass
         return urls
 
 

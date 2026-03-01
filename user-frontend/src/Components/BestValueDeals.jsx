@@ -1,77 +1,19 @@
-import React, { useMemo, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { fetchDealOfTheDay } from "../Store";
 
 const BestValueDeals = () => {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
-    const allProducts = useSelector((state) => state.products.all || []);
+    const deals = useSelector((state) => state.products.dealOfTheDay || []);
     const scrollRef = useRef(null);
 
-    const displayDeals = useMemo(() => {
-        if (!allProducts.length) return [];
-
-        // 1. Group products by category
-        const categorized = {};
-        allProducts.forEach(p => {
-            const cat = p.category || 'other';
-            if (!categorized[cat]) categorized[cat] = [];
-            categorized[cat].push(p);
-        });
-
-        // 2. Diversified selection strategy (max 8 products for a perfect grid)
-        const selected = [];
-        const usedIds = new Set();
-        const categories = Object.keys(categorized);
-
-        // Loop through categories to ensure each cat gets representation first
-        let catIndex = 0;
-        // Increase pool to 12 for better horizontal scrolling feel
-        while (selected.length < 12 && usedIds.size < allProducts.length) {
-            const currentCat = categories[catIndex % categories.length];
-            const productsInCat = categorized[currentCat];
-
-            // Find a product in this category that hasn't been used
-            const nextProduct = productsInCat.find(p => !usedIds.has(p.id));
-
-            if (nextProduct) {
-                selected.push(nextProduct);
-                usedIds.add(nextProduct.id);
-            }
-
-            catIndex++;
-            // Safety break if we've cycled through all categories and can't find more products
-            if (catIndex > 200) break;
-        }
-
-        return selected.map((p, idx) => {
-            // Robust image URL resolution
-            const gallery = (p.images || p.gallery || []).map(img => {
-                let imgPath = typeof img === 'string' ? img : (img.image || img.url);
-                if (!imgPath) return null;
-                if (imgPath.startsWith('http')) return imgPath;
-                if (imgPath.startsWith('/')) return `http://127.0.0.1:8000${imgPath}`;
-                return `http://127.0.0.1:8000/${imgPath}`;
-            }).filter(Boolean);
-
-            const displayImage = gallery.length > 0
-                ? gallery[0]
-                : (p.image && !p.image.includes('placeholder')
-                    ? p.image.replace('localhost', '127.0.0.1')
-                    : `/Fashion/${(idx % 11) + 1}.jpg`);
-
-            return {
-                id: p.id,
-                title: p.name,
-                discount: p.discount_percentage ? `${p.discount_percentage}% Off` : "Min. 50% Off",
-                image: displayImage,
-                category: p.category_display || p.category,
-                vendor: p.vendor_name || "Premium Store"
-            };
-        });
-    }, [allProducts]);
-
+    useEffect(() => {
+        dispatch(fetchDealOfTheDay());
+    }, [dispatch]);
 
     const handleViewAllDeals = () => {
         navigate("/offer-zone");
@@ -81,7 +23,7 @@ const BestValueDeals = () => {
         navigate(`/product/${productId}`);
     };
 
-    if (displayDeals.length === 0) return null;
+    if (deals.length === 0) return null;
 
     return (
         <section className="max-w-[1600px] mx-auto px-3 sm:px-6 md:px-12 py-4 sm:py-8">
@@ -99,7 +41,6 @@ const BestValueDeals = () => {
                     </div>
 
                     <div className="flex items-center gap-3">
-
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
@@ -116,7 +57,7 @@ const BestValueDeals = () => {
                     className="relative z-10 flex gap-3 sm:gap-4 overflow-x-auto pb-4 sm:pb-6 scrollbar-hide snap-x"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
-                    {displayDeals.map((deal) => (
+                    {deals.map((deal) => (
                         <motion.div
                             key={deal.id}
                             whileHover={{ y: -6 }}
@@ -126,25 +67,28 @@ const BestValueDeals = () => {
                             <div className="relative h-32 sm:h-40 bg-white overflow-hidden flex items-center justify-center p-3">
                                 <img
                                     src={deal.image}
-                                    alt={deal.title}
+                                    alt={deal.name}
                                     className="max-h-full max-w-full object-contain transition-all duration-700 group-hover:scale-110 drop-shadow-md"
                                 />
                                 <div className="absolute top-3 left-3 z-20">
                                     <span className="bg-blue-600/90 backdrop-blur-sm text-white text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wider shadow-sm">
-                                        {deal.category}
+                                        {deal.category_display || deal.category || "Deal"}
                                     </span>
                                 </div>
                                 <div className="absolute inset-0 bg-gradient-to-t from-blue-500/0 via-transparent to-transparent group-hover:from-blue-500/5 transition-colors duration-500" />
                             </div>
                             <div className="p-3 sm:p-5 space-y-1 sm:space-y-1.5 flex-grow flex flex-col">
-                                <p className="text-blue-500 font-bold text-[9px] uppercase tracking-tight">{deal.vendor}</p>
+                                <p className="text-blue-500 font-bold text-[9px] uppercase tracking-tight">{deal.vendor_name || "Premium Store"}</p>
                                 <h3 className="text-slate-800 font-bold text-xs tracking-tight leading-tight group-hover:text-blue-600 transition-colors line-clamp-1 h-4 mt-1">
-                                    {deal.title}
+                                    {deal.name}
                                 </h3>
                                 <div className="mt-auto pt-3 flex items-center justify-between">
-                                    <p className="text-slate-900 font-black text-lg">
-                                        {deal.discount}
-                                    </p>
+                                    <div className="flex flex-col">
+                                        <p className="text-gray-400 line-through text-[10px]">₹{deal.price + 500}</p>
+                                        <p className="text-slate-900 font-black text-lg">
+                                            ₹{deal.price}
+                                        </p>
+                                    </div>
                                     <div className="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
                                         <ArrowRight size={12} />
                                     </div>

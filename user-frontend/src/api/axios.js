@@ -322,6 +322,12 @@ export const reverseGeocode = async (lat, lon) => {
   return response.data;
 };
 
+// DEAL OF THE DAY (Public)
+export const getDealOfTheDay = async () => {
+  const response = await axios.get(`${API_BASE_URL}/deal-of-the-day/`);
+  return response.data;
+};
+
 // RETURN REQUESTS (Protected)
 export const submitReturnRequest = async (orderId, returnData) => {
   const token = localStorage.getItem("accessToken");
@@ -331,6 +337,19 @@ export const submitReturnRequest = async (orderId, returnData) => {
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
+    },
+  });
+  return response.data;
+};
+
+// GET WALLET (Protected)
+export const getWallet = async () => {
+  const token = localStorage.getItem("accessToken");
+  if (!token) throw new Error("No access token found");
+
+  const response = await axios.get(`${API_BASE_URL}/wallet`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
   });
   return response.data;

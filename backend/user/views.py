@@ -22,6 +22,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.core.paginator import Paginator
 from finance.services import FinanceService
+from deliveryAgent.services import auto_assign_order
 
 
 @api_view(['GET', 'POST'])
@@ -247,6 +248,31 @@ def update_profile(request):
     return Response(serializer.errors, status=400)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_wallet(request):
+    """Return the authenticated user's wallet balance and recent transactions."""
+    from .models import UserWallet
+    wallet, _ = UserWallet.objects.get_or_create(user=request.user)
+    recent_txns = wallet.transactions.order_by('-created_at')[:20]
+    return Response({
+        "balance": float(wallet.balance),
+        "total_credited": float(wallet.total_credited),
+        "total_debited": float(wallet.total_debited),
+        "transactions": [
+            {
+                "type": t.transaction_type,
+                "amount": float(t.amount),
+                "description": t.description,
+                "date": t.created_at.isoformat(),
+            }
+            for t in recent_txns
+        ]
+    })
+
+
+
+
 # 🔹 HOME (Product Page)
 @api_view(['GET'])
 @authentication_classes([])
@@ -456,6 +482,15 @@ def checkout_view(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def process_payment(request):
+    """
+    Process a payment and create an order with full atomicity.
+    No partial data will ever be persisted — if any step fails,
+    the entire transaction is rolled back.
+    """
+    import logging
+    import traceback as tb
+    logger = logging.getLogger(__name__)
+
     payment_mode = request.data.get('payment_mode')
     transaction_id = request.data.get('transaction_id') or str(uuid.uuid4())[:12]
     items_from_request = request.data.get('items')
@@ -464,145 +499,111 @@ def process_payment(request):
     if not payment_mode:
         return Response({"error": "Payment mode required"}, status=400)
 
+    # ── Resolve delivery address ────────────────────────────
+    def _resolve_address_id(data):
+        raw = data.get('address_id')
+        if not raw:
+            daddr = data.get('delivery_address')
+            if isinstance(daddr, dict):
+                raw = daddr.get('id')
+            elif daddr:
+                raw = daddr
+        return int(raw) if raw and str(raw).isdigit() else None
+
+    addr_id = _resolve_address_id(request.data)
+    if not addr_id:
+        return Response(
+            {"error": "Please select a delivery address before placing the order."},
+            status=400
+        )
+
+    order = None  # will be set inside the atomic block
+
     try:
         with transaction.atomic():
-            # CASE 1: Items passed directly (frontend state)
+
+            # ── CASE 1: Items provided by frontend ──────────────
             if items_from_request:
-                # Compute total from the items list sent by the frontend
+                # --- Stock pre-validation BEFORE any DB write ---
+                validated_items = []
                 total_product_amount = Decimal('0.00')
-                for i in items_from_request:
-                    try:
-                        p = Decimal(str(i.get('price') or 0))
-                        q = int(i.get('quantity') or 1)
-                        total_product_amount += p * q
-                    except (ValueError, TypeError, InvalidOperation):
-                        continue # skip invalid items
-                
-                tax_amount = (total_product_amount * Decimal('0.05')).quantize(Decimal('0.01'))
-                shipping_cost = Decimal('50.00') if total_product_amount > 0 else Decimal('0.00')
-                grand_total = total_product_amount + tax_amount + shipping_cost
-                
-                # Flexible address retrieval: support 'address_id' or 'delivery_address' object/id
-                raw_address_id = request.data.get('address_id')
-                if not raw_address_id:
-                    delivery_address_data = request.data.get('delivery_address')
-                    if isinstance(delivery_address_data, dict):
-                        raw_address_id = delivery_address_data.get('id')
-                    elif delivery_address_data:
-                        raw_address_id = delivery_address_data
 
-                addr_id = int(raw_address_id) if raw_address_id and str(raw_address_id).isdigit() else None
-
-                if not addr_id:
-                    return Response({"error": "Please select a delivery address before placing the order."}, status=400)
-
-                order = Order.objects.create(
-                    user=request.user,
-                    order_number=order_number,
-                    payment_method=payment_mode,
-                    delivery_address_id=addr_id,  # Safe integer or None
-                    transaction_id=transaction_id,
-                    subtotal=total_product_amount,
-                    tax_amount=tax_amount,
-                    shipping_cost=shipping_cost,
-                    total_amount=grand_total,
-                    payment_status='completed',
-                    status='confirmed'
-                )
-                
-                # Create Payment record
-                Payment.objects.create(
-                    order=order,
-                    user=request.user,
-                    method=payment_mode if payment_mode in dict(Payment.PAYMENT_METHOD_CHOICES) else 'cod',
-                    amount=grand_total,
-                    transaction_id=transaction_id,
-                    status='completed',
-                    completed_at=timezone.now().replace(second=0, microsecond=0)
-                )
-                
                 for item_data in items_from_request:
-                    price = Decimal(str(item_data.get('price', 0)))
-                    quantity = int(item_data.get('quantity', 1))
-                    
-                    # Try to link product and vendor
+                    try:
+                        price = Decimal(str(item_data.get('price', 0)))
+                        quantity = int(item_data.get('quantity', 1))
+                    except (ValueError, TypeError, InvalidOperation):
+                        logger.warning(f"Skipping invalid item payload: {item_data}")
+                        continue
+
+                    product_id = item_data.get('id') or item_data.get('product_id')
                     product = None
                     vendor = None
-                    product_id = item_data.get('id') or item_data.get('product_id')
-                    
+
                     if product_id:
-                        from vendor.models import Product
+                        from vendor.models import Product as VProduct
                         try:
-                            product = Product.objects.get(id=product_id)
-                            # Check stock
+                            # Lock the row to prevent concurrent overselling
+                            product = VProduct.objects.select_for_update().get(id=product_id)
                             if product.quantity < quantity:
-                                raise serializers.ValidationError(f"Insufficient stock for {product.name}")
-                            
+                                raise ValueError(
+                                    f"Insufficient stock for '{product.name}'. "
+                                    f"Available: {product.quantity}, Requested: {quantity}"
+                                )
                             vendor = product.vendor
-                        except Product.DoesNotExist:
-                            pass
-                    
-                    OrderItem.objects.create(
-                        order=order,
-                        product=product,
-                        vendor=vendor,
-                        product_name=item_data.get('name'),
-                        quantity=quantity,
-                        product_price=price,
-                        subtotal=price * quantity
-                    )
-                    
-                    # Decrease inventory atomically
-                    if product:
-                        Product.objects.filter(pk=product.pk).update(quantity=F('quantity') - quantity)
-                
-                # Record financial entries in ledger
-                FinanceService.record_order_financials(order)
-                
-                Cart.objects.filter(user=request.user).delete()
+                        except VProduct.DoesNotExist:
+                            logger.warning(f"Product {product_id} not found; item will be saved without product link.")
 
-            # CASE 2: Use items from the database cart
-            else:
-                cart = Cart.objects.get(user=request.user)
-                cart_items = cart.items.all()
-                if not cart_items:
-                    return Response({"error": "Cart is empty"}, status=400)
+                    validated_items.append({
+                        'product': product,
+                        'vendor': vendor,
+                        'name': item_data.get('name') or (product.name if product else 'Unknown'),
+                        'price': price,
+                        'quantity': quantity,
+                        'subtotal': price * quantity,
+                    })
+                    total_product_amount += price * quantity
 
-                total_product_amount = sum(item.get_total() for item in cart_items)
+                if not validated_items:
+                    return Response({"error": "No valid items found in the request."}, status=400)
+
                 tax_amount = (total_product_amount * Decimal('0.05')).quantize(Decimal('0.01'))
                 shipping_cost = Decimal('50.00') if total_product_amount > 0 else Decimal('0.00')
                 grand_total = total_product_amount + tax_amount + shipping_cost
-                
-                # Flexible address retrieval
-                raw_address_id = request.data.get('address_id')
-                if not raw_address_id:
-                    delivery_address_data = request.data.get('delivery_address')
-                    if isinstance(delivery_address_data, dict):
-                        raw_address_id = delivery_address_data.get('id')
-                    elif delivery_address_data:
-                        raw_address_id = delivery_address_data
 
-                addr_id = int(raw_address_id) if raw_address_id and str(raw_address_id).isdigit() else None
-
-                if not addr_id:
-                    return Response({"error": "Please select a delivery address before placing the order."}, status=400)
-
+                # --- Create Order (payment_status='pending' until all writes succeed) ---
                 order = Order.objects.create(
                     user=request.user,
                     order_number=order_number,
                     payment_method=payment_mode,
                     delivery_address_id=addr_id,
-                    billing_address_id=addr_id, # Default billing to delivery if not separate
                     transaction_id=transaction_id,
                     subtotal=total_product_amount,
                     tax_amount=tax_amount,
                     shipping_cost=shipping_cost,
                     total_amount=grand_total,
-                    payment_status='completed',
+                    payment_status='pending',  # stays pending until all steps done
                     status='confirmed'
                 )
 
-                # Create Payment record
+                # --- Create OrderItems & decrement stock ---
+                for item in validated_items:
+                    OrderItem.objects.create(
+                        order=order,
+                        product=item['product'],
+                        vendor=item['vendor'],
+                        product_name=item['name'],
+                        quantity=item['quantity'],
+                        product_price=item['price'],
+                        subtotal=item['subtotal'],
+                    )
+                    if item['product']:
+                        from vendor.models import Product as VProduct
+                        VProduct.objects.filter(pk=item['product'].pk).update(
+                            quantity=F('quantity') - item['quantity']
+                        )
+
+                # --- Create Payment record ---
                 Payment.objects.create(
                     order=order,
                     user=request.user,
@@ -613,11 +614,62 @@ def process_payment(request):
                     completed_at=timezone.now().replace(second=0, microsecond=0)
                 )
 
-                for item in cart_items:
-                    # Check stock
-                    if item.product.quantity < item.quantity:
-                        raise serializers.ValidationError(f"Insufficient stock for {item.product.name}")
+                # --- All writes succeeded: mark payment as completed ---
+                order.payment_status = 'completed'
+                order.save(update_fields=['payment_status'])
 
+                # --- Financial ledger ---
+                FinanceService.record_order_financials(order)
+
+                # --- Clear cart (frontend cart items passed directly, clear DB cart too) ---
+                Cart.objects.filter(user=request.user).delete()
+
+            # ── CASE 2: Items from database cart ────────────────
+            else:
+                try:
+                    cart = Cart.objects.get(user=request.user)
+                except Cart.DoesNotExist:
+                    return Response({"error": "Cart not found."}, status=404)
+
+                cart_items = list(cart.items.select_related('product__vendor').all())
+                if not cart_items:
+                    return Response({"error": "Your cart is empty."}, status=400)
+
+                # --- Stock pre-validation BEFORE any DB write ---
+                for item in cart_items:
+                    # Lock each product row
+                    product = (
+                        Product.objects.select_for_update().get(pk=item.product.pk)
+                    )
+                    if product.quantity < item.quantity:
+                        raise ValueError(
+                            f"Insufficient stock for '{product.name}'. "
+                            f"Available: {product.quantity}, Requested: {item.quantity}"
+                        )
+
+                total_product_amount = sum(item.get_total() for item in cart_items)
+                tax_amount = (total_product_amount * Decimal('0.05')).quantize(Decimal('0.01'))
+                shipping_cost = Decimal('50.00') if total_product_amount > 0 else Decimal('0.00')
+                grand_total = total_product_amount + tax_amount + shipping_cost
+
+                # --- Create Order ---
+                order = Order.objects.create(
+                    user=request.user,
+                    order_number=order_number,
+                    payment_method=payment_mode,
+                    delivery_address_id=addr_id,
+                    billing_address_id=addr_id,
+                    transaction_id=transaction_id,
+                    subtotal=total_product_amount,
+                    tax_amount=tax_amount,
+                    shipping_cost=shipping_cost,
+                    total_amount=grand_total,
+                    payment_status='pending',  # pending until all steps done
+                    status='confirmed'
+                )
+
+                # --- Create OrderItems & decrement stock ---
+                for item in cart_items:
                     OrderItem.objects.create(
                         order=order,
                         product=item.product,
@@ -625,53 +677,78 @@ def process_payment(request):
                         product_name=item.product.name,
                         quantity=item.quantity,
                         product_price=item.product.price,
-                        subtotal=item.get_total()
+                        subtotal=item.get_total(),
                     )
-                    
-                    # Decrease inventory atomically
-                    Product.objects.filter(pk=item.product.pk).update(quantity=F('quantity') - item.quantity)
-                
-                # Record financial entries in ledger
+                    Product.objects.filter(pk=item.product.pk).update(
+                        quantity=F('quantity') - item.quantity
+                    )
+
+                # --- Create Payment record ---
+                Payment.objects.create(
+                    order=order,
+                    user=request.user,
+                    method=payment_mode if payment_mode in dict(Payment.PAYMENT_METHOD_CHOICES) else 'cod',
+                    amount=grand_total,
+                    transaction_id=transaction_id,
+                    status='completed',
+                    completed_at=timezone.now().replace(second=0, microsecond=0)
+                )
+
+                # --- All writes succeeded: mark payment as completed ---
+                order.payment_status = 'completed'
+                order.save(update_fields=['payment_status'])
+
+                # --- Financial ledger ---
                 FinanceService.record_order_financials(order)
-                
+
+                # --- Clear database cart ---
                 cart.items.all().delete()
 
-    except Cart.DoesNotExist:
-        return Response({"error": "Cart not found"}, status=404)
-    except Exception as e:
-        import traceback
-        traceback.print_exc()   # prints full stack trace to Django console
-        return Response({"error": f"Database Error: {str(e)}"}, status=500)
+            # ── Auto-assign delivery (outside critical path — failure is non-fatal) ──
+            try:
+                auto_assign_order(order)
+            except Exception as assign_err:
+                logger.warning(f"Auto-assignment skipped for order {order.id}: {assign_err}")
 
-    # Send confirmation email
+    except ValueError as ve:
+        # Stock / validation error — safe, nothing was committed
+        logger.warning(f"Payment blocked - validation error: {ve}")
+        return Response({"error": str(ve)}, status=422)  # 422 Unprocessable Entity
+    except Cart.DoesNotExist:
+        return Response({"error": "Cart not found."}, status=404)
+    except Exception as exc:
+        logger.error(f"Payment processing failed for user {request.user.id}: {exc}")
+        tb.print_exc()
+        return Response(
+            {"error": "Order could not be placed due to a server error. Please try again."},
+            status=500
+        )
+
+    # ── Send confirmation email (non-critical) ─────────────
     try:
-        subject = f'Order Confirmed - {order.order_number}'
-        
-        # Dynamically determine the frontend URL
         frontend_origin = request.headers.get('Origin') or request.headers.get('Referer', '').rstrip('/')
         if not frontend_origin or 'localhost:8000' in frontend_origin:
-            frontend_origin = 'http://localhost:5173' # fallback
-            
+            frontend_origin = 'http://localhost:5173'
         from urllib.parse import urlparse
         parsed = urlparse(frontend_origin)
         frontend_origin = f"{parsed.scheme}://{parsed.netloc}"
-        
         tracking_link = f"{frontend_origin}/track-order/{order.order_number}"
-        
+
         message = (
             f"Dear {request.user.username},\n\n"
             f"Your order {order.order_number} has been successfully placed and confirmed!\n"
             f"Total Amount: ₹{order.total_amount}\n\n"
-            f"You can track your order here: {tracking_link}\n\n"
-            "Our team is already preparing your items for delivery. You can track your order status "
-            "anytime in your profile section.\n\n"
-            "Thank you for choosing ShopSphere!\n\n"
-            "Regards,\n"
-            "ShopSphere Team"
+            f"Track your order: {tracking_link}\n\n"
+            "Thank you for choosing ShopSphere!\n\nRegards,\nShopSphere Team"
         )
-        send_mail(subject, message, settings.EMAIL_HOST_USER, [request.user.email])
-    except Exception as e:
-        print(f"Failed to send order confirmation email: {e}")
+        send_mail(
+            subject=f'Order Confirmed - {order.order_number}',
+            message=message,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[request.user.email]
+        )
+    except Exception as mail_err:
+        logger.warning(f"Order confirmation email failed: {mail_err}")
 
     if request.accepted_renderer.format == 'json':
         return Response({
@@ -680,8 +757,10 @@ def process_payment(request):
             "order_number": order_number,
             "order_id": order.id
         })
-    
+
     return redirect('my_orders')
+
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -888,6 +967,8 @@ def address_page(request):
                 "message": "Address saved successfully",
                 "address": serializer.data
             }, status=201)
+
+
         return Response(serializer.errors, status=400)
 
     # GET — return all addresses for the user
@@ -1118,28 +1199,55 @@ def reverse_geocode(request):
 @authentication_classes([])
 @permission_classes([AllowAny])
 def get_trending_products(request):
-    from vendor.models import ProductImage
-    from django.db.models import Prefetch
-    
-    # Optimized prefetch
+    """
+    Fetch trending products based on search_count, but strictly filtered by real user reviews.
+    Requirement: Trending products MUST have an average rating > 3.0 calculated from the reviews table.
+    """
+    from vendor.models import Product, ProductImage
+    from django.db.models import Avg, Count, Prefetch
+    from user.models import Review
+
+    # Optimized image prefetch
     images_prefetch = Prefetch(
         'images',
         queryset=ProductImage.objects.defer('image_data')
     )
-    
-    # Removed average_rating__gt=3 as new data starts with 0
-    trending = Product.objects.filter(
-        status__in=['active', 'approved'],
-        is_blocked=False
-    ).select_related('vendor').prefetch_related(images_prefetch).order_by('-search_count', '-total_reviews', '-average_rating', '-id')[:12]
-    
+
+    # Single query approach:
+    # 1. Annotate with real-time average and count from the related 'reviews' set
+    # 2. Filter by the rule: Average > 3.0 AND Count > 0
+    # 3. Order by search_count (trending) then quality metrics
+    trending = (
+        Product.objects
+        .annotate(
+            calculated_avg=Avg('reviews__rating'),
+            total_revs=Count('reviews__id')
+        )
+        .filter(
+            calculated_avg__gt=3.0, # Strictly greater than 3.0
+            total_revs__gt=0,       # Must have at least one review
+            status__in=['active', 'approved'],
+            is_blocked=False
+        )
+        .select_related('vendor')
+        .prefetch_related(images_prefetch)
+        .order_by('-search_count', '-calculated_avg', '-total_revs', '-id')[:12]
+    )
+
     serializer = ProductSerializer(trending, many=True, context={'request': request})
     data = serializer.data
-    # Ensure average_rating is never None
-    for item in data:
-        if item.get('average_rating') is None:
-            item['average_rating'] = 0.0
+
+    # Ensure the frontend receives the calculated values in the standard keys
+    # ProductSerializer might default to the model field 'average_rating', 
+    # so we explicitly overwrite it with our live-calculated 'calculated_avg'.
+    for i, item in enumerate(data):
+        prod_obj = trending[i]
+        item['average_rating'] = float(round(prod_obj.calculated_avg or 0.0, 2))
+        item['total_reviews'] = prod_obj.total_revs
+        item['is_trending'] = True
+
     return Response(data)
+
 
 
 @api_view(['POST'])
@@ -1172,14 +1280,22 @@ def request_return_api(request, order_id):
     # 3. Create Return Request for items
     returns_created = []
     with transaction.atomic():
-        for item in order.items.all():
+        order_items = list(order.items.all())
+        total_subtotal = sum(item.subtotal for item in order_items) or Decimal('1')  # avoid div-by-0
+
+        for item in order_items:
+            # Proportional refund: item's share of the total amount paid (incl. tax + shipping)
+            item_proportion = Decimal(str(item.subtotal)) / Decimal(str(total_subtotal))
+            exact_refund = (item_proportion * Decimal(str(order.total_amount))).quantize(
+                Decimal('0.01'), rounding='ROUND_HALF_UP'
+            )
             ret = OrderReturn.objects.create(
                 order=order,
                 order_item=item,
                 user=request.user,
                 reason=reason,
                 description=description,
-                return_amount=item.subtotal,
+                return_amount=exact_refund,  # exact proportional paid amount (₹)
                 status='requested'
             )
             returns_created.append(ret.id)
@@ -1198,3 +1314,64 @@ def request_return_api(request, order_id):
         "message": "Return request submitted successfully. Once approved by the administrator, a pickup agent will be assigned to collect the items.",
         "return_ids": returns_created
     }, status=201)
+
+
+@api_view(['GET'])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def get_deal_of_the_day(request):
+    """
+    Returns a deterministic subset of products that changes every day.
+    Rotates through all available products.
+    """
+    from django.db.models import Prefetch, Avg, Count
+    from datetime import date
+
+    # Number of products to show in the deal section
+    PRODUCTS_PER_DAY = 10 
+
+    # 1. Get all eligible products
+    images_prefetch = Prefetch(
+        'images',
+        queryset=ProductImage.objects.defer('image_data')
+    )
+    
+    # We order by ID to ensure a stable base list for rotation
+    queryset = Product.objects.filter(
+        status__in=['active', 'approved'],
+        is_blocked=False
+    ).select_related('vendor').prefetch_related(images_prefetch).annotate(
+        avg_rating=Avg('reviews__rating'),
+        count_reviews=Count('reviews')
+    ).order_by('id')
+
+    all_products = list(queryset)
+    total_products = len(all_products)
+
+    if total_products == 0:
+        return Response([])
+
+    # 2. Calculate rotation based on days since a reference date
+    reference_date = date(2024, 1, 1)
+    today = date.today()
+    days_passed = (today - reference_date).days
+    
+    start_index = (days_passed * PRODUCTS_PER_DAY) % total_products
+    
+    # 3. Select products with wrap-around
+    deal_products = []
+    for i in range(min(PRODUCTS_PER_DAY, total_products)):
+        idx = (start_index + i) % total_products
+        deal_products.append(all_products[idx])
+
+    serializer = ProductSerializer(deal_products, many=True, context={'request': request})
+    
+    # Inject 'is_deal' flag and potential discount display logic
+    data = serializer.data
+    for item in data:
+        item['is_deal_of_the_day'] = True
+        # If product doesn't have a discount, we can simulate one for the 'Deal' vibe
+        if not item.get('discount_percentage'):
+             item['discount_percentage'] = 50 
+             
+    return Response(data)

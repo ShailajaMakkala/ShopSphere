@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
     FaBox, FaDollarSign, FaMapMarkerAlt, FaCheck, FaTruck,
     FaListUl, FaPhoneAlt, FaCalendarAlt
@@ -22,9 +22,17 @@ export default function DeliveryDashboard() {
     const [approvalStatus, setApprovalStatus] = useState('approved');
     const [rejectionReason, setRejectionReason] = useState(null);
 
-    const loadDashboard = async () => {
+    const loadDashboard = useCallback(async (forceInit = true) => {
         try {
-            setLoading(true);
+            if (forceInit) {
+                const cached = localStorage.getItem('delivery_dash_cache');
+                if (cached) {
+                    const { stats: s, profile: p } = JSON.parse(cached);
+                    setStats(s);
+                    setProfile(p);
+                }
+                setLoading(true);
+            }
             const [dashData, activeData] = await Promise.all([
                 fetchDeliveryDashboard(),
                 fetchAssignedOrders()
@@ -32,6 +40,11 @@ export default function DeliveryDashboard() {
 
             setProfile(dashData.profile);
             setStats(dashData.today_stats);
+            localStorage.setItem('delivery_dash_cache', JSON.stringify({
+                stats: dashData.today_stats,
+                profile: dashData.profile
+            }));
+
             // Filter only work-in-progress statuses
             const working = activeData.filter(a =>
                 ['assigned', 'accepted', 'picked_up', 'in_transit', 'arrived'].includes(a.status)
@@ -44,7 +57,6 @@ export default function DeliveryDashboard() {
                 const status = error.response.data.status || 'pending';
                 setApprovalStatus(status);
                 setRejectionReason(error.response.data.reason);
-                // Don't navigate away, we'll show a pending screen
             } else {
                 toast.error("Transmission failed. Re-syncing required.");
                 localStorage.removeItem("accessToken");
@@ -53,11 +65,11 @@ export default function DeliveryDashboard() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [navigate]);
 
-    useEffect(() => { loadDashboard(); }, []);
+    useEffect(() => { loadDashboard(); }, [loadDashboard]);
 
-    if (loading) {
+    if (loading && !stats) {
         return (
             <div className={`flex flex-col items-center justify-center min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'}`}>
                 <div className={`w-16 h-16 border-4 rounded-full animate-spin mb-6 ${isDarkMode ? 'border-white/5 border-t-orange-500' : 'border-slate-200 border-t-orange-500'}`}></div>

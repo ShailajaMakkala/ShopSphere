@@ -282,34 +282,42 @@ class FinanceService:
     def process_refund(order_return, method='original_payment'):
         """
         Handle full refund for a return request.
-        Credits customer wallet for COD, or logs simulation for online payments.
+        Credits the exact refund amount to the customer's wallet.
+        Idempotent: will not process the same return twice.
+        Currency: ₹ (Indian Rupee) throughout.
         """
-        from user.models import Refund, UserWallet, OrderTracking
-        
+        from user.models import Refund, UserWallet, OrderTracking, WalletTransaction
+
+        # ── Idempotency guard ────────────────────────────────
+        existing = Refund.objects.filter(order_return=order_return, status='completed').first()
+        if existing:
+            return existing  # already refunded, don't double-credit
+
         order_item = order_return.order_item
-        refund_amount = order_return.return_amount
-        
+        # Use the exact amount stored on the return request (proportional paid amount, incl tax/shipping)
+        refund_amount = Decimal(str(order_return.return_amount))
+
+        if refund_amount <= 0:
+            raise ValueError("Refund amount must be greater than zero.")
+
         # 1. Reverse Revenue in Ledger (Debit Vendor)
-        # Proportional commission reversal
-        full_amount = order_item.subtotal
-        comm_total = order_item.commission_amount
-        
-        comm_reversal = (Decimal(str(refund_amount)) / full_amount) * comm_total
+        full_amount = order_item.subtotal or Decimal('1')
+        comm_total = order_item.commission_amount or Decimal('0')
+
+        comm_reversal = (refund_amount / Decimal(str(full_amount))) * comm_total
         comm_reversal = comm_reversal.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
-        # Debit Vendor Net Revenue
         FinanceService._create_ledger_entry(
             vendor=order_item.vendor,
-            amount=-Decimal(str(refund_amount)),
+            amount=-refund_amount,
             entry_type='REFUND',
             description=f"Refund Reversal for {order_item.order.order_number}: Return ID {order_return.id}",
             order=order_item.order,
             order_item=order_item,
             reference_id=f"REFUND_REV_{order_return.id}",
-            is_settled=True # Refunds hit immediately
+            is_settled=True
         )
 
-        # Reverse Commission (Credit Vendor)
         FinanceService._create_ledger_entry(
             vendor=order_item.vendor,
             amount=comm_reversal,
@@ -321,35 +329,38 @@ class FinanceService:
             is_settled=True
         )
 
-        # 2. Create Refund Record
+        # 2. Create Refund Record (status=processing first for audit trail)
         refund = Refund.objects.create(
             order_return=order_return,
             user=order_return.user,
             refund_amount=refund_amount,
-            refund_method=method,
-            status='completed',
+            refund_method='wallet',  # always wallet for immediate visibility
+            status='processing',
             transaction_id=f"REF_{uuid.uuid4().hex[:12].upper()}",
-            completed_at=timezone.now()
         )
 
-        # 3. Credit customer wallet (DEMO: Always refund to wallet for immediate visibility)
+        # 3. Credit customer wallet with exact paid amount (₹)
         wallet, _ = UserWallet.objects.get_or_create(user=order_return.user)
-        wallet.add_balance(refund_amount, f"Refund for Order {order_return.order.order_number}")
-        
-        refund.refund_method = 'wallet'
-        refund.status = 'completed'
-        refund.save()
+        wallet.add_balance(
+            refund_amount,
+            f"Refund ₹{refund_amount:.2f} for Order {order_return.order.order_number}"
+        )
 
-        # 4. Update Return Status
+        # 4. Finalize refund record
+        refund.status = 'completed'
+        refund.completed_at = timezone.now()
+        refund.save(update_fields=['status', 'completed_at'])
+
+        # 5. Update Return Status
         order_return.refund_status = 'processed'
         order_return.status = 'completed'
         order_return.processed_at = timezone.now()
-        order_return.save()
+        order_return.save(update_fields=['refund_status', 'status', 'processed_at'])
 
         OrderTracking.objects.create(
             order=order_return.order,
             status='Refund Processed',
-            notes=f"Refund of ₹{refund_amount} processed via {refund.get_refund_method_display()}."
+            notes=f"Refund of ₹{refund_amount:.2f} credited to your wallet."
         )
 
         return refund

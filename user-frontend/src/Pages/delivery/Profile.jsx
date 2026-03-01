@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { FaUser, FaPhone, FaMapMarkerAlt, FaTruck, FaIdCard, FaUniversity, FaClock, FaLocationArrow, FaSave, FaInfoCircle } from 'react-icons/fa';
 import { fetchAgentProfile, updateAgentProfile, requestDeletion } from '../../api/delivery_axios';
 import { reverseGeocode } from '../../api/axios';
@@ -6,24 +6,32 @@ import { toast } from 'react-hot-toast';
 import { useTheme } from '../../context/ThemeContext';
 
 export default function Profile() {
-    const [profile, setProfile] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [profile, setProfile] = useState(() => {
+        const cached = localStorage.getItem('delivery_profile_cache');
+        return cached ? JSON.parse(cached) : null;
+    });
+    const [loading, setLoading] = useState(!profile);
     const [saving, setSaving] = useState(false);
     const [fetchingLocation, setFetchingLocation] = useState(false);
     const { isDarkMode } = useTheme();
 
+    const loadProfile = useCallback(async (silent = false) => {
+        try {
+            if (!silent) setLoading(true);
+            const data = await fetchAgentProfile();
+            setProfile(data);
+            localStorage.setItem('delivery_profile_cache', JSON.stringify(data));
+        } catch (error) {
+            console.error("Profile load failed:", error);
+            if (!silent) toast.error("Failed to load profile");
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     useEffect(() => {
-        const loadProfile = async () => {
-            try {
-                const data = await fetchAgentProfile();
-                setProfile(data);
-            } catch (error) {
-                toast.error("Failed to load profile");
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadProfile();
+        loadProfile(!!profile);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleChange = (e) => {
@@ -130,15 +138,7 @@ export default function Profile() {
                                     <h2 className={`text-xl md:text-2xl font-bold tracking-tight  transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Personal Info</h2>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-                                    <div className="space-y-3 text-left">
-                                        <label className={`text-[9px] font-bold uppercase tracking-wider ml-1  transition-colors ${isDarkMode ? 'text-slate-600' : 'text-slate-400'}`}>Full Name</label>
-                                        <input
-                                            type="text"
-                                            value={profile?.user_name || ''}
-                                            readOnly
-                                            className={`w-full px-5 py-4 rounded-2xl border font-bold cursor-not-allowed  shadow-inner transition-all ${isDarkMode ? 'bg-[#0f172a] border-white/5 text-slate-600' : 'bg-slate-50 border-slate-100 text-slate-400'}`}
-                                        />
-                                    </div>
+
                                     <div className="space-y-3 text-left">
                                         <label className={`text-[9px] font-bold uppercase tracking-wider ml-1  transition-colors ${isDarkMode ? 'text-slate-600' : 'text-slate-400'}`}>Username</label>
                                         <input

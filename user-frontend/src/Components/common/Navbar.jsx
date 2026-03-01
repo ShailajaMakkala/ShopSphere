@@ -380,9 +380,9 @@ function Navbar() {
                 <div className="flex flex-col h-full">
                     {/* Menu header */}
                     <div className="flex items-center justify-between p-4 border-b border-white/10">
-                        <Link to="/home" onClick={() => setIsOpen(false)} className="flex items-center gap-0 group">
-                            <img src="/s_logo.png" alt="ShopSphere" className="w-14 h-14 object-contain" />
-                            <span className="-ml-4 text-lg font-bold text-white">hopSphere</span>
+                        <Link to="/home" onClick={() => setIsOpen(false)} className="flex items-center gap-1.5 group" aria-label="ShopSphere Home">
+                            <img src="/s_logo.png" alt="ShopSphere" className="w-10 h-10 object-contain" />
+                            <span className="-ml-4 text-base font-bold text-white">hopSphere</span>
                         </Link>
                         <button onClick={() => setIsOpen(false)} className="p-2.5 rounded-xl text-white/70 hover:bg-white/10 min-w-[44px] min-h-[44px] flex items-center justify-center">
                             <FaTimes size={18} />

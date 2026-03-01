@@ -58,8 +58,8 @@ const MostSearched = () => {
                     let imgPath = typeof img === 'string' ? img : (img.image || img.url);
                     if (!imgPath) return null;
                     if (imgPath.startsWith('http')) return imgPath;
-                    if (imgPath.startsWith('/')) return `http://127.0.0.1:8000${imgPath}`;
-                    return `http://127.0.0.1:8000/${imgPath}`;
+                    if (imgPath.startsWith('/')) return `http://localhost:8000${imgPath}`;
+                    return `http://localhost:8000/${imgPath}`;
                 }).filter(Boolean);
 
                 const displayImage = gallery.length > 0
@@ -123,6 +123,7 @@ const MostSearched = () => {
                                 <img
                                     src={item.image}
                                     alt={item.title}
+                                    loading="lazy"
                                     className="max-h-full max-w-full object-contain transition-all duration-700 group-hover:scale-110 drop-shadow-md"
                                 />
                                 <div className="absolute top-3 left-3 z-20">

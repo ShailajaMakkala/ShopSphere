@@ -1,14 +1,18 @@
 from django.db import models
+from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Sum, Avg
 from decimal import Decimal
+import secrets
+import string
+import logging
+
+logger = logging.getLogger(__name__)
 
 
-# ===============================================
-#        DELIVERY AGENT PROFILE MODEL
-# ===============================================
+#        DELIVERY AGENT PROFILE MODEL 
 
 class DeliveryAgentProfile(models.Model):
     """Delivery Agent Profile for order delivery management"""
@@ -302,14 +306,32 @@ class DeliveryAssignment(models.Model):
 
     def mark_arrived(self):
         """Mark as arrived at customer location and generate OTP"""
-        import secrets
-        import string
         if not self.otp_code:
             # Generate 6-digit numeric OTP
             self.otp_code = ''.join(secrets.choice(string.digits) for _ in range(6))
         
         self.status = 'arrived'
         self.save()
+
+        # Send OTP to customer via email
+        try:
+            customer = self.order.user
+            subject = f"OTP for Order {self.order.order_number}"
+            message = (
+                f"Dear {customer.username},\n\n"
+                f"Our delivery agent {self.agent.user.get_full_name() or self.agent.user.username} has arrived at your location with your order {self.order.order_number}.\n\n"
+                f"Please provide this 6-digit OTP to the agent to receive your package: {self.otp_code}\n\n"
+                "Thank you for shopping with ShopSphere!"
+            )
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[customer.email],
+                fail_silently=True
+            )
+        except Exception as e:
+            logger.warning(f"Failed to send delivery OTP email to {self.order.user.email}: {e}")
     
     def mark_delivered(self):
         """Mark delivery as completed (Finalize standard delivery OR return pickup)"""

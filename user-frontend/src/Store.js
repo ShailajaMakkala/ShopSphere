@@ -1,5 +1,5 @@
 import { configureStore, createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getMyOrders, getProducts } from "./api/axios";
+import { getMyOrders, getProducts, getDealOfTheDay } from "./api/axios";
 
 // ─── Persistence Helpers (Cart & Wishlist) ──────────────────────────────────
 // Persist data per-user: key = "cart_<userEmail>" so each account is isolated
@@ -53,6 +53,18 @@ export const fetchProducts = createAsyncThunk(
   }
 );
 
+export const fetchDealOfTheDay = createAsyncThunk(
+  "products/fetchDealOfTheDay",
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await getDealOfTheDay();
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const productsSlice = createSlice({
   name: "products",
   initialState: {
@@ -68,6 +80,7 @@ const productsSlice = createSlice({
     services: [],
     other: [],
     all: [], // Products are fetched fresh from API
+    dealOfTheDay: [], // Rotating daily deals
     isLoading: false,
     error: null,
   },
@@ -136,6 +149,28 @@ const productsSlice = createSlice({
       .addCase(fetchProducts.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+      })
+      .addCase(fetchDealOfTheDay.fulfilled, (state, action) => {
+        const products = action.payload || [];
+        state.dealOfTheDay = products.map(product => {
+          const gallery = product.images && product.images.length > 0
+            ? product.images.map(img => {
+              let imgPath = typeof img === 'string' ? img : (img.image || img.url);
+              if (!imgPath) return "/public/placeholder.jpg";
+              if (imgPath.startsWith('http')) return imgPath;
+              if (imgPath.startsWith('/')) return `http://localhost:8000${imgPath}`;
+              return `http://localhost:8000/${imgPath}`;
+            })
+            : ["/public/placeholder.jpg"];
+
+          return {
+            ...product,
+            image: gallery[0],
+            gallery: gallery,
+            vendor: product.vendor_name,
+            price: Number(product.price)
+          };
+        });
       });
   }
 });

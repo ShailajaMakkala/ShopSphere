@@ -92,63 +92,89 @@ const Footer = () => {
 
     return (
         <footer className="relative overflow-hidden bg-gradient-to-br from-[#1e0533] via-[#2d1050] to-[#140025] text-white py-10 sm:py-16">
-            {/* Decorative elements */}
-            <div className="absolute top-0 left-1/4 w-72 h-72 bg-purple-600/10 rounded-full blur-[120px]" />
-            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-400/5 rounded-full blur-[150px]" />
+            {/* Decorative blobs */}
+            <div className="absolute top-0 left-1/4 w-72 h-72 bg-purple-600/10 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-400/5 rounded-full blur-[150px] pointer-events-none" />
             <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 sm:gap-8 md:gap-12 text-center md:text-left">
-                    <div>
-                        <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-orange-400 to-purple-400 bg-clip-text text-transparent">ShopSphere</h3>
-                        <p className="text-purple-300/70 text-xs sm:text-sm leading-relaxed">Your one-stop shop for everything you need. Quality products, best prices.</p>
+                {/* ── Main grid ──────────────────────────────── */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12 text-center sm:text-left">
 
-                        <div className="flex space-x-3 mt-6">
-                            <a href="#" className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-purple-300 hover:bg-orange-400 hover:text-white hover:border-orange-400 transition-all duration-300 min-w-[44px] min-h-[44px]">
-                                <FaFacebook size={14} />
-                            </a>
-                            <a href="#" className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-purple-300 hover:bg-orange-400 hover:text-white hover:border-orange-400 transition-all duration-300 min-w-[44px] min-h-[44px]">
-                                <FaTwitter size={14} />
-                            </a>
-                            <a href="#" className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-purple-300 hover:bg-orange-400 hover:text-white hover:border-orange-400 transition-all duration-300 min-w-[44px] min-h-[44px]">
-                                <FaInstagram size={14} />
-                            </a>
-                            <a href="#" className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-purple-300 hover:bg-orange-400 hover:text-white hover:border-orange-400 transition-all duration-300 min-w-[44px] min-h-[44px]">
-                                <FaLinkedin size={14} />
-                            </a>
+                    {/* Brand column */}
+                    <div className="flex flex-col items-center sm:items-start">
+                        <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-orange-400 to-purple-400 bg-clip-text text-transparent">
+                            ShopSphere
+                        </h3>
+                        <p className="text-purple-300/70 text-xs sm:text-sm leading-relaxed max-w-[260px] sm:max-w-none">
+                            Your one-stop shop for everything you need. Quality products, best prices.
+                        </p>
+
+                        {/* Social icons — always centered on mobile */}
+                        <div className="flex items-center justify-center sm:justify-start space-x-3 mt-6 w-full">
+                            {[FaFacebook, FaTwitter, FaInstagram, FaLinkedin].map((Icon, i) => (
+                                <a
+                                    key={i}
+                                    href="#"
+                                    className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-purple-300 hover:bg-orange-400 hover:text-white hover:border-orange-400 transition-all duration-300"
+                                    aria-label="Social link"
+                                >
+                                    <Icon size={14} />
+                                </a>
+                            ))}
                         </div>
                     </div>
-                    <div>
-                        <h4 className="text-xs sm:text-sm font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-orange-400 mb-4 sm:mb-6">Quick Links</h4>
-                        <ul className="space-y-3">
-                            <li><a href="/" className="text-purple-300/70 text-sm hover:text-orange-400 transition-colors duration-300 flex items-center gap-2 justify-center md:justify-start"><span className="w-1 h-1 rounded-full bg-purple-500/50"></span>Home</a></li>
-                            <li><a href="/shop" className="text-purple-300/70 text-sm hover:text-orange-400 transition-colors duration-300 flex items-center gap-2 justify-center md:justify-start"><span className="w-1 h-1 rounded-full bg-purple-500/50"></span>Shop</a></li>
-                            <li><a href="/about" className="text-purple-300/70 text-sm hover:text-orange-400 transition-colors duration-300 flex items-center gap-2 justify-center md:justify-start"><span className="w-1 h-1 rounded-full bg-purple-500/50"></span>About Us</a></li>
-                            <li><a href="/contact" className="text-purple-300/70 text-sm hover:text-orange-400 transition-colors duration-300 flex items-center gap-2 justify-center md:justify-start"><span className="w-1 h-1 rounded-full bg-purple-500/50"></span>Contact</a></li>
+
+                    {/* Quick Links */}
+                    <div className="flex flex-col items-center sm:items-start">
+                        <h4 className="text-xs sm:text-sm font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-orange-400 mb-4 sm:mb-6">
+                            Quick Links
+                        </h4>
+                        <ul className="space-y-3 w-full">
+                            {[['/', 'Home'], ['/shop', 'Shop'], ['/about', 'About Us'], ['/contact', 'Contact']].map(([href, label]) => (
+                                <li key={href}>
+                                    <a href={href} className="text-purple-300/70 text-sm hover:text-orange-400 transition-colors duration-300 flex items-center gap-2 justify-center sm:justify-start">
+                                        <span className="w-1 h-1 rounded-full bg-purple-500/50 flex-shrink-0" />
+                                        {label}
+                                    </a>
+                                </li>
+                            ))}
                         </ul>
                     </div>
-                    <div>
-                        <h4 className="text-xs sm:text-sm font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-orange-400 mb-4 sm:mb-6">Customer Service</h4>
-                        <ul className="space-y-3">
-                            <li><a href="/profile" className="text-purple-300/70 text-sm hover:text-orange-400 transition-colors duration-300 flex items-center gap-2 justify-center md:justify-start"><span className="w-1 h-1 rounded-full bg-purple-500/50"></span>My Account</a></li>
-                            <li><a href="/orders" className="text-purple-300/70 text-sm hover:text-orange-400 transition-colors duration-300 flex items-center gap-2 justify-center md:justify-start"><span className="w-1 h-1 rounded-full bg-purple-500/50"></span>Order History</a></li>
-                            <li><a href="/faq" className="text-purple-300/70 text-sm hover:text-orange-400 transition-colors duration-300 flex items-center gap-2 justify-center md:justify-start"><span className="w-1 h-1 rounded-full bg-purple-500/50"></span>FAQ</a></li>
-                            <li><a href="/returns" className="text-purple-300/70 text-sm hover:text-orange-400 transition-colors duration-300 flex items-center gap-2 justify-center md:justify-start"><span className="w-1 h-1 rounded-full bg-purple-500/50"></span>Returns</a></li>
+
+                    {/* Customer Service */}
+                    <div className="flex flex-col items-center sm:items-start">
+                        <h4 className="text-xs sm:text-sm font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-orange-400 mb-4 sm:mb-6">
+                            Customer Service
+                        </h4>
+                        <ul className="space-y-3 w-full">
+                            {[['/profile', 'My Account'], ['/orders', 'Order History'], ['/faq', 'FAQ'], ['/returns', 'Returns']].map(([href, label]) => (
+                                <li key={href}>
+                                    <a href={href} className="text-purple-300/70 text-sm hover:text-orange-400 transition-colors duration-300 flex items-center gap-2 justify-center sm:justify-start">
+                                        <span className="w-1 h-1 rounded-full bg-purple-500/50 flex-shrink-0" />
+                                        {label}
+                                    </a>
+                                </li>
+                            ))}
                         </ul>
                     </div>
-                    <div className="flex flex-col items-center md:items-end justify-center">
+
+                    {/* Logo / Easter egg — hidden on mobile to prevent layout stretch */}
+                    <div className="hidden sm:flex flex-col items-center lg:items-end justify-center">
                         <motion.button
                             whileHover={{ scale: 1.1, rotate: [0, -10, 10, 0] }}
                             whileTap={{ scale: 0.9 }}
                             onClick={triggerHoli}
                             className="relative group p-4"
+                            aria-label="Holi celebration"
                         >
                             <div className="absolute inset-0 bg-orange-500/20 blur-2xl rounded-full group-hover:bg-orange-500/40 transition-all duration-500" />
-                            <img src="/s_logo.png" alt="ShopSphere Logo" className="relative w-40 h-40 object-contain drop-shadow-2xl" />
+                            <img src="/s_logo.png" alt="ShopSphere Logo" className="relative w-32 h-32 sm:w-40 sm:h-40 object-contain drop-shadow-2xl" />
                         </motion.button>
                     </div>
                 </div>
 
+                {/* Holi blast animation */}
                 <AnimatePresence>
                     {isHoliActive && (
                         <>
@@ -167,9 +193,12 @@ const Footer = () => {
                     )}
                 </AnimatePresence>
 
-                <div className="border-t border-white/5 mt-8 sm:mt-12 pt-6 sm:pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-                    <p className="text-purple-400/60 text-sm">&copy; {new Date().getFullYear()} ShopSphere. All rights reserved.</p>
-                    <p className="text-purple-400/60 text-sm flex items-center gap-1.5">
+                {/* Bottom bar */}
+                <div className="border-t border-white/5 mt-8 sm:mt-12 pt-6 sm:pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-center sm:text-left">
+                    <p className="text-purple-400/60 text-xs sm:text-sm">
+                        &copy; {new Date().getFullYear()} ShopSphere. All rights reserved.
+                    </p>
+                    <p className="text-purple-400/60 text-xs sm:text-sm flex items-center gap-1.5">
                         Made with <FaHeart className="text-orange-400 text-xs" /> by ShopSphere Team
                     </p>
                 </div>

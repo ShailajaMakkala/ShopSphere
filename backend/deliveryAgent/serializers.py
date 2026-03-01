@@ -60,10 +60,10 @@ class DeliveryAssignmentListSerializer(serializers.ModelSerializer):
             'id', 'agent_name', 'order_id', 'order_number', 'customer_name', 'customer_email',
             'delivery_city', 'delivery_address', 'pickup_address',
             'status', 'assignment_type', 'estimated_delivery_date',
-            'pickup_time', 'delivery_time', 'delivery_fee', 'assigned_at',
+            'pickup_time', 'delivery_time', 'delivery_fee', 'assigned_at', 'completed_at',
             'items', 'failure_reason'
         ]
-        read_only_fields = ['id', 'assigned_at']
+        read_only_fields = ['id', 'assigned_at', 'completed_at']
 
 
 class DeliveryAssignmentDetailSerializer(serializers.ModelSerializer):
@@ -175,10 +175,12 @@ class DeliveryCommissionSerializer(serializers.ModelSerializer):
     approved_at = serializers.DateTimeField(read_only=True)
     paid_at = serializers.DateTimeField(read_only=True)
     
+    delivery_assignment_details = DeliveryAssignmentListSerializer(source='delivery_assignment', read_only=True)
+    
     class Meta:
         model = DeliveryCommission
         fields = [
-            'id', 'delivery_assignment', 'agent_name', 'base_fee', 'distance_bonus', 'time_bonus',
+            'id', 'delivery_assignment', 'delivery_assignment_details', 'agent_name', 'base_fee', 'distance_bonus', 'time_bonus',
             'rating_bonus', 'deductions', 'total_commission', 'status',
             'notes', 'created_at', 'approved_at', 'paid_at'
         ]

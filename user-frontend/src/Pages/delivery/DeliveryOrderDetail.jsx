@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
     FaMapMarkerAlt,
@@ -29,7 +29,7 @@ import { toast } from 'react-hot-toast';
 import { useTheme } from '../../context/ThemeContext';
 
 // ─── Status Stepper ─────────────────────────────────────────────────────────────
-function StatusStepper({ currentStatus, isDarkMode }) {
+const StatusStepper = memo(function StatusStepper({ currentStatus, isDarkMode }) {
     const STEPS = [
         { key: 'assigned', label: 'Assigned' },
         { key: 'accepted', label: 'Accepted' },
@@ -73,10 +73,10 @@ function StatusStepper({ currentStatus, isDarkMode }) {
             )}
         </div>
     );
-}
+});
 
 // ─── Return Verification Panel ──────────────────────────────────────────────
-function ReturnVerificationPanel({ orderId, loading, onVerify, isDarkMode }) {
+const ReturnVerificationPanel = memo(function ReturnVerificationPanel({ orderId, loading, onVerify, isDarkMode }) {
     const [notes, setNotes] = useState('');
     const [image, setImage] = useState(null);
 
@@ -139,7 +139,7 @@ function ReturnVerificationPanel({ orderId, loading, onVerify, isDarkMode }) {
             </div>
         </div>
     );
-}
+});
 
 export default function DeliveryOrderDetail() {
     const { id } = useParams();
@@ -153,7 +153,7 @@ export default function DeliveryOrderDetail() {
     const [verifiedItems, setVerifiedItems] = useState({});
     const { isDarkMode } = useTheme();
 
-    const loadDetail = async () => {
+    const loadDetail = useCallback(async () => {
         try {
             const data = await fetchAssignmentDetail(id);
             setAssignment(data);
@@ -163,18 +163,18 @@ export default function DeliveryOrderDetail() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id, navigate]);
 
-    const toggleItemVerification = (itemId) => {
+    const toggleItemVerification = useCallback((itemId) => {
         setVerifiedItems(prev => ({
             ...prev,
             [itemId]: !prev[itemId]
         }));
-    };
+    }, []);
 
-    useEffect(() => { loadDetail(); }, [id]);
+    useEffect(() => { loadDetail(); }, [loadDetail]);
 
-    const handleAction = async (label, apiFn, customData = null) => {
+    const handleAction = useCallback(async (label, apiFn, customData = null) => {
         setActionLoading(true);
         try {
             if (customData) {
@@ -193,7 +193,7 @@ export default function DeliveryOrderDetail() {
         } finally {
             setActionLoading(false);
         }
-    };
+    }, [id, loadDetail]);
 
     if (loading) return (
         <div className={`p-20 text-center flex flex-col items-center justify-center min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'}`}>

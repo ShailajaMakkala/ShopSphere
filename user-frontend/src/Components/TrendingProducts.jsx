@@ -16,8 +16,8 @@ function getImageUrl(item) {
         let imgPath = typeof img === "string" ? img : (img.image || img.url);
         if (!imgPath) return "/placeholder.jpg";
         if (imgPath.startsWith("http")) return imgPath;
-        if (imgPath.startsWith("/")) return `http://127.0.0.1:8000${imgPath}`;
-        return `http://127.0.0.1:8000/${imgPath}`;
+        if (imgPath.startsWith("/")) return `http://localhost:8000${imgPath}`;
+        return `http://localhost:8000/${imgPath}`;
     }
     return item.image || "/placeholder.jpg";
 }
@@ -230,6 +230,7 @@ export default function TrendingProducts({
                                         <motion.img
                                             src={getImageUrl(item)}
                                             alt={item.name}
+                                            loading="lazy"
                                             className="max-h-full max-w-full object-contain drop-shadow-xl"
                                             animate={hoveredId === item.id ? { scale: 1.08, rotate: 1 } : { scale: 1, rotate: 0 }}
                                             transition={{ duration: 0.35, ease: "easeOut" }}

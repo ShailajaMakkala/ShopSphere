@@ -290,10 +290,16 @@ class DeliveryAssignmentViewSet(viewsets.ViewSet):
             entered_otp = request.data.get('otp_code', '').strip()
             if not entered_otp:
                 return Response({'error': 'OTP is required to complete delivery. Ask the customer for their OTP.'}, status=status.HTTP_400_BAD_REQUEST)
+            
             if not assignment.otp_code:
-                return Response({'error': 'No OTP has been generated for this delivery. Ensure you marked it as In Transit first.'}, status=status.HTTP_400_BAD_REQUEST)
+                # If OTP hasn't been generated, generate and send it now as a fallback
+                assignment.mark_arrived()
+                return Response({
+                    'error': 'A fresh OTP has just been sent to the customer\'s email. Please ask them for the 6-digit code to complete delivery.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
             if entered_otp != assignment.otp_code:
-                return Response({'error': 'Incorrect OTP. Please ask the customer to check their email or in-app notification.'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': 'Incorrect OTP. Please ask the customer to check their email (including spam) or their account notifications.'}, status=status.HTTP_400_BAD_REQUEST)
 
             # Handle optional proof of delivery
             if 'signature_image' in request.FILES:

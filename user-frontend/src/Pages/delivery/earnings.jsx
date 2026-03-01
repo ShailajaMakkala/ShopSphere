@@ -8,17 +8,24 @@ import { useTheme } from '../../context/ThemeContext';
 export default function EarningsPage() {
     const navigate = useNavigate();
 
-    const [earnings, setEarnings] = useState(null);
-    const [commissions, setCommissions] = useState([]);
+    const [earnings, setEarnings] = useState(() => {
+        const cached = localStorage.getItem('earnings_cache');
+        return cached ? JSON.parse(cached) : null;
+    });
+    const [commissions, setCommissions] = useState(() => {
+        const cached = localStorage.getItem('commissions_cache');
+        return cached ? JSON.parse(cached) : [];
+    });
     const [filter, setFilter] = useState('monthly');
-    const [txLoading, setTxLoading] = useState(true);
+    const [txLoading, setTxLoading] = useState(!commissions.length);
     const [withdrawAmount, setWithdrawAmount] = useState('');
     const { isDarkMode } = useTheme();
 
-    const loadEarnings = useCallback(async () => {
+    const loadEarnings = useCallback(async (silent = false) => {
         try {
             const data = await fetchEarningsSummary(filter);
             setEarnings(data);
+            localStorage.setItem('earnings_cache', JSON.stringify(data));
         } catch (error) {
             console.error("Earnings load failed:", error);
             if (error.response?.status === 403) {
@@ -26,26 +33,28 @@ export default function EarningsPage() {
                 toast.error(reason);
                 localStorage.removeItem("accessToken");
                 navigate('/delivery');
-            } else {
+            } else if (!silent) {
                 toast.error("Failed to load earnings");
             }
         }
     }, [filter, navigate]);
 
-    const loadCommissions = async () => {
+    const loadCommissions = useCallback(async (silent = false) => {
         try {
-            setTxLoading(true);
+            if (!silent && !commissions.length) setTxLoading(true);
             const data = await fetchCommissionList();
-            setCommissions(Array.isArray(data) ? data : []);
+            const list = Array.isArray(data) ? data : [];
+            setCommissions(list);
+            localStorage.setItem('commissions_cache', JSON.stringify(list));
         } catch (error) {
             console.error("Commission list load failed:", error);
         } finally {
             setTxLoading(false);
         }
-    };
+    }, [commissions.length]);
 
-    useEffect(() => { loadEarnings(); }, [loadEarnings]);
-    useEffect(() => { loadCommissions(); }, []);
+    useEffect(() => { loadEarnings(true); }, [loadEarnings]);
+    useEffect(() => { loadCommissions(true); }, [loadCommissions]);
 
     const handleWithdraw = async () => {
         if (!withdrawAmount || isNaN(withdrawAmount)) {
@@ -152,7 +161,7 @@ export default function EarningsPage() {
                                                             </div>
                                                             <div>
                                                                 <p className={`font-bold text-sm tracking-tight  transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-                                                                    {c.delivery_assignment?.order?.order_number || c.notes || `TRX-${c.id}`}
+                                                                    {c.delivery_assignment_details?.order_number || c.notes || `TRX-${c.id}`}
                                                                 </p>
                                                                 <p className={`text-[9px] font-bold uppercase tracking-widest mt-0.5 transition-colors ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
                                                                     {c.created_at ? new Date(c.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '––'}

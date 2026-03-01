@@ -1172,7 +1172,7 @@ class AdminOrderViewSet(viewsets.ReadOnlyModelViewSet):
         return AdminOrderDetailSerializer
 
     def get_queryset(self):
-        queryset = super().get_queryset().exclude(status__in=['pending', 'confirmed'])
+        queryset = super().get_queryset().exclude(status='pending')
         status_param = self.request.query_params.get('status')
         if status_param:
             queryset = queryset.filter(status=status_param)

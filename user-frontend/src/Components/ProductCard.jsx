@@ -22,16 +22,7 @@ export default function ProductCard({
     });
 
     // Fallback image
-    const displayImage = gallery.length > 0 ? gallery[currentImgIndex] : (item.image || "/public/placeholder.jpg");
-
-    useEffect(() => {
-        if (gallery.length > 1) {
-            const interval = setInterval(() => {
-                setCurrentImgIndex((prev) => (prev + 1) % gallery.length);
-            }, 3000);
-            return () => clearInterval(interval);
-        }
-    }, [gallery.length]);
+    const displayImage = gallery.length > 0 ? gallery[0] : (item.image || "/public/placeholder.jpg");
 
     return (
         <motion.div
@@ -40,17 +31,14 @@ export default function ProductCard({
             onClick={() => navigate(`/product/${item.id}`)}
         >
             <div className="relative h-40 sm:h-48 md:h-56 overflow-hidden rounded-t-2xl sm:rounded-t-3xl bg-gray-50 flex items-center justify-center p-3">
-                <AnimatePresence mode="wait">
-                    <motion.img
-                        key={displayImage}
-                        src={displayImage}
-                        className="max-w-full max-h-full object-contain transition-all duration-700 group-hover:scale-110"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.5 }}
-                    />
-                </AnimatePresence>
+                <motion.img
+                    src={displayImage}
+                    loading="lazy"
+                    className="max-w-full max-h-full object-contain transition-all duration-700 group-hover:scale-110"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                />
 
                 <button
                     onClick={(e) => {

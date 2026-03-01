@@ -98,7 +98,7 @@ def auto_assign_order(order):
         if pincode_match or region_match or city_match:
             active_count = DeliveryAssignment.objects.filter(
                 agent=agent,
-                status__in=['assigned', 'accepted', 'picked_up', 'in_transit']
+                status__in=['assigned', 'accepted', 'picked_up', 'in_transit', 'arrived', 'attempting_delivery']
             ).count()
             
             # Status Weight: available(0), on_delivery(1), on_break(2), offline(3)
@@ -132,7 +132,7 @@ def auto_assign_order(order):
              # Just use workload and status for global fallback
              active_count = DeliveryAssignment.objects.filter(
                  agent=agent,
-                 status__in=['assigned', 'accepted', 'picked_up', 'in_transit']
+                 status__in=['assigned', 'accepted', 'picked_up', 'in_transit', 'arrived', 'attempting_delivery']
              ).count()
              status_map = {'available': 0, 'on_delivery': 1, 'on_break': 2, 'offline': 3}
              status_weight = status_map.get(agent.availability_status, 4)
@@ -185,6 +185,10 @@ def auto_assign_order(order):
         customer_contact=delivery_address.phone or '',
     )
 
+    # Link the agent to the order for reverse lookup/admin visibility
+    order.delivery_agent = best_agent
+    order.save(update_fields=['delivery_agent'])
+
     # First tracking record
     DeliveryTracking.objects.create(
         delivery_assignment=assignment,
@@ -206,6 +210,33 @@ def auto_assign_order(order):
         order.status = 'confirmed'
         order.save(update_fields=['status'])
     # 'confirmed' status: leave unchanged — vendor still needs to ship
+
+    # Send notification to Agent (non-fatal)
+    try:
+        from django.core.mail import send_mail
+        from django.conf import settings
+        
+        subject = f"New Delivery Assignment: {order.order_number}"
+        message = (
+            f"Hello {best_agent.user.username},\n\n"
+            f"You have been automatically assigned a new delivery task!\n\n"
+            f"Order: {order.order_number}\n"
+            f"Pickup From: {pickup_address}\n"
+            f"Deliver To: {delivery_addr_text}\n"
+            f"Estimated Date: {estimated_date}\n"
+            f"Your Delivery Fee: ₹{delivery_fee}\n\n"
+            "Please log in to your dashboard to accept the order and begin the process.\n\n"
+            "Regards,\nShopSphere Logistics"
+        )
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[best_agent.user.email],
+            fail_silently=True
+        )
+    except Exception as e:
+        print(f"Agent Notification Failed: {e}")
 
     return assignment
 
@@ -260,7 +291,7 @@ def auto_assign_return(order, return_requests=None):
     if not tier_candidates:
         # Global fallback
         for agent in candidates:
-             active_count = DeliveryAssignment.objects.filter(agent=agent, status__in=['assigned', 'accepted', 'picked_up']).count()
+             active_count = DeliveryAssignment.objects.filter(agent=agent, status__in=['assigned', 'accepted', 'picked_up', 'in_transit', 'arrived', 'attempting_delivery']).count()
              tier_candidates.append((agent, 0, 999999, active_count))
 
     if not tier_candidates:
@@ -326,7 +357,7 @@ def get_unassigned_confirmed_orders():
     assigned_order_ids = DeliveryAssignment.objects.values_list('order_id', flat=True)
     return Order.objects.filter(
         Q(payment_status='completed') | Q(payment_method='cod'),
-        status='shipping'
+        status__in=['confirmed', 'shipping']
     ).exclude(
         id__in=assigned_order_ids
     ).select_related('delivery_address').order_by('-created_at')

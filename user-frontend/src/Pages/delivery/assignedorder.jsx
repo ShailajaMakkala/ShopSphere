@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     FaStore,
@@ -42,7 +42,7 @@ const STEPS = [
 
 const STATUS_INDEX = Object.fromEntries(STEPS.map((s, i) => [s.key, i]));
 
-function StatusStepper({ currentStatus, isDarkMode }) {
+const StatusStepper = memo(function StatusStepper({ currentStatus, isDarkMode }) {
     const currentIdx = STATUS_INDEX[currentStatus] ?? 0;
     const isFailed = currentStatus === 'failed';
 
@@ -73,10 +73,10 @@ function StatusStepper({ currentStatus, isDarkMode }) {
             )}
         </div>
     );
-}
+});
 
 // ─── Return Verification Panel ──────────────────────────────────────────────
-function ReturnVerificationPanel({ orderId, loading, onVerify, isDarkMode }) {
+const ReturnVerificationPanel = memo(function ReturnVerificationPanel({ orderId, loading, onVerify, isDarkMode }) {
     const [notes, setNotes] = useState('');
     const [image, setImage] = useState(null);
 
@@ -139,10 +139,10 @@ function ReturnVerificationPanel({ orderId, loading, onVerify, isDarkMode }) {
             </div>
         </div>
     );
-}
+});
 
 // ─── OTP Input panel ───────────────────────────────────────────────────────────
-function OtpDeliveryPanel({ orderId, loading, onConfirm, isDarkMode }) {
+const OtpDeliveryPanel = memo(function OtpDeliveryPanel({ orderId, loading, onConfirm, isDarkMode }) {
     const [digits, setDigits] = useState(['', '', '', '', '', '']);
 
     const handleDigit = (idx, val) => {
@@ -221,39 +221,46 @@ function OtpDeliveryPanel({ orderId, loading, onConfirm, isDarkMode }) {
             </div>
         </div>
     );
-}
+});
 
 export default function AssignedOrders() {
     const navigate = useNavigate();
-    const [activeDeliveries, setActiveDeliveries] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [activeDeliveries, setActiveDeliveries] = useState(() => {
+        const cached = localStorage.getItem('delivery_active_cache');
+        return cached ? JSON.parse(cached) : [];
+    });
+    const [loading, setLoading] = useState(!activeDeliveries.length);
     const [actionLoading, setActionLoading] = useState({});
     const { isDarkMode } = useTheme();
 
-    const loadDeliveries = async () => {
+    const loadDeliveries = useCallback(async (silent = false) => {
         try {
-            setLoading(true);
+            if (!silent) setLoading(true);
             const data = await fetchAssignedOrders();
             const working = data.filter(a =>
                 ['assigned', 'accepted', 'picked_up', 'in_transit', 'arrived'].includes(a.status)
             );
             setActiveDeliveries(working);
+            localStorage.setItem('delivery_active_cache', JSON.stringify(working));
         } catch (error) {
             if (error.response?.status === 403) {
                 toast.error('Account restricted.');
                 localStorage.removeItem('accessToken');
                 navigate('/delivery');
-            } else {
+            } else if (!silent) {
                 toast.error('Failed to load orders');
             }
         } finally {
             setLoading(false);
         }
-    };
+    }, [navigate]); // Remove activeDeliveries.length dependency
 
-    useEffect(() => { loadDeliveries(); }, []);
+    useEffect(() => {
+        loadDeliveries(!!activeDeliveries.length);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-    const runAction = async (id, label, apiFn, ...args) => {
+    const runAction = useCallback(async (id, label, apiFn, ...args) => {
         setActionLoading(prev => ({ ...prev, [id]: true }));
         try {
             await apiFn(id, ...args);
@@ -262,40 +269,40 @@ export default function AssignedOrders() {
             } else {
                 toast.success(`${label} Success!`);
             }
-            loadDeliveries();
+            loadDeliveries(true); // Silent reload
         } catch (error) {
             toast.error(error.response?.data?.error || `Failed: ${label}`);
         } finally {
             setActionLoading(prev => ({ ...prev, [id]: false }));
         }
-    };
+    }, [loadDeliveries]);
 
-    const handleOtpDelivery = async (id, otp) => {
+    const handleOtpDelivery = useCallback(async (id, otp) => {
         setActionLoading(prev => ({ ...prev, [id]: true }));
         try {
             await completeDelivery(id, { otp_code: otp });
             toast.success('🎉 Delivery completed successfully!');
-            loadDeliveries();
+            loadDeliveries(true);
         } catch (error) {
             const msg = error.response?.data?.error || 'Failed to verify OTP';
             toast.error(msg);
         } finally {
             setActionLoading(prev => ({ ...prev, [id]: false }));
         }
-    };
+    }, [loadDeliveries]);
 
-    const handleReturnVerification = async (id, data) => {
+    const handleReturnVerification = useCallback(async (id, data) => {
         setActionLoading(prev => ({ ...prev, [id]: true }));
         try {
             await verifyReturn(id, data);
             toast.success('🎉 Return verified and refund initiated!');
-            loadDeliveries();
+            loadDeliveries(true);
         } catch (error) {
             toast.error(error.response?.data?.error || 'Failed to verify return');
         } finally {
             setActionLoading(prev => ({ ...prev, [id]: false }));
         }
-    };
+    }, [loadDeliveries]);
 
     if (loading) {
         return (
